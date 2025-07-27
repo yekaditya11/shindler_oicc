@@ -7,9 +7,9 @@ import axios from 'axios';
 import requestOptimizer from '../utils/requestOptimizer';
 import insightsCache from './insightsCache';
 
-const API_BASE_URL ='http://13.50.248.45:8001';
+//const API_BASE_URL ='http://13.50.248.45:8001';
 
-//const API_BASE_URL ='http://localhost:8001';
+const API_BASE_URL ='http://localhost:8001';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
