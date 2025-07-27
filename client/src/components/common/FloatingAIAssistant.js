@@ -36,22 +36,22 @@ const FloatingAIAssistant = ({
       <img
         src="/ai-insights-icon.gif"
         alt="AI Insights Assistant"
+        className="ai-insights-icon-enhanced"
         style={{
-          width: isMobile ? 60 : 72,
-          height: isMobile ? 60 : 72,
+          width: isMobile ? 70 : 80, // Decreased size slightly
+          height: isMobile ? 70 : 80,
           borderRadius: '50%',
           cursor: 'pointer',
           border: 'none !important',
           outline: 'none !important',
           boxSizing: 'border-box',
           objectFit: 'cover',
+          objectPosition: 'center center',
+          transform: 'scale(1.3)', // Scale up to crop white space
           WebkitTapHighlightColor: 'transparent',
           userSelect: 'none',
-          backgroundColor: 'white',
-          boxShadow: 'none !important',
-          padding: '0',
-          margin: '0',
-          display: 'block',
+          backgroundColor: 'transparent', // Remove white background
+          imageRendering: 'crisp-edges',
         }}
       />
     </div>

@@ -292,5 +292,27 @@ img[alt*="AI Insights Assistant"] {
   box-shadow: none !important;
   padding: 0 !important;
   margin: 0 !important;
-  background-color: white !important;
+  background-color: transparent !important;
+  mix-blend-mode: multiply; /* Helps blend away white background */
+  filter: brightness(1.1) contrast(1.1); /* Enhance the icon appearance */
+}
+
+/* Enhanced AI Insights Icon styles for better white background removal */
+.ai-insights-icon-enhanced {
+  /* Remove any white background from the GIF */
+  background: transparent !important;
+  /* Improve icon visibility and contrast */
+  filter: brightness(1.05) contrast(1.15) saturate(1.1) !important;
+  /* Better blending to remove white areas */
+  mix-blend-mode: multiply !important;
+  /* Ensure smooth rendering */
+  image-rendering: -webkit-optimize-contrast !important;
+  image-rendering: crisp-edges !important;
+  /* Animation for hover effect */
+  transition: transform 0.2s ease, filter 0.2s ease !important;
+}
+
+.ai-insights-icon-enhanced:hover {
+  transform: scale(1.35) !important;
+  filter: brightness(1.1) contrast(1.2) saturate(1.15) !important;
 }
