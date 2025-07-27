@@ -1,0 +1,64 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# Environment variables
+.env
+.env.*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Editor settings
+.vscode/
+.idea/
+
+# Log files
+*.log
+
+# Unit test / coverage
+.coverage
+htmlcov/
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.cache
+pytest_cache/
+
+# Mypy / Pylint
+.mypy_cache/
+.pylint.d/
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Jupyter (if used for data inspection)
+.ipynb_checkpoints/
+
+# Docker (if used)
+*.pid
+*.pid.lock
+
+# Database files (if using SQLite or other local)
+*.sqlite3
+*.db
+
+# FastAPI static & temp files (if you generate static/media)
+staticfiles/
+media/
+tmp/
+
+# Local dev tools (like debug toolbar, uvicorn reload cache)
+__pycache__/
+.uvicorn_reload/

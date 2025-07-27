@@ -1,0 +1,44 @@
+{
+  "name": "Test Dashboard",
+  "charts": [
+    {
+      "chart_data": {
+        "type": "echarts",
+        "title": {
+          "text": "Test Chart"
+        },
+        "xAxis": {
+          "type": "category",
+          "data": [
+            "Mon",
+            "Tue",
+            "Wed",
+            "Thu",
+            "Fri"
+          ]
+        },
+        "yAxis": {
+          "type": "value"
+        },
+        "series": [
+          {
+            "data": [
+              120,
+              200,
+              150,
+              80,
+              70
+            ],
+            "type": "bar"
+          }
+        ]
+      },
+      "title": "Test Chart",
+      "source": "test",
+      "user_id": "anonymous"
+    }
+  ],
+  "user_id": "anonymous",
+  "created_at": "2025-07-27T11:02:14.021763",
+  "updated_at": "2025-07-27T11:02:14.021763"
+}

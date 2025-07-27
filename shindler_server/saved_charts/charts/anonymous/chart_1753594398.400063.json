@@ -1,0 +1,65 @@
+{
+  "title": "AI Generated Chart",
+  "chartData": {
+    "tooltip": {
+      "trigger": "axis",
+      "axisPointer": {
+        "type": "shadow"
+      }
+    },
+    "legend": {
+      "data": [
+        "Total Events",
+        "Work Stopped Count",
+        "Sanctions Required"
+      ]
+    },
+    "xAxis": {
+      "type": "category",
+      "data": [
+        "Near Miss",
+        "Unsafe Condition",
+        "Unsafe Act"
+      ],
+      "name": "Unsafe Event Type"
+    },
+    "yAxis": {
+      "type": "value",
+      "name": "Count"
+    },
+    "series": [
+      {
+        "name": "Total Events",
+        "type": "bar",
+        "data": [
+          383,
+          8365,
+          413
+        ]
+      },
+      {
+        "name": "Work Stopped Count",
+        "type": "bar",
+        "data": [
+          24,
+          655,
+          40
+        ]
+      },
+      {
+        "name": "Sanctions Required",
+        "type": "bar",
+        "data": [
+          3,
+          53,
+          1
+        ]
+      }
+    ],
+    "type": "echarts"
+  },
+  "source": "chat",
+  "timestamp": "2025-07-27T11:03:18.400063",
+  "user_id": "anonymous",
+  "created_at": "2025-07-27T11:03:18.400063"
+}

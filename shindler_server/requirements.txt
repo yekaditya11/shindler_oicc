@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+pandas
+openpyxl
+psycopg2-binary
+sqlalchemy
+python-dotenv
+pydantic
+pydantic-settings
+boto3
+botocore
+openai
+PyJWT
+langgraph
+langgraph-checkpoint-postgres
+langchain-openai
+python-multipart

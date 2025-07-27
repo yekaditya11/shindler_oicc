@@ -1,0 +1,23 @@
+{
+  "charts": [
+    {
+      "id": "chart_1753594329.956441",
+      "title": "Test Chart",
+      "created_at": "2025-07-27T11:02:09.956441",
+      "source": "test"
+    },
+    {
+      "id": "chart_1753594398.400063",
+      "title": "AI Generated Chart",
+      "created_at": "2025-07-27T11:03:18.400063",
+      "source": "chat"
+    },
+    {
+      "id": "chart_1753595423.609563",
+      "title": "Monthly Trends of Unsafe Events",
+      "created_at": "2025-07-27T11:20:23.609563",
+      "source": "chat"
+    }
+  ],
+  "last_updated": "2025-07-27T11:20:23.616719"
+}

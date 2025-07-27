@@ -1,0 +1,1323 @@
+{
+  "unsafe_events_ei_tech": {
+    "event_id": {
+      "data_type": "integer",
+      "min": "8513",
+      "max": "17669"
+    },
+    "reporter_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Mugeshbabu Murugan",
+        "Kamlesh Prasad",
+        "Sukhpreet Singh",
+        "Pinninti Gopi",
+        "Thamizharasan Kesavan"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 1296 unique values"
+    },
+    "manager_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Vineet Srivastava",
+        "Kishor Tupe",
+        "Hemant Mhatre",
+        "Karthikeyan Rajendran",
+        "Rahul Kumar"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 286 unique values"
+    },
+    "branch": {
+      "data_type": "character varying",
+      "unique_values": [
+        "North Delhi",
+        "Thane & KDMC",
+        "Mumbai 1",
+        "Goa",
+        "Bangalore 1"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 27 unique values"
+    },
+    "reported_date": {
+      "data_type": "date",
+      "min": "2025-01-01",
+      "max": "2025-06-17"
+    },
+    "reporter_id": {
+      "data_type": "character varying",
+      "unique_values": [
+        "719029.0",
+        "708707.0",
+        "20130106.0",
+        "20064940.0",
+        "20083034.0"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 1317 unique values"
+    },
+    "date_of_unsafe_event": {
+      "data_type": "date",
+      "min": "2023-05-07",
+      "max": "2025-06-17"
+    },
+    "time": {
+      "data_type": "character varying",
+      "unique_values": [
+        "12:00AM"
+      ],
+      "unique_count": 1
+    },
+    "time_of_unsafe_event": {
+      "data_type": "character varying",
+      "unique_values": [
+        "10:30",
+        "10:00",
+        "11:00",
+        "11:30",
+        "17:20"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 956 unique values"
+    },
+    "unsafe_event_type": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Unsafe Condition",
+        "Unsafe Act",
+        "Near Miss"
+      ],
+      "unique_count": 3
+    },
+    "business_details": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Service Maintenance",
+        "Repair",
+        "New installation",
+        "Modernisation",
+        "Factory"
+      ],
+      "unique_count": 5
+    },
+    "site_reference": {
+      "data_type": "text",
+      "unique_values": [
+        "Hari Hara",
+        "Iris villa",
+        "Sarathcity Capital Mall",
+        "Forgot",
+        "One west"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 6313 unique values"
+    },
+    "unsafe_event_location": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Other",
+        "Hoistway",
+        "Pit",
+        "Landing",
+        "Machine Room"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 11 unique values"
+    },
+    "product_type": {
+      "data_type": "character varying",
+      "unique_values": [
+        "S3 series",
+        "Other product",
+        "S5 series",
+        "Old Sch products Traction",
+        "Old Sch product MRL"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 12 unique values"
+    },
+    "employee_id": {
+      "data_type": "character varying",
+      "unique_values": [
+        "719029",
+        "708707",
+        "20130106",
+        "20064940",
+        "20083034"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 1298 unique values"
+    },
+    "employee_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Mugeshbabu Murugan",
+        "Kamlesh Prasad",
+        "Sukhpreet Singh",
+        "Pinninti Gopi",
+        "Thamizharasan Kesavan"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 1281 unique values"
+    },
+    "subcontractor_company_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "IPS",
+        "Don\u2019t know",
+        "Ips",
+        "Shree jagdamba enterprises",
+        "N J ARUN CONTRACTOR"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 36 unique values"
+    },
+    "subcontractor_id": {
+      "data_type": "character varying",
+      "unique_values": [
+        "20119370",
+        "Don\u2019t know",
+        "1271513",
+        "110691",
+        "1319707"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 33 unique values"
+    },
+    "subcontractor_city": {
+      "data_type": "character varying",
+      "note": "No non-null values found"
+    },
+    "subcontractor_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "NA                                                                                                                                                                                                      *NA",
+        "Mallesh D S                                                                                                                                                                                             *110595",
+        "Don\u2019t know                                                                                                                                                                                              *Don\u2019t know",
+        "Sachin pawar                                                                                                                                                                                            *110235",
+        "Satish Jadhav                                                                                                                                                                                           *110691"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 50 unique values"
+    },
+    "kg_name": {
+      "data_type": "character varying",
+      "note": "No non-null values found"
+    },
+    "country_name": {
+      "data_type": "character varying",
+      "note": "No non-null values found"
+    },
+    "division": {
+      "data_type": "character varying",
+      "note": "No non-null values found"
+    },
+    "department": {
+      "data_type": "character varying",
+      "note": "No non-null values found"
+    },
+    "city": {
+      "data_type": "character varying",
+      "note": "No non-null values found"
+    },
+    "sub_area": {
+      "data_type": "character varying",
+      "note": "No non-null values found"
+    },
+    "district": {
+      "data_type": "character varying",
+      "note": "No non-null values found"
+    },
+    "zone": {
+      "data_type": "character varying",
+      "note": "No non-null values found"
+    },
+    "serious_near_miss": {
+      "data_type": "character varying",
+      "note": "No non-null values found"
+    },
+    "unsafe_act": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Unsafe Condition",
+        "Unsafe Act",
+        "Near Miss"
+      ],
+      "unique_count": 3
+    },
+    "unsafe_act_other": {
+      "data_type": "text",
+      "note": "No non-null values found"
+    },
+    "unsafe_condition": {
+      "data_type": "text",
+      "unique_values": [
+        "Other",
+        "Electrical hazards",
+        "Poor lighting",
+        "Falling objects hazard",
+        "Tripping hazard"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 23 unique values"
+    },
+    "unsafe_condition_other": {
+      "data_type": "text",
+      "note": "No non-null values found"
+    },
+    "work_stopped": {
+      "data_type": "character varying",
+      "unique_values": [
+        "NO",
+        "YES"
+      ],
+      "unique_count": 2
+    },
+    "stop_work_nogo_violation": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Safe Hoistway Access",
+        "Fall Protection",
+        "Log Out / Tag Out",
+        "Hoisting / Rigging"
+      ],
+      "unique_count": 4
+    },
+    "nogo_violation_detail": {
+      "data_type": "text",
+      "unique_values": [
+        "No",
+        "Yes",
+        "NO",
+        "Water in pit",
+        "Na"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 220 unique values"
+    },
+    "stop_work_duration": {
+      "data_type": "character varying",
+      "unique_values": [
+        "One Day or Less",
+        "More than one day"
+      ],
+      "unique_count": 2
+    },
+    "other_safety_issues": {
+      "data_type": "text",
+      "unique_values": [
+        "No",
+        "Water in pit",
+        "Pit light not working",
+        "Water seepage in pit",
+        "Inform to railway"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 526 unique values"
+    },
+    "comments_remarks": {
+      "data_type": "text",
+      "unique_values": [
+        "No",
+        "Yes",
+        "NO",
+        "Water in pit",
+        "Na"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 220 unique values"
+    },
+    "event_requires_sanction": {
+      "data_type": "character varying",
+      "unique_values": [
+        "NO",
+        "YES"
+      ],
+      "unique_count": 2
+    },
+    "action_description_1": {
+      "data_type": "text",
+      "unique_values": [
+        "Pit light not working",
+        "Shaft light not working",
+        "Water in pit",
+        "In ground floor landing door near by customer electric wiring cable",
+        "Poor lighting"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 7252 unique values"
+    },
+    "action_description_2": {
+      "data_type": "text",
+      "note": "No non-null values found"
+    },
+    "action_description_3": {
+      "data_type": "text",
+      "note": "No non-null values found"
+    },
+    "action_description_4": {
+      "data_type": "text",
+      "note": "No non-null values found"
+    },
+    "action_description_5": {
+      "data_type": "text",
+      "note": "No non-null values found"
+    },
+    "image": {
+      "data_type": "character varying",
+      "unique_values": [
+        "0",
+        "heic.jpg",
+        "1000532129.jpg",
+        "png.jpg",
+        "1000250645.jpg"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 7044 unique values"
+    },
+    "status": {
+      "data_type": "character varying",
+      "unique_values": [
+        "0",
+        "SAP",
+        "IGNORED"
+      ],
+      "unique_count": 3
+    },
+    "region": {
+      "data_type": "character varying",
+      "unique_values": [
+        "WR 2",
+        "WR 1",
+        "SR 1",
+        "NR 1",
+        "SR 2"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 6 unique values"
+    },
+    "db_uploaded_date": {
+      "data_type": "timestamp without time zone",
+      "min": "2025-07-21 07:06:15.989363",
+      "max": "2025-07-21 07:06:44.079790"
+    },
+    "id": {
+      "data_type": "integer",
+      "min": "1",
+      "max": "9161"
+    },
+    "created_at": {
+      "data_type": "timestamp with time zone",
+      "min": "2025-07-21 07:06:15.989363+00:00",
+      "max": "2025-07-21 07:06:44.079790+00:00"
+    },
+    "updated_at": {
+      "data_type": "timestamp with time zone",
+      "note": "No non-null values found"
+    }
+  },
+  "unsafe_events_ni_tct": {
+    "reporting_id": {
+      "data_type": "integer",
+      "min": "9057",
+      "max": "12402171"
+    },
+    "status_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Pending",
+        "SAP"
+      ],
+      "unique_count": 2
+    },
+    "status": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Pending",
+        "Approved"
+      ],
+      "unique_count": 2
+    },
+    "location_key": {
+      "data_type": "integer",
+      "min": "5001",
+      "max": "5065"
+    },
+    "location": {
+      "data_type": "character varying",
+      "unique_values": [
+        "5010 - Surat",
+        "5048 - Bangalore 2",
+        "5002 - Thane & KDMC",
+        "5041 - Bangalore 1",
+        "5001 - Mumbai 1"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 39 unique values"
+    },
+    "branch_key": {
+      "data_type": "integer",
+      "min": "5001",
+      "max": "5065"
+    },
+    "no": {
+      "data_type": "integer",
+      "min": "-5065",
+      "max": "-5001"
+    },
+    "branch_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Surat",
+        "Bangalore 2",
+        "Bangalore 1",
+        "Thane & KDMC",
+        "Ahmedabad & MP"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 27 unique values"
+    },
+    "region_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "West 2",
+        "South 1",
+        "West 1",
+        "South 2",
+        "North 1"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 6 unique values"
+    },
+    "region": {
+      "data_type": "character varying",
+      "unique_values": [
+        "WR 2",
+        "SR 1",
+        "WR 1",
+        "SR 2",
+        "NR 1"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 6 unique values"
+    },
+    "reporter_sap_id": {
+      "data_type": "character varying",
+      "unique_values": [
+        "20002284",
+        "20096994",
+        "20002673",
+        "20114422",
+        "20003165"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 917 unique values"
+    },
+    "reporter_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "MILANKUMAR DALPATBHAI VASAVA",
+        "Karan Pandey",
+        "Manuji Thakor",
+        "Dheeraj Kumar",
+        "Akshay Jagtap"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 911 unique values"
+    },
+    "designation_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "FT",
+        "PE",
+        "FTC",
+        "SCF",
+        "IPS"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 6 unique values"
+    },
+    "designation": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Fitter",
+        "Project Engineer",
+        "FTC",
+        "Subcontractor Fitter",
+        "IPS"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 6 unique values"
+    },
+    "gl_id_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "5422.0",
+        "5486.0",
+        "4005.0",
+        "5840.0",
+        "680.0"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 124 unique values"
+    },
+    "gl_id": {
+      "data_type": "character varying",
+      "unique_values": [
+        "manjunatha  annajigowda",
+        "Rajesh Kumar",
+        "Sudarshan Ambadipudi",
+        "Shaival Gajjar",
+        "J. Manickavasagam"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 110 unique values"
+    },
+    "pe_id_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "20001907",
+        "17880",
+        "4098",
+        "17245",
+        "5438"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 77 unique values"
+    },
+    "pe_id": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Manoj Magar",
+        "Nagaraju Madaiah",
+        "Shravan Yadav",
+        "Yogesh Kumar",
+        "Davidson Navroj"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 68 unique values"
+    },
+    "created_on": {
+      "data_type": "timestamp without time zone",
+      "min": "2025-01-24 17:19:45.733000",
+      "max": "2025-06-17 16:41:13.826000"
+    },
+    "date_and_time_of_unsafe_event": {
+      "data_type": "timestamp without time zone",
+      "min": "2024-11-08 15:58:00",
+      "max": "2025-12-12 09:00:00"
+    },
+    "type_of_unsafe_event_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "ET03",
+        "ET02",
+        "ET01"
+      ],
+      "unique_count": 3
+    },
+    "type_of_unsafe_event": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Unsafe Condition",
+        "Unsafe Act",
+        "Near Miss"
+      ],
+      "unique_count": 3
+    },
+    "unsafe_event_details_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "UE25",
+        "UE22",
+        "UE24",
+        "UE18",
+        "UE19"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 22 unique values"
+    },
+    "unsafe_event_details": {
+      "data_type": "text",
+      "unique_values": [
+        "Other Unsafe Condition",
+        "Housekeeping Issues",
+        "Electrical Hazards",
+        "Tripping Hazard",
+        "Falling Objects Hazard"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 22 unique values"
+    },
+    "action_related_to_high_risk_situation_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "YES",
+        "NO"
+      ],
+      "unique_count": 2
+    },
+    "action_related_to_high_risk_situation": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Yes",
+        "No"
+      ],
+      "unique_count": 2
+    },
+    "business_details_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "NI",
+        "MOD"
+      ],
+      "unique_count": 2
+    },
+    "business_details": {
+      "data_type": "character varying",
+      "unique_values": [
+        "New Installation",
+        "Modernisation"
+      ],
+      "unique_count": 2
+    },
+    "site_name": {
+      "data_type": "text",
+      "unique_values": [
+        "Stalwart insignia",
+        "Avadh ercole",
+        "Woj",
+        "Avadh Ercole",
+        "L&T Kharkopar"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 2255 unique values"
+    },
+    "site_reference_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "LC11",
+        "LC02",
+        "LC04",
+        "LC01",
+        "LC07"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 11 unique values"
+    },
+    "site_reference": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Other",
+        "Landing",
+        "Pit",
+        "Hoistway",
+        "Warehouse / Logistic Area"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 11 unique values"
+    },
+    "product_type_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "ES1",
+        "3300",
+        "ES5",
+        "5500",
+        "5500AP"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 9 unique values"
+    },
+    "product_type": {
+      "data_type": "character varying",
+      "unique_values": [
+        "ES1",
+        "3300",
+        "ES 5.0",
+        "5500",
+        "5500AP"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 9 unique values"
+    },
+    "persons_involved": {
+      "data_type": "text",
+      "unique_values": [
+        "No",
+        "Nitin Patil",
+        "Ashish choudhary",
+        "Antisebastian",
+        "2"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 1954 unique values"
+    },
+    "work_was_stopped_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "NO",
+        "YES"
+      ],
+      "unique_count": 2
+    },
+    "work_was_stopped": {
+      "data_type": "character varying",
+      "unique_values": [
+        "No",
+        "Yes"
+      ],
+      "unique_count": 2
+    },
+    "work_stopped_hours": {
+      "data_type": "character varying",
+      "unique_values": [
+        "0.0",
+        "1.0",
+        "2.0",
+        "4.0",
+        "3.0"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 26 unique values"
+    },
+    "no_go_violation_key": {
+      "data_type": "character varying",
+      "unique_values": [
+        "NG2",
+        "NG1",
+        "NG4",
+        "NG3",
+        "NG6"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 6 unique values"
+    },
+    "no_go_violation": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Safe Hoistway Access",
+        "Fall Protection",
+        "Hoisting / Rigging",
+        "Log Out / Tag Out",
+        "Subcon\u2019s Certification"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 6 unique values"
+    },
+    "job_no": {
+      "data_type": "character varying",
+      "unique_values": [
+        "11784677.0",
+        "19156372.0",
+        "11819388.0",
+        "20100140.0",
+        "11832750.0"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 1675 unique values"
+    },
+    "additional_comments": {
+      "data_type": "text",
+      "unique_values": [
+        "Inform to customer",
+        "No",
+        "Informed to customer",
+        "Falling hazard",
+        "Water in pit"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 3357 unique values"
+    },
+    "has_attachment": {
+      "data_type": "boolean",
+      "note": "No non-null values found"
+    },
+    "attachment": {
+      "data_type": "character varying",
+      "note": "No non-null values found"
+    },
+    "db_uploaded_date": {
+      "data_type": "timestamp without time zone",
+      "min": "2025-07-17 12:38:40.759855",
+      "max": "2025-07-17 12:38:50.006059"
+    },
+    "id": {
+      "data_type": "integer",
+      "min": "1",
+      "max": "4804"
+    },
+    "created_at": {
+      "data_type": "timestamp with time zone",
+      "min": "2025-07-17 12:38:40.759855+00:00",
+      "max": "2025-07-17 12:38:50.006059+00:00"
+    },
+    "updated_at": {
+      "data_type": "timestamp with time zone",
+      "note": "No non-null values found"
+    }
+  },
+  "unsafe_events_srs": {
+    "event_id": {
+      "data_type": "character varying",
+      "unique_values": [
+        "UE2025IND333338",
+        "UE2025IND333346",
+        "UE2025IND333347",
+        "UE2025IND333352",
+        "UE2025IND333400"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 8183 unique values"
+    },
+    "reporter_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "JoyalFrank",
+        "Johndevanand",
+        "BiditMondal",
+        "AnkitKumar",
+        "JeevanandhamMohan"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 879 unique values"
+    },
+    "reported_date": {
+      "data_type": "date",
+      "min": "2025-01-06",
+      "max": "2025-06-23"
+    },
+    "reporter_id": {
+      "data_type": "character varying",
+      "unique_values": [
+        "20130924",
+        "714721",
+        "703525",
+        "704295",
+        "20095739"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 900 unique values"
+    },
+    "date_of_unsafe_event": {
+      "data_type": "date",
+      "min": "2025-01-01",
+      "max": "2025-06-21"
+    },
+    "time_of_unsafe_event": {
+      "data_type": "character varying",
+      "unique_values": [
+        "10:00:00",
+        "11:00:00",
+        "15:00:00",
+        "12:00:00",
+        "13:00:00"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 4579 unique values"
+    },
+    "unsafe_event_type": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Unsafe Condition",
+        "Unsafe Act",
+        "Near Miss",
+        "Unsafe Act,Unsafe Condition",
+        "Unsafe Condition,Unsafe Act"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 10 unique values"
+    },
+    "business_details": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Service maintenance",
+        "New installation",
+        "Repair",
+        "Other",
+        "Modernisation"
+      ],
+      "unique_count": 5
+    },
+    "site_reference": {
+      "data_type": "text",
+      "unique_values": [
+        "NMIAL",
+        "SP Joyville",
+        "IKEA",
+        "Embassy",
+        "Sarai Kale Khan Station (NCRTC)"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 5926 unique values"
+    },
+    "unsafe_event_location": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Hoistway",
+        "Landing",
+        "Others",
+        "Pit",
+        "Car top"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 10 unique values"
+    },
+    "product_type": {
+      "data_type": "character varying",
+      "unique_values": [
+        "S3 Series",
+        "S5 Series",
+        "Other product",
+        "S97 Series (ESC)",
+        "S7 Series"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 12 unique values"
+    },
+    "employee_id": {
+      "data_type": "character varying",
+      "unique_values": [
+        "708707.0",
+        "709220.0",
+        "20100881.0",
+        "719975.0",
+        "709263.0"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 2460 unique values"
+    },
+    "employee_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Kamlesh Prasad",
+        "Md. Anbar Hossain",
+        "Awanish Mishra",
+        "Ansar Maniyar",
+        "Ashokkumar Gupta"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 2318 unique values"
+    },
+    "subcontractor_company_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Integrated Personnel Services Ltd",
+        "Shree Enterprises",
+        "RAJESH KUMAR RAM KISHOR MOURYA",
+        "P Selvam",
+        "Shree Siddhivinayak Enterprises"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 204 unique values"
+    },
+    "subcontractor_id": {
+      "data_type": "character varying",
+      "unique_values": [
+        "1280053.0",
+        "1317781.0",
+        "1241566.0",
+        "1170359.0",
+        "1198750.0"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 203 unique values"
+    },
+    "subcontractor_city": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Delhi 1",
+        "Mumbai",
+        "Infra TRD",
+        "Jaipur",
+        "Delhi 2"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 49 unique values"
+    },
+    "subcontractor_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Mohd Touseef",
+        "Girish G",
+        "Naresh KUMAR",
+        "Manoj Kumar",
+        "Pavan Kumar"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 556 unique values"
+    },
+    "kg_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "IND"
+      ],
+      "unique_count": 1
+    },
+    "country_name": {
+      "data_type": "character varying",
+      "unique_values": [
+        "India"
+      ],
+      "unique_count": 1
+    },
+    "division": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Schindler India PVT Ltd. (5000)",
+        "India Elevator factory (8200)"
+      ],
+      "unique_count": 2
+    },
+    "department": {
+      "data_type": "character varying",
+      "unique_values": [
+        "AM-EI-BANG (80563951)",
+        "AM-EI-DELHI1 (80845942)",
+        "S/C IND (10000685)",
+        "TL-EI-AHM (80385804)",
+        "AM-EI (80617610)"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 353 unique values"
+    },
+    "city": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Bangalore 1 (5041)",
+        "North Delhi (5021)",
+        "INFRA/TRD (5018)",
+        "Bangalore 2 (5048)",
+        "South Delhi (5030)"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 53 unique values"
+    },
+    "sub_area": {
+      "data_type": "character varying",
+      "unique_values": [
+        "5041.0",
+        "5021.0",
+        "5048.0",
+        "5030.0",
+        "5042.0"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 38 unique values"
+    },
+    "district": {
+      "data_type": "character varying",
+      "note": "No non-null values found"
+    },
+    "zone": {
+      "data_type": "character varying",
+      "unique_values": [
+        "SCH IND & SA",
+        "S/C IND",
+        "SC-IND"
+      ],
+      "unique_count": 3
+    },
+    "serious_near_miss": {
+      "data_type": "character varying",
+      "unique_values": [
+        "No",
+        "Yes"
+      ],
+      "unique_count": 2
+    },
+    "unsafe_act": {
+      "data_type": "text",
+      "unique_values": [
+        "Other,",
+        "Lack or improper use of PPE,",
+        "Operating without following adequate procedure,",
+        "Failure to inform about unsafe situation,",
+        "Fall hazard exposure,"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 69 unique values"
+    },
+    "unsafe_act_other": {
+      "data_type": "text",
+      "unique_values": [
+        "Forget to announce face way during main switch on /off.",
+        "JH cover was not fixed",
+        "Old materials kept in machine room have created tripping hazards.",
+        "when enter in car top on checking the Ost test the car is 1 step down from the floor level, Employee is not assuming the risk of car top entry, after performing the task guide to employee, employee accept the fault, report the fearless reporting.",
+        "1.faulty hand tool"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 410 unique values"
+    },
+    "unsafe_condition": {
+      "data_type": "text",
+      "unique_values": [
+        "Other,",
+        "Poor lighting,",
+        "Housekeeping issue,",
+        "Electrical hazards,",
+        "Tripping hazard,"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 213 unique values"
+    },
+    "unsafe_condition_other": {
+      "data_type": "text",
+      "unique_values": [
+        "Water in pit",
+        "ARD not working",
+        "CCU box cover found open",
+        "Material kept in cartop",
+        "Pit light not working"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 1006 unique values"
+    },
+    "work_stopped": {
+      "data_type": "character varying",
+      "unique_values": [
+        "No",
+        "Yes"
+      ],
+      "unique_count": 2
+    },
+    "stop_work_nogo_violation": {
+      "data_type": "character varying",
+      "unique_values": [
+        "No",
+        "Yes"
+      ],
+      "unique_count": 2
+    },
+    "nogo_violation_detail": {
+      "data_type": "text",
+      "unique_values": [
+        "Fall Protection,",
+        "Jumper,",
+        "Safe Hoistway Access,",
+        "Subcons Certificate,",
+        "Jumper, Subcons Certificate,"
+      ],
+      "unique_count": 5
+    },
+    "stop_work_duration": {
+      "data_type": "character varying",
+      "unique_values": [
+        "One Day or Less",
+        "More than one day"
+      ],
+      "unique_count": 2
+    },
+    "other_safety_issues": {
+      "data_type": "text",
+      "unique_values": [
+        "No",
+        "NO",
+        "no",
+        "defective material lying on cartop",
+        "Pit light not working"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 470 unique values"
+    },
+    "comments_remarks": {
+      "data_type": "text",
+      "unique_values": [
+        "Counselling Done",
+        "No",
+        "Educated at site",
+        "Immediately stopped the work and cleared the same",
+        "Lift machine room housekeeping was not properly done. Informed FT about the same. Immediately FT has done proper housekeeping of the lift machine room & then started further installation activity."
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 478 unique values"
+    },
+    "event_requires_sanction": {
+      "data_type": "character varying",
+      "unique_values": [
+        "No",
+        "Yes"
+      ],
+      "unique_count": 2
+    },
+    "action_description_1": {
+      "data_type": "text",
+      "unique_values": [
+        "Pit light not working",
+        "Housekeeping issue",
+        "Educated the risk and Informed Engineer to close the points at the earliest.",
+        "Customer communication given",
+        "Poor lighting"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 6283 unique values"
+    },
+    "action_description_2": {
+      "data_type": "text",
+      "unique_values": [
+        "3 Point contact not made while using the Pit ladder",
+        "Customer side main breaker not visible",
+        "Discussed with customer to arrange the new hook."
+      ],
+      "unique_count": 3
+    },
+    "action_description_3": {
+      "data_type": "text",
+      "note": "No non-null values found"
+    },
+    "action_description_4": {
+      "data_type": "text",
+      "note": "No non-null values found"
+    },
+    "action_description_5": {
+      "data_type": "text",
+      "note": "No non-null values found"
+    },
+    "branch": {
+      "data_type": "character varying",
+      "unique_values": [
+        "Bangalore 1",
+        "North Delhi",
+        "INFRA / TRD",
+        "Bangalore 2",
+        "South Delhi"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 29 unique values"
+    },
+    "region": {
+      "data_type": "character varying",
+      "unique_values": [
+        "SR 1",
+        "WR 2",
+        "NR 1",
+        "NR 2",
+        "WR 1"
+      ],
+      "unique_count": 5,
+      "note": "Showing top 5 of 7 unique values"
+    },
+    "db_uploaded_date": {
+      "data_type": "timestamp without time zone",
+      "min": "2025-07-17 12:34:08.826602",
+      "max": "2025-07-17 12:34:23.776288"
+    },
+    "id": {
+      "data_type": "integer",
+      "min": "1",
+      "max": "8183"
+    },
+    "created_at": {
+      "data_type": "timestamp with time zone",
+      "min": "2025-07-17 12:34:08.826602+00:00",
+      "max": "2025-07-17 12:34:23.776288+00:00"
+    },
+    "updated_at": {
+      "data_type": "timestamp with time zone",
+      "note": "No non-null values found"
+    }
+  }
+}

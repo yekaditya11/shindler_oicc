@@ -1,0 +1,61 @@
+{
+  "title": "Monthly Trends of Unsafe Events",
+  "chartData": {
+    "title": {
+      "text": "Monthly Trends of Unsafe Events",
+      "left": "center"
+    },
+    "tooltip": {
+      "trigger": "axis"
+    },
+    "xAxis": {
+      "type": "category",
+      "data": [
+        "2023-05",
+        "2023-12",
+        "2025-01",
+        "2025-02",
+        "2025-03",
+        "2025-04",
+        "2025-05",
+        "2025-06"
+      ],
+      "axisLabel": {
+        "rotate": 45
+      }
+    },
+    "yAxis": {
+      "type": "value",
+      "name": "Total Unsafe Events"
+    },
+    "series": [
+      {
+        "name": "Unsafe Events",
+        "type": "line",
+        "data": [
+          2,
+          2,
+          869,
+          1547,
+          1758,
+          1718,
+          2277,
+          988
+        ],
+        "smooth": true,
+        "lineStyle": {
+          "width": 3
+        },
+        "itemStyle": {
+          "color": "#FF6B6B"
+        }
+      }
+    ],
+    "displayTitle": "Monthly Trends of Unsafe Events",
+    "type": "echarts"
+  },
+  "source": "chat",
+  "timestamp": "2025-07-27T11:20:23.609563",
+  "user_id": "anonymous",
+  "created_at": "2025-07-27T11:20:23.609563"
+}
