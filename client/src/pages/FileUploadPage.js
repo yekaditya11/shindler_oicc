@@ -24,7 +24,6 @@ import FinancialIcon from '@mui/icons-material/AccountBalance';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import PerformanceIcon from '@mui/icons-material/Speed';
 import HighlightIcon from '@mui/icons-material/Highlight';
-import AssessmentIcon from '@mui/icons-material/Assessment';
 import { motion, AnimatePresence } from 'framer-motion';
 import SafetyConnectLayout from '../components/layout/SafetyConnectLayout';
 import { uploadAndAnalyzeFile } from '../services/api';
@@ -100,32 +99,8 @@ const FileUploadPage = () => {
 
 
 
-  // Header right actions - data health button
-  const headerRightActions = (
-    <>
-      {/* Data Health Button */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.3 }}
-      >
-        <IconButton
-          onClick={() => navigate('/data-health')}
-          sx={{
-            color: 'white',
-            '&:hover': {
-              bgcolor: 'rgba(255, 255, 255, 0.1)',
-              transform: 'scale(1.05)',
-            },
-            transition: 'all 0.2s ease',
-          }}
-          title="Data Health Assessment"
-        >
-          <AssessmentIcon />
-        </IconButton>
-      </motion.div>
-    </>
-  );
+  // Header right actions - removed data health button
+  const headerRightActions = null;
 
   return (
     <SafetyConnectLayout headerRightActions={headerRightActions}>

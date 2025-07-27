@@ -29,7 +29,6 @@ import {
 } from '@mui/material';
 import {
   AccountCircle as AccountIcon,
-  Settings as SettingsIcon,
   Logout as LogoutIcon,
   Dashboard as DashboardIcon,
   Menu as MenuIcon,
@@ -151,18 +150,6 @@ const SafetyConnectLayout = ({
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {/* Header Right Actions (like upload button) */}
             {headerRightActions}
-            
-            <IconButton
-              size="large"
-              sx={{
-                color: 'white',
-                '&:hover': {
-                  bgcolor: 'rgba(255, 255, 255, 0.1)',
-                }
-              }}
-            >
-              <SettingsIcon />
-            </IconButton>
 
             <IconButton
               size="large"
@@ -203,10 +190,6 @@ const SafetyConnectLayout = ({
               <MenuItem onClick={handleClose}>
                 <AccountIcon sx={{ mr: 2, color: '#092f57' }} />
                 Profile
-              </MenuItem>
-              <MenuItem onClick={handleClose}>
-                <SettingsIcon sx={{ mr: 2, color: '#092f57' }} />
-                Settings
               </MenuItem>
               <Divider />
               <MenuItem onClick={handleClose}>
