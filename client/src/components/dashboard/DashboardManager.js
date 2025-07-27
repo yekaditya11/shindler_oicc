@@ -8,13 +8,9 @@ import {
   Box,
   Alert,
   Snackbar,
-  CircularProgress,
-  Tabs,
-  Tab,
-  Paper
+  CircularProgress
 } from '@mui/material';
 import CustomDashboard from './CustomDashboard';
-import SavedDashboards from './SavedDashboards';
 import chartManager from '../../services/chartManager';
 import ApiService from '../../services/api';
 
@@ -22,8 +18,6 @@ const DashboardManager = () => {
   const [savedCharts, setSavedCharts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
-  const [activeTab, setActiveTab] = useState(0);
-  const [currentDashboard, setCurrentDashboard] = useState(null);
 
   // Load charts from global chart manager
   useEffect(() => {
@@ -50,7 +44,14 @@ const DashboardManager = () => {
 
   // Delete chart using global chart manager
   const deleteChart = async (chartId) => {
-    await chartManager.deleteChart(chartId);
+    try {
+      console.log('🗑️ DashboardManager: Deleting chart:', chartId);
+      await chartManager.deleteChart(chartId);
+      console.log('✅ DashboardManager: Chart deleted successfully');
+    } catch (error) {
+      console.error('❌ DashboardManager: Error deleting chart:', error);
+      throw error; // Re-throw to let CustomDashboard handle the error
+    }
   };
 
   // Update dashboard (for reordering)
@@ -71,9 +72,6 @@ const DashboardManager = () => {
           'anonymous'
         );
         showNotification(`Dashboard "${dashboardConfig.name}" saved successfully!`, 'success');
-        
-        // Switch to saved dashboards tab to show the new dashboard
-        setActiveTab(1);
       } catch (apiError) {
         console.warn('Backend save failed, using local storage:', apiError);
         // Fallback to localStorage
@@ -91,20 +89,6 @@ const DashboardManager = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  // Load saved dashboard
-  const handleLoadDashboard = (dashboard) => {
-    setCurrentDashboard(dashboard);
-    setSavedCharts(dashboard.charts || []);
-    setActiveTab(0); // Switch to custom dashboard tab
-    showNotification(`Dashboard "${dashboard.name}" loaded successfully!`, 'success');
-  };
-
-  // Handle refresh
-  const handleRefresh = () => {
-    // Reload charts from global chart manager
-    setSavedCharts(chartManager.getCharts());
   };
 
   // Show notification
@@ -133,53 +117,12 @@ const DashboardManager = () => {
 
   return (
     <Box sx={{ height: '100%', overflow: 'hidden' }}>
-      {/* Tab Navigation */}
-      <Paper sx={{ mb: 2 }}>
-        <Tabs 
-          value={activeTab} 
-          onChange={(e, newValue) => setActiveTab(newValue)}
-          sx={{ 
-            borderBottom: 1, 
-            borderColor: 'divider',
-            '& .MuiTab-root': {
-              textTransform: 'none',
-              fontWeight: 500
-            }
-          }}
-        >
-          <Tab 
-            label="Custom Dashboard" 
-            sx={{ 
-              color: activeTab === 0 ? '#3b82f6' : 'text.secondary',
-              '&.Mui-selected': { color: '#3b82f6' }
-            }}
-          />
-          <Tab 
-            label="Saved Dashboards" 
-            sx={{ 
-              color: activeTab === 1 ? '#3b82f6' : 'text.secondary',
-              '&.Mui-selected': { color: '#3b82f6' }
-            }}
-          />
-        </Tabs>
-      </Paper>
-
-      {/* Tab Content */}
-      {activeTab === 0 && (
-        <CustomDashboard
-          savedCharts={savedCharts}
-          onSaveChart={saveDashboard}
-          onDeleteChart={deleteChart}
-          onUpdateDashboard={updateDashboard}
-        />
-      )}
-
-      {activeTab === 1 && (
-        <SavedDashboards
-          onLoadDashboard={handleLoadDashboard}
-          onRefresh={handleRefresh}
-        />
-      )}
+      <CustomDashboard
+        savedCharts={savedCharts}
+        onSaveChart={saveDashboard}
+        onDeleteChart={deleteChart}
+        onUpdateDashboard={updateDashboard}
+      />
 
       {/* Notification Snackbar */}
       <Snackbar

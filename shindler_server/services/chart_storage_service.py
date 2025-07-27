@@ -79,6 +79,12 @@ class ChartStorageService:
                 try:
                     with open(chart_file, 'r', encoding='utf-8') as f:
                         chart_data = json.load(f)
+                    
+                    # Add the chart ID (filename without extension) to the chart data
+                    chart_id = chart_file.stem  # Gets filename without extension
+                    chart_data["id"] = chart_id
+                    chart_data["chart_id"] = chart_id
+                    
                     charts.append(chart_data)
                 except Exception as e:
                     logger.error(f"Error loading chart file {chart_file}: {e}")

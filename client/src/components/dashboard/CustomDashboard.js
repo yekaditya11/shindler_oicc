@@ -4,7 +4,7 @@
  * Supports drag-and-drop, resizing, and chart management
  */
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   Box,
   Grid,
@@ -272,7 +272,7 @@ const CustomDashboard = ({ savedCharts = [], onSaveChart, onDeleteChart, onUpdat
         resizeObserver.disconnect();
       }
     };
-  }, [charts.length, charts]); // Added charts dependency to trigger on chart content changes
+  }, [charts.length]); // Only trigger on chart count changes, not content changes
 
   // Add global event listener for chart additions
   useEffect(() => {
@@ -296,13 +296,68 @@ const CustomDashboard = ({ savedCharts = [], onSaveChart, onDeleteChart, onUpdat
   }, []);
 
   // Handle chart deletion
-  const handleDeleteChart = (chartId) => {
-    const updatedCharts = charts.filter(chart =>
-      chart.id !== chartId && chart.chart_id !== chartId
-    );
+  const handleDeleteChart = async (chartId) => {
+    console.log('🗑️ Deleting chart:', chartId);
+    console.log('🗑️ Current charts before deletion:', charts.map(c => ({ id: c.id, chart_id: c.chart_id })));
+    
+    // Find the chart to get all possible IDs - check multiple ID fields
+    const chartToDelete = charts.find(chart => {
+      const chartIds = [
+        chart.id,
+        chart.chart_id,
+        chart.chartId,
+        chart.id?.toString(),
+        chart.chart_id?.toString(),
+        chart.chartId?.toString()
+      ].filter(Boolean); // Remove undefined/null values
+      
+      return chartIds.includes(chartId) || chartIds.includes(chartId.toString());
+    });
+    
+    if (!chartToDelete) {
+      console.error('❌ Chart not found for deletion:', chartId);
+      console.log('🗑️ Available charts:', charts.map(c => ({ 
+        id: c.id, 
+        chart_id: c.chart_id, 
+        chartId: c.chartId,
+        title: c.title,
+        created_at: c.created_at,
+        timestamp: c.timestamp
+      })));
+      console.log('🗑️ Full chart objects:', charts);
+      return;
+    }
+    
+    console.log('🗑️ Found chart to delete:', chartToDelete);
+    
+    // First update local state immediately for responsive UI
+    const updatedCharts = charts.filter(chart => {
+      const chartIds = [
+        chart.id,
+        chart.chart_id,
+        chart.chartId,
+        chart.id?.toString(),
+        chart.chart_id?.toString(),
+        chart.chartId?.toString()
+      ].filter(Boolean); // Remove undefined/null values
+      
+      return !chartIds.includes(chartId) && !chartIds.includes(chartId.toString());
+    });
     setCharts(updatedCharts);
+    
+    // Then call the global chart manager to sync with backend/localStorage
     if (onDeleteChart) {
-      onDeleteChart(chartId);
+      try {
+        // Try to delete using the primary ID first, then fallback to chart_id
+        const deleteId = chartToDelete.id || chartToDelete.chart_id || chartToDelete.chartId || chartId;
+        console.log('🗑️ Attempting to delete with ID:', deleteId);
+        await onDeleteChart(deleteId);
+        console.log('✅ Chart deleted successfully from global manager');
+      } catch (error) {
+        console.error('❌ Error deleting chart from global manager:', error);
+        // Revert local state if global deletion failed
+        setCharts(charts);
+      }
     }
   };
 
@@ -328,17 +383,49 @@ const CustomDashboard = ({ savedCharts = [], onSaveChart, onDeleteChart, onUpdat
   // Render individual chart
   const renderChart = (chart, index) => {
     const chartSize = chart.size || 6; // Default to half width
-    const chartId = chart.chart_id || chart.id || `chart_${index}`;
+    
+    // Use the actual stored chart ID - don't generate new ones
+    let chartId = chart.chart_id || chart.id || chart.chartId;
+    
+    // If no ID exists, create a stable one based on chart content
+    if (!chartId) {
+      const chartData = chart.chartData || chart.chart_data;
+      const title = chart.title || 'Unknown Chart';
+      const timestamp = Math.floor((chart.created_at || chart.timestamp || Date.now()) / 1000); // Use Unix timestamp like server
+      chartId = `chart_${timestamp}`;
+      
+      // Store this ID in the chart object for future use
+      chart.id = chartId;
+      chart.chart_id = chartId;
+      chart.chartId = chartId;
+    }
+    
+    // For deletion, use the same ID
+    const deleteChartId = chartId;
     const isBeingDragged = dragState.isDragging && dragState.draggedIndex === index;
     const isDragOver = dragState.isDragging && dragState.dragOverIndex === index;
     
-    // Debug logging for chart rendering
-    console.log(`Rendering chart ${index}:`, { 
-      isBeingDragged, 
-      isDragOver, 
-      chartId, 
-      chartType: chart.chartData?.type || chart.chart_data?.type 
-    });
+    // Debug logging for chart IDs (only when needed)
+    if (!chart.id && !chart.chart_id && !chart.chartId) {
+      console.log(`📊 Chart ${index} ID info:`, {
+        originalId: chart.id,
+        chartId: chart.chart_id,
+        chartIdAlt: chart.chartId,
+        finalChartId: chartId,
+        deleteChartId: deleteChartId,
+        title: chart.title
+      });
+    }
+    
+    // Debug logging for chart rendering (only when dragging or when chart changes)
+    if (isBeingDragged || isDragOver) {
+      console.log(`Rendering chart ${index}:`, { 
+        isBeingDragged, 
+        isDragOver, 
+        chartId, 
+        chartType: chart.chartData?.type || chart.chart_data?.type 
+      });
+    }
 
     // Calculate dynamic height based on chart size and type
     const getChartHeight = () => {
@@ -423,7 +510,7 @@ const CustomDashboard = ({ savedCharts = [], onSaveChart, onDeleteChart, onUpdat
                     size="small"
                     onClick={(e) => {
                       e.stopPropagation(); // Prevent triggering drag
-                      handleDeleteChart(chartId);
+                      handleDeleteChart(deleteChartId);
                     }}
                     sx={{
                       color: '#dc2626',
@@ -501,7 +588,10 @@ const CustomDashboard = ({ savedCharts = [], onSaveChart, onDeleteChart, onUpdat
                     }
                   }
 
-                  console.log('Chart type detected:', chartType, 'for chart data:', chartData);
+                  // Only log chart type detection when it changes
+                  if (chart.chartType !== chartType) {
+                    console.log('Chart type detected:', chartType, 'for chart data:', chartData);
+                  }
 
                   // Create responsive chart wrapper
                   const ChartWrapper = ({ children }) => (

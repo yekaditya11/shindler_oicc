@@ -6,10 +6,9 @@
 import axios from 'axios';
 import requestOptimizer from '../utils/requestOptimizer';
 
-//const API_BASE_URL ='http://13.51.171.153:9000';
+const API_BASE_URL ='http://13.50.248.45:8001';
 
-const API_BASE_URL ='http://localhost:8000';
-
+//const API_BASE_URL ='http://localhost:8001';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -574,6 +573,10 @@ class ApiService {
   async deleteDashboard(dashboardId, userId = 'anonymous') {
     const params = { user_id: userId };
     return api.delete(`/dashboard/dashboard/${dashboardId}`, { params });
+  }
+
+  async debugCharts(userId = 'anonymous') {
+    return api.get(`/dashboard/debug/charts`, { params: { user_id: userId } });
   }
 
   // Generic metrics fetcher for real-time updates - Optimized

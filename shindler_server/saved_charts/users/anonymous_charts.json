@@ -17,7 +17,13 @@
       "title": "Monthly Trends of Unsafe Events",
       "created_at": "2025-07-27T11:20:23.609563",
       "source": "chat"
+    },
+    {
+      "id": "chart_1753603897.576352",
+      "title": "AI Generated Chart",
+      "created_at": "2025-07-27T13:41:37.576352",
+      "source": "chat"
     }
   ],
-  "last_updated": "2025-07-27T11:20:23.616719"
+  "last_updated": "2025-07-27T13:53:20.193054"
 }

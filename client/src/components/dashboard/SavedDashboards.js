@@ -20,14 +20,8 @@ import {
   TextField,
   Alert,
   CircularProgress,
-  Tooltip,
   Menu,
-  MenuItem,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemSecondaryAction,
-  Divider
+  MenuItem
 } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
@@ -35,7 +29,6 @@ import {
   Edit as EditIcon,
   MoreVert as MoreIcon,
   Refresh as RefreshIcon,
-  Visibility as ViewIcon,
   Schedule as TimeIcon
 } from '@mui/icons-material';
 import ApiService from '../../services/api';

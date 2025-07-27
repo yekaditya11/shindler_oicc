@@ -195,6 +195,13 @@ async def delete_chart(chart_id: str, user_id: str = Query("anonymous", descript
     Delete a specific chart
     """
     try:
+        logger.info(f"Attempting to delete chart {chart_id} for user {user_id}")
+        
+        # Log the chart file path for debugging
+        chart_file_path = chart_storage.charts_path / user_id / f"{chart_id}.json"
+        logger.info(f"Chart file path: {chart_file_path}")
+        logger.info(f"Chart file exists: {chart_file_path.exists()}")
+        
         success = chart_storage.delete_chart(chart_id, user_id)
         if not success:
             raise HTTPException(status_code=404, detail="Chart not found")
@@ -276,4 +283,36 @@ async def get_dashboard_stats():
         
     except Exception as e:
         logger.error(f"Error getting dashboard stats: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get stats: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"Failed to get stats: {str(e)}")
+
+@router.get("/debug/charts")
+async def debug_charts(user_id: str = Query("anonymous", description="User ID")):
+    """
+    Debug endpoint to list all chart files for a user
+    """
+    try:
+        user_charts_path = chart_storage.charts_path / user_id
+        if not user_charts_path.exists():
+            return {
+                "status": "success",
+                "message": "No charts directory found",
+                "charts": []
+            }
+        
+        chart_files = []
+        for chart_file in user_charts_path.glob("*.json"):
+            chart_files.append({
+                "filename": chart_file.name,
+                "chart_id": chart_file.stem,
+                "size": chart_file.stat().st_size,
+                "modified": chart_file.stat().st_mtime
+            })
+        
+        return {
+            "status": "success",
+            "message": f"Found {len(chart_files)} chart files",
+            "charts": chart_files
+        }
+    except Exception as e:
+        logger.error(f"Error debugging charts: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to debug charts: {str(e)}") 
