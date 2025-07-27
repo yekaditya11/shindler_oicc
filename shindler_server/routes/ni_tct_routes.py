@@ -81,8 +81,8 @@ async def get_ni_tct_kpis(
         
         logger.info(f"Processing NI TCT KPI request with date range: {start_date} to {end_date}")
         
-        # Initialize KPI queries (NI TCT doesn't use date filtering in constructor)
-        kpi_queries = NITCTKPIQueries()
+        # Initialize KPI queries with date filtering
+        kpi_queries = NITCTKPIQueries(start_date=start_date, end_date=end_date)
         
         # Execute all KPIs
         results = kpi_queries.get_all_kpis()
@@ -143,7 +143,7 @@ async def generate_more_ni_tct_insights(
         end_date = request_data.get('end_date')
         
         # Get fresh KPI data
-        kpi_queries = NITCTKPIQueries()
+        kpi_queries = NITCTKPIQueries(start_date=start_date, end_date=end_date)
         kpi_data = kpi_queries.get_all_kpis()
         
         # Generate additional insights with different prompts/angles
@@ -241,7 +241,7 @@ async def get_ni_tct_insights(
         logger.info(f"Processing NI TCT AI insights request with date range: {start_date} to {end_date}")
         
         # Get KPI data first
-        kpi_queries = NITCTKPIQueries()
+        kpi_queries = NITCTKPIQueries(start_date=start_date, end_date=end_date)
         kpi_data = kpi_queries.get_all_kpis()
         
         # Generate AI insights

@@ -23,7 +23,13 @@
       "title": "AI Generated Chart",
       "created_at": "2025-07-27T13:41:37.576352",
       "source": "chat"
+    },
+    {
+      "id": "chart_1753634487.381063",
+      "title": "Recent Unsafe Event Types",
+      "created_at": "2025-07-27T22:11:27.381063",
+      "source": "chat"
     }
   ],
-  "last_updated": "2025-07-27T13:53:20.193054"
+  "last_updated": "2025-07-27T22:11:27.384946"
 }

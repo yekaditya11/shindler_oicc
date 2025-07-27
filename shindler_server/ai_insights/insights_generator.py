@@ -33,21 +33,22 @@ class AIInsightsGenerator:
     
     def generate_insights(self, kpi_data: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Generate AI insights from KPI data
+        Generate AI-powered analytical insights from KPI data focused on event analysis
         
         Args:
             kpi_data: Dictionary containing KPI metrics from EI Tech system
             
         Returns:
-            Dictionary containing comprehensive insights in bullet point format
+            Dictionary containing comprehensive analytical insights with sentiment analysis
+            focused on event patterns, correlations, and statistical observations
         """
         try:
-            logger.info("Starting AI insights generation")
+            logger.info("Starting AI insights generation with sentiment analysis")
             
             # Prepare the data for analysis
             formatted_data = self._format_kpi_data_for_analysis(kpi_data)
             
-            # Generate comprehensive insights
+            # Generate comprehensive insights with sentiment
             insights_list = self._generate_comprehensive_insights(formatted_data)
             
             result = {
@@ -56,11 +57,12 @@ class AIInsightsGenerator:
                     "generated_at": datetime.now().isoformat(),
                     "data_period": f"{kpi_data.get('query_metadata', {}).get('start_date', 'N/A')} to {kpi_data.get('query_metadata', {}).get('end_date', 'N/A')}",
                     "ai_model": self.deployment_name,
-                    "total_insights": len(insights_list)
+                    "total_insights": len(insights_list),
+                    "sentiment_enabled": True
                 }
             }
             
-            logger.info("AI insights generation completed successfully")
+            logger.info("AI insights generation with sentiment analysis completed successfully")
             return result
             
         except Exception as e:
@@ -71,17 +73,17 @@ class AIInsightsGenerator:
                                    positive_examples: List[str], count: int = 5, 
                                    focus_areas: List[str] = None) -> List[str]:
         """
-        Generate additional AI insights that are different from existing ones
+        Generate additional analytical insights focused on event patterns that are different from existing ones
         
         Args:
             kpi_data: Dictionary containing KPI metrics
             existing_insights: List of already generated insights to avoid duplicates
             positive_examples: List of insights that received positive feedback
             count: Number of new insights to generate
-            focus_areas: List of specific areas to focus on
+            focus_areas: List of specific analytical areas to focus on
             
         Returns:
-            List of new unique insights
+            List of new unique analytical insights with sentiment analysis focused on event patterns
         """
         try:
             logger.info(f"Generating {count} additional insights with focus areas: {focus_areas}")
@@ -97,7 +99,7 @@ class AIInsightsGenerator:
             # Filter out any duplicates or similar insights
             unique_insights = self._filter_unique_insights(additional_insights, existing_insights)
             
-            logger.info(f"Generated {len(unique_insights)} unique additional insights")
+            logger.info(f"Generated {len(unique_insights)} unique additional insights with sentiment")
             return unique_insights[:count]  # Return only requested count
             
         except Exception as e:
@@ -106,19 +108,19 @@ class AIInsightsGenerator:
     
     def _generate_additional_insights_with_focus(self, formatted_data: str, existing_insights: List[str], 
                                                positive_examples: List[str], count: int, 
-                                               focus_areas: List[str]) -> List[str]:
+                                               focus_areas: List[str]) -> List[Dict[str, str]]:
         """Generate insights with specific focus areas to ensure novelty"""
         
         focus_prompts = {
-            'operational_efficiency': "Focus on operational efficiency, process optimization, and workflow improvements",
-            'predictive_analysis': "Focus on predictive patterns, future trends, and early warning indicators",
-            'strategic_recommendations': "Focus on strategic decisions, leadership actions, and organizational changes",
-            'compliance_analysis': "Focus on regulatory compliance, policy adherence, and audit findings",
-            'behavioral_patterns': "Focus on human behavior patterns, training needs, and cultural aspects",
-            'systemic_issues': "Focus on systemic problems, root causes, and process breakdowns",
-            'technical_analysis': "Focus on technical aspects, equipment performance, and methodology effectiveness",
-            'temporal_patterns': "Focus on time-based patterns, scheduling, and cyclical trends",
-            'maintenance_optimization': "Focus on maintenance strategies, equipment lifecycle, and resource allocation"
+            'operational_efficiency': "Focus on operational patterns, process performance correlations, and workflow bottleneck analysis",
+            'predictive_analysis': "Focus on predictive indicators, leading metrics identification, and statistical forecasting patterns",
+            'strategic_recommendations': "Focus on organizational performance patterns, leadership impact analysis, and structural correlation insights",
+            'compliance_analysis': "Focus on compliance pattern analysis, regulatory deviation trends, and systematic adherence gaps",
+            'behavioral_patterns': "Focus on human behavior correlations, cultural indicators, and performance pattern analysis",
+            'systemic_issues': "Focus on system failure patterns, root cause correlations, and process breakdown analysis",
+            'technical_analysis': "Focus on equipment performance patterns, technical failure correlations, and methodology effectiveness analysis",
+            'temporal_patterns': "Focus on time-based correlations, cyclical pattern analysis, and scheduling impact patterns",
+            'maintenance_optimization': "Focus on maintenance pattern analysis, equipment lifecycle correlations, and resource utilization patterns"
         }
         
         # Create focused prompts based on focus areas
@@ -130,9 +132,10 @@ class AIInsightsGenerator:
         
         focus_text = " AND ".join(focus_instructions) if focus_instructions else "Focus on different analytical perspectives"
         
-        # Build the prompt for additional insights
+        # Build the prompt for additional insights with sentiment
         prompt = f"""
-        As a senior safety analyst, analyze this comprehensive safety data and generate {count} NEW and UNIQUE insights that are DIFFERENT from the existing insights.
+        As a senior safety analyst, analyze this comprehensive safety data and generate {count} NEW and UNIQUE analytical insights that are DIFFERENT from the existing insights.
+        Focus on EVENT ANALYSIS and PATTERN IDENTIFICATION rather than recommendations.
 
         SAFETY DATA:
         {formatted_data}
@@ -147,22 +150,42 @@ class AIInsightsGenerator:
         {focus_text}
 
         GENERATION REQUIREMENTS:
-        1. Generate exactly {count} insights that are COMPLETELY DIFFERENT from existing ones
-        2. Each insight must provide NEW information or perspective
-        3. Use different analytical angles: {', '.join(focus_areas) if focus_areas else 'various perspectives'}
+        1. Generate exactly {count} analytical insights that are COMPLETELY DIFFERENT from existing ones
+        2. Each insight must provide NEW analytical observations about event patterns or correlations
+        3. Focus on WHAT IS HAPPENING and WHY, not what should be done about it
         4. Avoid repetition or paraphrasing of existing insights
-        5. Be specific, actionable, and data-driven
+        5. Be specific, data-driven, and focused on event analysis
         6. Each insight should be 1-2 sentences maximum
-        7. Focus on practical implications and recommendations
+        7. Focus on statistical patterns, correlations, and event characteristics
+        8. CLASSIFY each insight's sentiment as 'positive', 'negative', or 'neutral'
 
-        FORMAT: Return ONLY the insights as a numbered list (1., 2., 3., etc.) without any additional text.
+        SENTIMENT CLASSIFICATION GUIDELINES:
+        - POSITIVE: Improvements, achievements, good performance, declining risks, successful interventions
+        - NEGATIVE: Deteriorating conditions, high risks, compliance failures, safety concerns, incidents increasing
+        - NEUTRAL: Status updates, procedural information, data observations without clear positive/negative impact
+
+        ANALYTICAL FOCUS (NO RECOMMENDATIONS):
+        - Event frequency patterns and their statistical significance
+        - Correlation analysis between different incident types and factors
+        - Temporal and geographic clustering patterns in event data
+        - Performance indicators and their relationship to incident rates
+        - Cultural and behavioral pattern analysis from event reporting
+
+        Response format: Return EXACTLY {count} insights in this JSON format:
+        [
+          {{"text": "analytical insight about event patterns here", "sentiment": "positive|negative|neutral"}},
+          {{"text": "analytical insight about event patterns here", "sentiment": "positive|negative|neutral"}},
+          ...
+        ]
+
+        Provide ONLY the JSON array, no additional text or formatting.
         """
 
         try:
             response = self.client.chat.completions.create(
                 model=self.deployment_name,
                 messages=[
-                    {"role": "system", "content": "You are a senior safety analyst expert at generating unique, actionable insights from safety data. Always provide fresh perspectives that complement existing analysis."},
+                    {"role": "system", "content": "You are a senior safety analyst expert at generating unique, analytical insights from safety data with accurate sentiment classification. Focus on event pattern analysis and statistical observations rather than recommendations. Always provide fresh analytical perspectives that complement existing analysis. Always respond with valid JSON format."},
                     {"role": "user", "content": prompt}
                 ],
                 max_tokens=self.max_tokens,
@@ -170,34 +193,72 @@ class AIInsightsGenerator:
                 top_p=0.9
             )
             
-            insights_text = response.choices[0].message.content.strip()
+            content = response.choices[0].message.content.strip()
             
-            # Parse the insights from the response
-            insights = []
-            for line in insights_text.split('\n'):
-                line = line.strip()
-                if line and (line[0].isdigit() or line.startswith('-')):
-                    # Remove numbering and clean up
-                    insight = line.split('.', 1)[-1].strip() if '.' in line else line.lstrip('- ').strip()
-                    if insight and len(insight) > 20:  # Filter out very short responses
-                        insights.append(insight)
-            
-            return insights
+            # Parse the structured insights from the response
+            try:
+                insights_json = json.loads(content)
+                if isinstance(insights_json, list) and all(isinstance(item, dict) for item in insights_json):
+                    # Validate and structure the insights
+                    structured_insights = []
+                    for item in insights_json:
+                        if 'text' in item and 'sentiment' in item:
+                            sentiment = item['sentiment'].lower()
+                            if sentiment not in ['positive', 'negative', 'neutral']:
+                                sentiment = 'neutral'
+                            
+                            structured_insights.append({
+                                'text': item['text'],
+                                'sentiment': sentiment
+                            })
+                        elif isinstance(item, str):
+                            structured_insights.append({
+                                'text': item,
+                                'sentiment': 'neutral'
+                            })
+                    
+                    return structured_insights
+                else:
+                    # Fallback to text parsing
+                    return self._parse_additional_insights_fallback(content, count)
+                    
+            except json.JSONDecodeError:
+                # Fallback to text parsing
+                return self._parse_additional_insights_fallback(content, count)
             
         except Exception as e:
             logger.error(f"Error calling Azure OpenAI for additional insights: {str(e)}")
             raise
     
-    def _filter_unique_insights(self, new_insights: List[str], existing_insights: List[str]) -> List[str]:
+    def _parse_additional_insights_fallback(self, content: str, count: int) -> List[Dict[str, str]]:
+        """Parse additional insights from non-JSON response"""
+        insights = []
+        for line in content.split('\n'):
+            line = line.strip()
+            if line and (line[0].isdigit() or line.startswith('-')):
+                # Remove numbering and clean up
+                insight = line.split('.', 1)[-1].strip() if '.' in line else line.lstrip('- ').strip()
+                if insight and len(insight) > 20:  # Filter out very short responses
+                    insights.append({
+                        'text': insight,
+                        'sentiment': 'neutral'  # Default sentiment when parsing fails
+                    })
+        
+        return insights[:count]
+    
+    def _filter_unique_insights(self, new_insights: List[Dict[str, str]], existing_insights: List[str]) -> List[Dict[str, str]]:
         """Filter out insights that are too similar to existing ones"""
         unique_insights = []
         
         for new_insight in new_insights:
             is_unique = True
-            new_words = set(new_insight.lower().split())
+            new_text = new_insight.get('text', '')
+            new_words = set(new_text.lower().split())
             
             for existing_insight in existing_insights:
-                existing_words = set(existing_insight.lower().split())
+                # Handle both string and dict formats for existing insights
+                existing_text = existing_insight if isinstance(existing_insight, str) else existing_insight.get('text', '')
+                existing_words = set(existing_text.lower().split())
                 
                 # Calculate word overlap - if more than 50% overlap, consider it similar
                 overlap = len(new_words.intersection(existing_words))
@@ -252,22 +313,52 @@ class AIInsightsGenerator:
         # Convert all Decimal objects to floats
         clean_kpi_data = convert_decimals(kpi_data)
         
-        # Extract key metrics with safe defaults
-        core_metrics = {
-            "total_unsafe_events": clean_kpi_data.get("number_of_unsafe_events", 0),
-            "near_misses": clean_kpi_data.get("near_misses", 0),
-            "nogo_violations": clean_kpi_data.get("number_of_nogo_violations", 0),
-        }
-        
-        # Format data safely
-        monthly_trends = safe_json_dumps(clean_kpi_data.get("monthly_unsafe_events_trend", []), 6)
-        branch_data = safe_json_dumps(clean_kpi_data.get("unsafe_events_by_branch", []), 5)
-        region_data = safe_json_dumps(clean_kpi_data.get("unsafe_events_by_region", []), 5)
-        unsafe_behaviors = safe_json_dumps(clean_kpi_data.get("common_unsafe_behaviors", []), 5)
-        work_hours_lost = safe_json_dumps(clean_kpi_data.get("work_hours_lost", []), 3)
-        action_compliance = safe_json_dumps(clean_kpi_data.get("action_creation_and_compliance", []), 3)
-        time_patterns = safe_json_dumps(clean_kpi_data.get("unsafe_events_by_time_of_day", []), 5)
-        risk_data = safe_json_dumps(clean_kpi_data.get("at_risk_regions", []), 3)
+        # Determine data source type and extract metrics accordingly
+        if "total_events" in clean_kpi_data:
+            # NI_TCT data structure
+            total_events_data = clean_kpi_data.get("total_events", {})
+            events_by_type = clean_kpi_data.get("events_by_type", [])
+            near_miss_count = 0
+            for event_type in events_by_type:
+                if "near miss" in str(event_type.get("type_of_unsafe_event", "")).lower():
+                    near_miss_count = event_type.get("event_count", 0)
+                    break
+            
+            nogo_data = clean_kpi_data.get("nogo_violations", {})
+            
+            core_metrics = {
+                "total_unsafe_events": total_events_data.get("total_events", 0),
+                "near_misses": near_miss_count,
+                "nogo_violations": nogo_data.get("events_with_nogo_violations", 0),
+            }
+            
+            # NI_TCT specific data extraction
+            monthly_trends = safe_json_dumps(clean_kpi_data.get("events_monthly", []), 6)
+            branch_data = safe_json_dumps(clean_kpi_data.get("branch_distribution", []), 5)
+            region_data = safe_json_dumps(clean_kpi_data.get("regional_distribution", []), 5)
+            unsafe_behaviors = safe_json_dumps(events_by_type, 5)
+            work_hours_lost = safe_json_dumps(clean_kpi_data.get("work_stoppage_duration", []), 3)
+            action_compliance = safe_json_dumps(clean_kpi_data.get("high_risk_response_effectiveness", []), 3)
+            time_patterns = safe_json_dumps(clean_kpi_data.get("incidents_by_time_of_day", []), 5)
+            risk_data = safe_json_dumps(clean_kpi_data.get("repeat_location_analysis", []), 3)
+            
+        else:
+            # EI Tech data structure (original)
+            core_metrics = {
+                "total_unsafe_events": clean_kpi_data.get("number_of_unsafe_events", 0),
+                "near_misses": clean_kpi_data.get("near_misses", 0),
+                "nogo_violations": clean_kpi_data.get("number_of_nogo_violations", 0),
+            }
+            
+            # EI Tech specific data extraction
+            monthly_trends = safe_json_dumps(clean_kpi_data.get("monthly_unsafe_events_trend", []), 6)
+            branch_data = safe_json_dumps(clean_kpi_data.get("unsafe_events_by_branch", []), 5)
+            region_data = safe_json_dumps(clean_kpi_data.get("unsafe_events_by_region", []), 5)
+            unsafe_behaviors = safe_json_dumps(clean_kpi_data.get("common_unsafe_behaviors", []), 5)
+            work_hours_lost = safe_json_dumps(clean_kpi_data.get("work_hours_lost", []), 3)
+            action_compliance = safe_json_dumps(clean_kpi_data.get("action_creation_and_compliance", []), 3)
+            time_patterns = safe_json_dumps(clean_kpi_data.get("unsafe_events_by_time_of_day", []), 5)
+            risk_data = safe_json_dumps(clean_kpi_data.get("at_risk_regions", []), 3)
         
         formatted_summary = f"""
         COMPREHENSIVE SAFETY KPI ANALYSIS DATA:
@@ -300,38 +391,55 @@ class AIInsightsGenerator:
         """Generate comprehensive insights combining all aspects"""
         
         prompt = f"""
-        Analyze the following safety KPI data and provide exactly 10 concise, actionable insights in bullet point format.
+        Analyze the following safety KPI data and provide exactly 10 concise, analytical insights with sentiment analysis.
+        Focus on EVENT ANALYSIS and IN-DEPTH UNDERSTANDING rather than recommendations.
         
         CRITICAL REQUIREMENTS:
-        - Each bullet point must be exactly 15-20 words
-        - Must include specific branch analysis and branch-level recommendations
-        - Focus on actionable insights with specific data points
-        - Include geographic patterns, branch performance, and operational recommendations
+        - Each insight must be exactly 15-25 words
+        - Focus on WHAT IS HAPPENING and WHY, not what to do about it
+        - Provide deep analytical observations about event patterns, correlations, and trends
+        - Include specific data points and statistical observations
+        - CLASSIFY each insight's sentiment as 'positive', 'negative', or 'neutral'
         
-        Key areas to cover:
-        1. Branch-specific incident analysis and performance comparison
-        2. Geographic risk patterns and regional safety performance
-        3. Trend analysis with specific time patterns and seasonal data
-        4. Operational efficiency and work hours impact analysis
-        5. NOGO violations and compliance gaps by location
-        6. Near miss reporting patterns and safety culture indicators
-        7. High-risk time periods and shift-based incident patterns
-        8. Action item compliance and closure rates by branch
-        9. Resource allocation recommendations based on incident concentration
-        10. Priority safety interventions with measurable outcomes
+        SENTIMENT CLASSIFICATION GUIDELINES:
+        - POSITIVE: Improvements, achievements, good performance, declining risks, successful interventions
+        - NEGATIVE: Deteriorating conditions, high risks, compliance failures, safety concerns, incidents increasing
+        - NEUTRAL: Status updates, procedural information, data observations without clear positive/negative impact
+        
+        ANALYTICAL FOCUS AREAS (NO RECOMMENDATIONS):
+        1. Event frequency patterns and statistical correlations across time periods
+        2. Geographic clustering analysis and regional incident concentration patterns
+        3. Behavioral pattern analysis and incident type correlations
+        4. Temporal trend analysis showing cyclical or seasonal patterns
+        5. Severity escalation patterns from near misses to actual incidents
+        6. Work disruption impact analysis and productivity correlation patterns
+        7. Compliance gap analysis showing systematic non-adherence patterns
+        8. Risk manifestation patterns and incident prediction indicators
+        9. Organizational safety culture indicators based on reporting patterns
+        10. Resource impact analysis showing cost and efficiency correlations
+        
+        EXAMPLE ANALYTICAL INSIGHTS (NOT RECOMMENDATIONS):
+        - "Branch X shows 300% higher incident rate during morning shifts indicating systematic operational stress"
+        - "Near miss reporting declined 40% while actual incidents increased, suggesting underreporting culture developing"
+        - "NOGO violations cluster in specific equipment categories, indicating design or training gaps"
         
         Data:
         {data}
         
-        Provide exactly 10 insights as bullet points starting with '•'. Each bullet point must be 15-20 words and include specific branch names, numbers, or percentages when available.
+        Response format: Return EXACTLY 10 insights in this JSON format:
+        [
+          {{"text": "analytical insight about events/patterns here", "sentiment": "positive|negative|neutral"}},
+          {{"text": "analytical insight about events/patterns here", "sentiment": "positive|negative|neutral"}},
+          ...
+        ]
         
-        Response format: Only bullet points, no introduction text or categories.
+        Provide ONLY the JSON array, no additional text or formatting.
         """
         
-        return self._call_openai_for_insights(prompt)
+        return self._call_openai_for_structured_insights(prompt)
     
-    def _call_openai_for_insights(self, prompt: str) -> List[str]:
-        """Make API call to Azure OpenAI and process response"""
+    def _call_openai_for_structured_insights(self, prompt: str) -> List[Dict[str, str]]:
+        """Make API call to Azure OpenAI and process response for structured insights with sentiment"""
         
         try:
             response = self.client.chat.completions.create(
@@ -339,7 +447,7 @@ class AIInsightsGenerator:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a senior safety analytics expert with deep expertise in EI Tech workplace safety data analysis, risk management, and operational excellence. Provide comprehensive, strategic insights that combine multiple data points into actionable business intelligence."
+                        "content": "You are a senior safety analytics expert with deep expertise in EI Tech workplace safety data analysis, event pattern recognition, and statistical correlation analysis. Provide comprehensive, analytical insights with accurate sentiment classification that identify patterns, trends, and correlations in safety events. Focus on WHAT IS HAPPENING and WHY rather than recommendations. Always respond with valid JSON format."
                     },
                     {
                         "role": "user",
@@ -353,29 +461,96 @@ class AIInsightsGenerator:
             
             content = response.choices[0].message.content.strip()
             
-            # Parse bullet points from response
-            bullet_points = []
-            for line in content.split('\n'):
-                line = line.strip()
-                if line and (line.startswith('•') or line.startswith('-') or line.startswith('*')):
-                    # Clean up bullet point formatting
-                    clean_point = line.lstrip('•-* ').strip()
-                    if clean_point:
-                        bullet_points.append(clean_point)
-            
-            # Ensure we have exactly 10 insights
-            if len(bullet_points) > 10:
-                bullet_points = bullet_points[:10]
-            elif len(bullet_points) < 10:
-                # If we got fewer than 10, pad with a note
-                while len(bullet_points) < 10:
-                    bullet_points.append("Additional analysis requires more comprehensive data for deeper insights.")
-            
-            return bullet_points
-            
+            # Attempt to parse JSON, handle potential errors
+            try:
+                insights_json = json.loads(content)
+                if isinstance(insights_json, list) and all(isinstance(item, dict) for item in insights_json):
+                    # Validate that each insight has required fields
+                    validated_insights = []
+                    for item in insights_json:
+                        if 'text' in item and 'sentiment' in item:
+                            # Validate sentiment values
+                            sentiment = item['sentiment'].lower()
+                            if sentiment in ['positive', 'negative', 'neutral']:
+                                validated_insights.append({
+                                    'text': item['text'],
+                                    'sentiment': sentiment
+                                })
+                            else:
+                                # Default to neutral if invalid sentiment
+                                validated_insights.append({
+                                    'text': item['text'],
+                                    'sentiment': 'neutral'
+                                })
+                        else:
+                            # If missing required fields, create a basic insight
+                            validated_insights.append({
+                                'text': str(item) if isinstance(item, str) else "Analysis requires more comprehensive data for deeper insights.",
+                                'sentiment': 'neutral'
+                            })
+                    
+                    # Ensure we have exactly 10 insights
+                    if len(validated_insights) > 10:
+                        validated_insights = validated_insights[:10]
+                    elif len(validated_insights) < 10:
+                        # Pad with neutral insights if we got fewer than 10
+                        while len(validated_insights) < 10:
+                            validated_insights.append({
+                                'text': "Additional analysis requires more comprehensive data for deeper insights.",
+                                'sentiment': 'neutral'
+                            })
+                    
+                    return validated_insights
+                else:
+                    logger.warning(f"Azure OpenAI response is not a valid JSON list of insights: {content}")
+                    # Return fallback structured insights
+                    return self._create_fallback_insights()
+                    
+            except json.JSONDecodeError as e:
+                logger.error(f"Error decoding JSON from Azure OpenAI response: {e}")
+                # Attempt to extract insights from non-JSON response
+                return self._parse_fallback_insights(content)
+                
         except Exception as e:
-            logger.error(f"Error calling Azure OpenAI: {str(e)}")
-            return [f"Error generating insights: {str(e)}"]
+            logger.error(f"Error calling Azure OpenAI for structured insights: {str(e)}")
+            return self._create_fallback_insights()
+    
+    def _create_fallback_insights(self) -> List[Dict[str, str]]:
+        """Create fallback insights when API fails"""
+        return [
+            {"text": "Safety data analysis is currently unavailable. Please try again later.", "sentiment": "neutral"},
+            {"text": "System is working to provide comprehensive safety insights.", "sentiment": "neutral"},
+            {"text": "Regular monitoring of safety metrics is recommended.", "sentiment": "neutral"},
+            {"text": "Safety performance tracking requires consistent data collection.", "sentiment": "neutral"},
+            {"text": "Incident reporting systems should be regularly reviewed.", "sentiment": "neutral"},
+            {"text": "Training compliance monitoring is essential for safety management.", "sentiment": "neutral"},
+            {"text": "Risk assessment procedures should be regularly updated.", "sentiment": "neutral"},
+            {"text": "Equipment safety checks require consistent scheduling.", "sentiment": "neutral"},
+            {"text": "Safety culture development is an ongoing organizational priority.", "sentiment": "neutral"},
+            {"text": "Data quality improvements will enhance future insights.", "sentiment": "neutral"}
+        ]
+    
+    def _parse_fallback_insights(self, content: str) -> List[Dict[str, str]]:
+        """Try to parse insights from non-JSON response"""
+        insights = []
+        for line in content.split('\n'):
+            line = line.strip()
+            if line and (line.startswith('•') or line.startswith('-') or line.startswith('*') or line.startswith('{')):
+                # Clean up bullet point formatting
+                clean_point = line.lstrip('•-* ').strip()
+                if clean_point and not clean_point.startswith('{'):
+                    insights.append({
+                        'text': clean_point,
+                        'sentiment': 'neutral'  # Default to neutral when sentiment can't be determined
+                    })
+        
+        # Ensure we have exactly 10 insights
+        if len(insights) > 10:
+            insights = insights[:10]
+        elif len(insights) < 10:
+            insights.extend(self._create_fallback_insights()[:10-len(insights)])
+        
+        return insights
     
     def generate_executive_summary(self, kpi_data: Dict[str, Any]) -> str:
         """Generate a concise executive summary of the safety performance"""

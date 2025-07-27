@@ -6,9 +6,10 @@ Date: 2025-07-14
 """
 
 import logging
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import text
+from datetime import datetime, date, timedelta
 
 from config.database_config import db_manager
 
@@ -18,10 +19,39 @@ logger = logging.getLogger(__name__)
 
 
 class NITCTKPIQueries:
-    """SQL queries for NI TCT App KPIs"""
+    """SQL queries for NI TCT App KPIs with date filtering support"""
     
-    def __init__(self):
+    def __init__(self, start_date: Optional[str] = None, end_date: Optional[str] = None):
         self.table_name = "unsafe_events_ni_tct"
+        
+        # Set default date range to 1 year from today if no dates provided
+        if start_date is None and end_date is None:
+            # Default to 1 year of data from today
+            today = date.today()
+            one_year_ago = today - timedelta(days=365)
+            self.start_date = one_year_ago.strftime('%Y-%m-%d')
+            self.end_date = today.strftime('%Y-%m-%d')
+            logger.info(f"NI_TCT: No date range provided, defaulting to 1 year: {self.start_date} to {self.end_date}")
+        else:
+            self.start_date = start_date
+            self.end_date = end_date
+            logger.info(f"NI_TCT: Using provided date range: {self.start_date} to {self.end_date}")
+            
+        self.date_filter = self._build_date_filter()
+    
+    def _build_date_filter(self) -> str:
+        """Build date filter clause for SQL queries"""
+        conditions = []
+        
+        if self.start_date:
+            conditions.append(f"date_and_time_of_unsafe_event::date >= '{self.start_date}'")
+        
+        if self.end_date:
+            conditions.append(f"date_and_time_of_unsafe_event::date <= '{self.end_date}'")
+        
+        if conditions:
+            return "AND " + " AND ".join(conditions)
+        return ""
     
     def get_session(self) -> Session:
         """Get database session"""
@@ -51,6 +81,7 @@ class NITCTKPIQueries:
             COUNT(CASE WHEN status IS NOT NULL THEN 1 END) as events_with_status
         FROM {self.table_name}
         WHERE reporting_id IS NOT NULL
+        {self.date_filter}
         """
         return self.execute_query(query)[0]
     
@@ -63,6 +94,7 @@ class NITCTKPIQueries:
             CAST((COUNT(*) * 100.0 / SUM(COUNT(*)) OVER()) AS DECIMAL(10,2)) as percentage
         FROM {self.table_name}
         WHERE type_of_unsafe_event IS NOT NULL
+        {self.date_filter}
         GROUP BY type_of_unsafe_event
         ORDER BY event_count DESC
         """
@@ -92,6 +124,7 @@ class NITCTKPIQueries:
                   NULLIF(COUNT(*), 0)) AS DECIMAL(10,2)) as work_stopped_percentage
         FROM {self.table_name}
         WHERE date_and_time_of_unsafe_event IS NOT NULL
+        {self.date_filter}
         GROUP BY {date_part}
         ORDER BY {date_part}
         """
@@ -124,6 +157,7 @@ class NITCTKPIQueries:
                   NULLIF(COUNT(*), 0)) AS DECIMAL(10,2)) as high_risk_action_percentage
         FROM {self.table_name}
         WHERE action_related_to_high_risk_situation IS NOT NULL
+        {self.date_filter}
         """
         return self.execute_query(query)[0]
     
@@ -139,6 +173,7 @@ class NITCTKPIQueries:
             COUNT(CASE WHEN work_stopped_hours IS NOT NULL AND work_stopped_hours != '' THEN 1 END) as events_with_duration_data
         FROM {self.table_name}
         WHERE work_was_stopped IS NOT NULL
+        {self.date_filter}
         """
         return self.execute_query(query)[0]
     
@@ -151,6 +186,8 @@ class NITCTKPIQueries:
             CAST((COUNT(CASE WHEN no_go_violation IS NOT NULL AND no_go_violation != '' THEN 1 END) * 100.0 /
                   NULLIF(COUNT(*), 0)) AS DECIMAL(10,2)) as nogo_violation_percentage
         FROM {self.table_name}
+        WHERE 1=1
+        {self.date_filter}
         """
         return self.execute_query(query)[0]
 
@@ -185,6 +222,7 @@ class NITCTKPIQueries:
                   NULLIF(COUNT(*), 0)) AS DECIMAL(10,2)) as work_stopped_rate
         FROM {self.table_name}
         WHERE region IS NOT NULL
+        {self.date_filter}
         GROUP BY region
         ORDER BY event_count DESC
         """
@@ -203,6 +241,7 @@ class NITCTKPIQueries:
                   NULLIF(COUNT(*), 0)) AS DECIMAL(10,2)) as work_stopped_rate
         FROM {self.table_name}
         WHERE branch_name IS NOT NULL
+        {self.date_filter}
         GROUP BY branch_name
         ORDER BY event_count DESC
         LIMIT 25

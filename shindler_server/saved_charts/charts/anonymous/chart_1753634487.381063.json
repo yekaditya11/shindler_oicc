@@ -1,0 +1,77 @@
+{
+  "title": "Recent Unsafe Event Types",
+  "chartData": {
+    "title": {
+      "text": "Recent Unsafe Event Types"
+    },
+    "tooltip": {
+      "trigger": "item"
+    },
+    "legend": {
+      "top": "5%",
+      "left": "center"
+    },
+    "series": [
+      {
+        "name": "Unsafe Event Types",
+        "type": "pie",
+        "radius": [
+          "40%",
+          "70%"
+        ],
+        "avoidLabelOverlap": false,
+        "itemStyle": {
+          "borderRadius": 10,
+          "borderColor": "#fff",
+          "borderWidth": 2
+        },
+        "label": {
+          "show": false,
+          "position": "center"
+        },
+        "emphasis": {
+          "label": {
+            "show": true,
+            "fontSize": "18",
+            "fontWeight": "bold"
+          }
+        },
+        "labelLine": {
+          "show": false
+        },
+        "data": [
+          {
+            "value": 6,
+            "name": "Other"
+          },
+          {
+            "value": 3,
+            "name": "Tripping hazard"
+          },
+          {
+            "value": 1,
+            "name": "Falling objects hazard"
+          },
+          {
+            "value": 1,
+            "name": "Housekeeping issue"
+          },
+          {
+            "value": 1,
+            "name": "Poor lighting"
+          },
+          {
+            "value": 1,
+            "name": "Electrical hazards"
+          }
+        ]
+      }
+    ],
+    "displayTitle": "Recent Unsafe Event Types",
+    "type": "echarts"
+  },
+  "source": "chat",
+  "timestamp": "2025-07-27T22:11:27.381063",
+  "user_id": "anonymous",
+  "created_at": "2025-07-27T22:11:27.381063"
+}

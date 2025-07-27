@@ -730,31 +730,58 @@ const UnifiedInsightsPanel = ({
                         },
                       }}>
                         {aiAnalysis.insights.map((insight, index) => {
-                          // Comprehensive safety check for insight text
+                          // Enhanced safety check for insight text with sentiment support
                           let insightText = '';
+                          let sentiment = 'neutral'; // Default sentiment
+                          
                           if (typeof insight === 'string') {
+                            // Legacy format - just text
                             insightText = insight;
+                            sentiment = 'neutral';
                           } else if (insight && typeof insight === 'object') {
+                            // New structured format with sentiment
                             if (typeof insight.text === 'string') {
                               insightText = insight.text;
+                              sentiment = insight.sentiment || 'neutral';
                             } else if (insight.text && typeof insight.text === 'object') {
                               // Handle nested objects
                               insightText = JSON.stringify(insight.text);
+                              sentiment = insight.sentiment || 'neutral';
                             } else {
                               insightText = JSON.stringify(insight);
+                              sentiment = 'neutral';
                             }
                           } else {
                             insightText = String(insight || 'No insight text available');
+                            sentiment = 'neutral';
                           }
                           
-                          const sentiment = (typeof insight === 'object' && insight?.sentiment) || 'neutral';
+                          // Validate sentiment value
+                          if (!['positive', 'negative', 'neutral'].includes(sentiment)) {
+                            sentiment = 'neutral';
+                          }
 
                           const getBulletColor = (sentiment) => {
                             switch (sentiment) {
-                              case 'positive': return '#10b981';
-                              case 'negative': return '#dc2626';
+                              case 'positive': 
+                                return '#10b981'; // Green for positive insights
+                              case 'negative': 
+                                return '#dc2626'; // Red for negative insights
                               case 'neutral':
-                              default: return '#6b7280';
+                              default: 
+                                return '#10b981'; // Default to green for neutral insights
+                            }
+                          };
+
+                          const getSentimentIcon = (sentiment) => {
+                            switch (sentiment) {
+                              case 'positive': 
+                                return '•'; // Green dot for positive
+                              case 'negative': 
+                                return '•'; // Red dot for negative
+                              case 'neutral':
+                              default: 
+                                return '•'; // Green dot for neutral (defaulting to positive)
                             }
                           };
 
@@ -768,16 +795,23 @@ const UnifiedInsightsPanel = ({
                                 opacity: 1
                               }
                             }}>
-                              <Typography sx={{
-                                color: getBulletColor(sentiment),
-                                lineHeight: 1.6,
-                                fontSize: '1.2rem',
-                                fontWeight: 'bold',
-                                minWidth: '12px',
+                              {/* Sentiment-based bullet point */}
+                              <Box sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                minWidth: '16px',
                                 mt: 0.1
                               }}>
-                                •
-                              </Typography>
+                                <Typography sx={{
+                                  color: getBulletColor(sentiment),
+                                  lineHeight: 1.6,
+                                  fontSize: '1.2rem',
+                                  fontWeight: 'bold',
+                                  textShadow: sentiment !== 'neutral' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none'
+                                }}>
+                                  {getSentimentIcon(sentiment)}
+                                </Typography>
+                              </Box>
 
                               <Typography sx={{
                                 color: '#4b5563',
@@ -789,7 +823,7 @@ const UnifiedInsightsPanel = ({
                                 wordBreak: 'break-word'
                               }}>
                                 {typeof insightText === 'string' 
-                                  ? insightText.replace(/^•\s*/, '') 
+                                  ? insightText.replace(/^[•⚠✓]\s*/, '') // Remove any existing bullet symbols
                                   : String(insightText)}
                                 {index === aiAnalysis.insights.length - 1 && (
                                   <Typography

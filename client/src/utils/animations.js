@@ -125,21 +125,6 @@ export const chartAnimations = {
   }
 };
 
-// Sidebar navigation animations
-export const sidebarAnimations = {
-  container: {
-    initial: { x: -250 },
-    animate: { x: 0 },
-    exit: { x: -250 },
-    transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] }
-  },
-  item: {
-    initial: { opacity: 0, x: -20 },
-    animate: { opacity: 1, x: 0 },
-    transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] }
-  }
-};
-
 // Enhanced Chat animations with improved visual effects
 export const chatAnimations = {
   // Enhanced message entrance with staggered effect

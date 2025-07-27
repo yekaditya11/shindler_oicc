@@ -1,12 +1,11 @@
 /**
  * SafetyConnectLayout Component
  * Clean, professional layout for SafetyConnect dashboard
- * Features minimal sidebar, clean header, and professional styling
+ * Header-only layout with no sidebar
  */
 
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
   Box,
   AppBar,
@@ -17,12 +16,6 @@ import {
   Menu,
   MenuItem,
   Divider,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Breadcrumbs,
   useTheme,
   useMediaQuery,
@@ -30,15 +23,8 @@ import {
 import {
   AccountCircle as AccountIcon,
   Logout as LogoutIcon,
-  Dashboard as DashboardIcon,
-  Menu as MenuIcon,
   NavigateNext as NavigateNextIcon,
-  Security as SecurityIcon,
-  ReportProblem as ReportIcon,
-  Visibility as VisibilityIcon,
 } from '@mui/icons-material';
-
-const drawerWidth = 180; // Further reduced from 200 to 180 for more content space
 
 const SafetyConnectLayout = ({ 
   children, 
@@ -49,21 +35,9 @@ const SafetyConnectLayout = ({
   breadcrumbs = [] 
 }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const navigate = useNavigate();
   const location = useLocation();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  // Navigation items - minimal design
-  const navigationItems = [
-    {
-      text: 'Dashboard',
-      icon: <DashboardIcon />,
-      path: '/dashboard',
-      active: location.pathname === '/' || location.pathname === '/dashboard'
-    }
-  ];
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -73,19 +47,8 @@ const SafetyConnectLayout = ({
     setAnchorEl(null);
   };
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  const handleNavigation = (path) => {
-    navigate(path);
-    if (isMobile) {
-      setMobileOpen(false);
-    }
-  };
-
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
       {/* Clean Header - No rounded corners */}
       <AppBar
         position="fixed"
@@ -100,25 +63,8 @@ const SafetyConnectLayout = ({
         }}
       >
         <Toolbar sx={{ justifyContent: 'space-between', minHeight: '64px !important' }}>
-          {/* Left side - Logo and Mobile Menu */}
+          {/* Left side - Logo */}
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              edge="start"
-              onClick={handleDrawerToggle}
-              sx={{
-                mr: 1,
-                display: { sm: 'none' },
-                color: 'white',
-                '&:hover': {
-                  bgcolor: 'rgba(255, 255, 255, 0.1)',
-                }
-              }}
-            >
-              <MenuIcon />
-            </IconButton>
-
             {/* SafetyConnect Logo */}
             <Box
               component="img"
@@ -236,163 +182,12 @@ const SafetyConnectLayout = ({
         </Toolbar>
       </AppBar>
 
-      {/* Minimal Sidebar Navigation */}
-      <Box
-        component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
-      >
-        {/* Mobile drawer */}
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true,
-          }}
-          sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth,
-              mt: 8,
-              bgcolor: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              border: 'none',
-              borderRight: '1px solid #e5e7eb',
-            },
-          }}
-        >
-          <List sx={{ p: 1 }}>
-            {navigationItems.map((item) => (
-              <ListItem key={item.text} disablePadding>
-                <ListItemButton
-                  onClick={() => handleNavigation(item.path)}
-                  sx={{
-                    mb: 0.5,
-                    bgcolor: item.active ? '#e3f2fd' : 'transparent',
-                    '&:hover': {
-                      bgcolor: item.active ? '#e3f2fd' : '#f8fafc',
-                    },
-                    minHeight: 40,
-                  }}
-                >
-                  <ListItemIcon sx={{ minWidth: 36 }}>
-                    {React.cloneElement(item.icon, {
-                      sx: { 
-                        color: item.active ? '#1976d2' : '#092f57',
-                        fontSize: 20
-                      }
-                    })}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.text}
-                    primaryTypographyProps={{
-                      fontWeight: item.active ? 600 : 500,
-                      color: item.active ? '#1976d2' : '#092f57',
-                      fontSize: '0.875rem'
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-        </Drawer>
-
-        {/* Desktop drawer */}
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
-              width: drawerWidth,
-              mt: 8,
-              bgcolor: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)',
-              border: 'none',
-              borderRight: '1px solid #e5e7eb',
-            },
-          }}
-          open
-        >
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3, staggerChildren: 0.1 }}
-          >
-            <List sx={{ p: 1 }}>
-              {navigationItems.map((item, index) => (
-                <motion.div
-                  key={item.text}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{
-                    duration: 0.3,
-                    delay: index * 0.1,
-                    ease: [0.4, 0, 0.2, 1]
-                  }}
-                >
-                  <ListItem disablePadding>
-                    <motion.div
-                      whileHover={{
-                        scale: 1.02,
-                        x: 4,
-                        transition: { duration: 0.2 }
-                      }}
-                      whileTap={{ scale: 0.98 }}
-                      style={{ width: '100%' }}
-                    >
-                      <ListItemButton
-                        onClick={() => handleNavigation(item.path)}
-                        sx={{
-                          mb: 0.5,
-                          borderRadius: 0.5, // Reduced border radius
-                          bgcolor: item.active ? '#e3f2fd' : 'transparent',
-                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                          '&:hover': {
-                            bgcolor: item.active ? '#e3f2fd' : '#f8fafc',
-                            boxShadow: '0 2px 8px 0 rgba(0, 0, 0, 0.1)',
-                          },
-                          minHeight: 40,
-                        }}
-                      >
-                        <ListItemIcon sx={{ minWidth: 36 }}>
-                          <motion.div
-                            whileHover={{ scale: 1.1, rotate: 5 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            {React.cloneElement(item.icon, {
-                              sx: {
-                                color: item.active ? '#1976d2' : '#092f57',
-                                fontSize: 20
-                              }
-                            })}
-                          </motion.div>
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={item.text}
-                          primaryTypographyProps={{
-                            fontWeight: item.active ? 600 : 500,
-                            color: item.active ? '#1976d2' : '#092f57',
-                            fontSize: '0.875rem'
-                          }}
-                        />
-                      </ListItemButton>
-                    </motion.div>
-                  </ListItem>
-                </motion.div>
-              ))}
-            </List>
-          </motion.div>
-        </Drawer>
-      </Box>
-
-      {/* Main Content Area */}
+      {/* Main Content Area - Full Width */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
+          width: '100%',
           bgcolor: '#f8fafc',
           minHeight: 'calc(100vh - 64px)',
           mt: 8,
