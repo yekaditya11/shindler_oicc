@@ -86,6 +86,10 @@ const FileUploadPage = () => {
       
       const result = await uploadAndAnalyzeFile(file);
       
+      console.log('📤 File upload result:', result);
+      console.log('📤 File type detected:', result.file_type);
+      console.log('📤 Available dashboards:', result.available_dashboards);
+      
       // Directly redirect to dashboard with the analysis results
       navigate('/dashboard', { 
         state: { 

@@ -29,7 +29,7 @@ def analyze_file_content(df: pd.DataFrame, filename: str = "") -> str:
     # Filename-based indicators (higher priority)
     filename_ei_tech_indicators = [
         'ei tech app', 'ei_tech', 'eitech', 'unsafe event - ei tech',
-        'unsafe event ei tech', 'ei tech', 'electrical incident'
+        'unsafe event ei tech', 'ei tech', 'electrical incident', 'ei_tct'
     ]
     
     filename_srs_indicators = [
@@ -39,7 +39,7 @@ def analyze_file_content(df: pd.DataFrame, filename: str = "") -> str:
     
     filename_ni_tct_indicators = [
         'unsafe event- ni tct app', 'ni tct app', 'ni_tct', 'nitct',
-        'unsafe event ni tct', 'ni tct', 'non-intrusive testing'
+        'unsafe event ni tct', 'ni tct', 'non-intrusive testing', 'ei_tct'
     ]
     
     # Check filename first (higher weight)

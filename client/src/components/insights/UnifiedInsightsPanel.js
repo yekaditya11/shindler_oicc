@@ -59,6 +59,7 @@ const UnifiedInsightsPanel = ({
   onGenerateMore,
   onRemoveInsight
 }) => {
+
   // Chat state
   const [activeTab, setActiveTab] = useState(0); // 0 = AI Insights, 1 = Chat
   const [messages, setMessages] = useState([]);
@@ -216,6 +217,8 @@ const UnifiedInsightsPanel = ({
   const handleSuggestedAction = (action) => {
     handleSendMessage(action);
   };
+
+
 
   // Handle adding chart to dashboard
   const handleAddChartToDashboard = async (chartConfig) => {
@@ -508,6 +511,8 @@ const UnifiedInsightsPanel = ({
                 </IconButton>
               </Tooltip>
             )}
+
+            
 
             {/* Download PDF (only show when AI insights tab is active and has insights) */}
             {activeTab === 0 && aiAnalysis?.insights && aiAnalysis.insights.length > 0 && (
@@ -888,6 +893,8 @@ const UnifiedInsightsPanel = ({
                       </Box>
                     </Box>
                   )}
+
+
                 </motion.div>
               ) : (
                 <Box sx={{

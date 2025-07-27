@@ -283,3 +283,14 @@ body {
   border-bottom-left-radius: 2px !important;
   border-bottom-right-radius: 2px !important;
 }
+
+/* AI Icon specific styles - ensure no borders */
+img[src*="ai-insights-icon.gif"],
+img[alt*="AI Insights Assistant"] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: white !important;
+}

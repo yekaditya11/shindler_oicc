@@ -113,12 +113,17 @@ const FloatingAIAssistant = ({
             height: isMobile ? 42 : 48,
             borderRadius: '50%',
             cursor: 'pointer',
-            border: 'none',
-            outline: 'none',
+            border: 'none !important',
+            outline: 'none !important',
             boxSizing: 'border-box',
             objectFit: 'cover',
             WebkitTapHighlightColor: 'transparent',
             userSelect: 'none',
+            backgroundColor: 'white',
+            boxShadow: 'none !important',
+            padding: '0',
+            margin: '0',
+            display: 'block',
           }}
           initial="idle"
           animate={isLoading ? "loading" : isActive ? "active" : isHovered ? "hover" : "idle"}

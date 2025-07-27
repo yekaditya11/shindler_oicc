@@ -8,6 +8,7 @@ class DashboardCacheService {
     this.cache = new Map();
     this.cacheExpiry = 5 * 60 * 1000; // 5 minutes in milliseconds
     this.maxCacheSize = 50; // Maximum number of cached items
+    this.pendingRequests = new Map(); // Track pending requests to prevent duplicates
   }
 
   /**
@@ -83,7 +84,16 @@ class DashboardCacheService {
    */
   clearAll() {
     this.cache.clear();
-    console.log('📦 Cleared all cache');
+    this.pendingRequests.clear();
+    console.log('📦 Cleared all cache and pending requests');
+  }
+
+  /**
+   * Clear pending requests
+   */
+  clearPendingRequests() {
+    this.pendingRequests.clear();
+    console.log('📦 Cleared all pending requests');
   }
 
   /**
@@ -102,7 +112,6 @@ class DashboardCacheService {
    */
   async preloadCommonData(moduleId, apiService) {
     const commonRanges = [
-      { daysBack: 30, label: 'Last 30 days' },
       { daysBack: 90, label: 'Last 90 days' },
       { daysBack: 365, label: 'Last year' }
     ];
@@ -129,6 +138,32 @@ class DashboardCacheService {
       return cachedData;
     }
 
+    // Generate request key for deduplication
+    const requestKey = this.generateCacheKey(moduleId, dateParams);
+    
+    // Check if there's already a pending request for this data
+    if (this.pendingRequests.has(requestKey)) {
+      console.log('📦 Request already pending for:', requestKey, '- waiting for existing request');
+      return this.pendingRequests.get(requestKey);
+    }
+
+    // Create a new promise for this request
+    const requestPromise = this._fetchData(moduleId, dateParams, apiService);
+    this.pendingRequests.set(requestKey, requestPromise);
+    
+    try {
+      const data = await requestPromise;
+      return data;
+    } finally {
+      // Clean up the pending request
+      this.pendingRequests.delete(requestKey);
+    }
+  }
+
+  /**
+   * Internal method to fetch data from API
+   */
+  async _fetchData(moduleId, dateParams, apiService) {
     // Fetch from API
     console.log('📦 Fetching fresh data for module:', moduleId);
     let data;

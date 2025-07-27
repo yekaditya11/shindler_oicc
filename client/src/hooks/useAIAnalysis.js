@@ -36,7 +36,7 @@ export const useAIAnalysis = () => {
   const fetchModuleAnalysis = useCallback(async (module, options = {}) => {
     const {
       customerId = null,
-      daysBack = 30,
+      daysBack = 90,
       includeAI = true
     } = options;
 
@@ -110,7 +110,7 @@ export const useAIAnalysis = () => {
   const fetchComprehensiveAnalysis = useCallback(async (options = {}) => {
     const {
       customerId = null,
-      daysBack = 30,
+      daysBack = 90,
       includeAI = true,
       modules = 'all'
     } = options;

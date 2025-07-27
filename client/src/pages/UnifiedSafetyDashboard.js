@@ -119,7 +119,9 @@ const UnifiedSafetyDashboard = () => {
 
   console.log('🏠 UnifiedSafetyDashboard - Location state:', {
     fileAnalysis: !!fileAnalysis,
-    availableDashboards: availableDashboards
+    fileType: fileAnalysis?.file_type,
+    availableDashboards: availableDashboards,
+    fullFileAnalysis: fileAnalysis
   });
 
   // Fallback: Try to get availableDashboards from localStorage if not in location state
@@ -207,6 +209,18 @@ const UnifiedSafetyDashboard = () => {
       const allDashboards = ['ei-tech-dashboard', 'srs-dashboard', 'ni-tct-dashboard', 'custom-dashboard'];
       localStorage.setItem('availableDashboards', JSON.stringify(allDashboards));
     }
+    
+    // If we have file analysis with a specific type, ensure we only show relevant dashboards
+    if (fileAnalysis && fileAnalysis.file_type && fileAnalysis.file_type !== 'unknown') {
+      console.log('📁 File analysis detected:', fileAnalysis.file_type);
+      console.log('📁 Available dashboards from analysis:', fileAnalysis.available_dashboards);
+      
+      // Store the specific dashboards for this file type
+      if (fileAnalysis.available_dashboards) {
+        localStorage.setItem('availableDashboards', JSON.stringify(fileAnalysis.available_dashboards));
+        console.log('📁 Stored specific dashboards for file type:', fileAnalysis.file_type);
+      }
+    }
   }, [fileAnalysis, finalAvailableDashboards]);
 
   // Initialize chart resize handler and global event listeners
@@ -275,13 +289,22 @@ const UnifiedSafetyDashboard = () => {
       // Use cache service to fetch data
       const data = await dashboardCache.fetchWithCache(moduleId, dateParams, ApiService);
       
-      setModuleData(data?.data || data);
-      console.log('✅ Data fetched successfully for', moduleId, '- Data received:', data ? 'Yes' : 'No');
+      // Check if this is still the current module (prevent race conditions)
+      if (moduleId === selectedModule) {
+        setModuleData(data?.data || data);
+        console.log('✅ Data fetched successfully for', moduleId, '- Data received:', data ? 'Yes' : 'No');
+      } else {
+        console.log('🔄 Ignoring data for', moduleId, '- module changed to', selectedModule);
+      }
     } catch (err) {
       console.error(`❌ Error fetching ${moduleId} data:`, err);
-      setError(`Failed to load ${currentModule?.label || moduleId} data. Please try again.`);
+      if (moduleId === selectedModule) {
+        setError(`Failed to load ${currentModule?.label || moduleId} data. Please try again.`);
+      }
     } finally {
-      setLoading(false);
+      if (moduleId === selectedModule) {
+        setLoading(false);
+      }
     }
   };
 
@@ -290,18 +313,48 @@ const UnifiedSafetyDashboard = () => {
   // Load data when module or date range changes
   useEffect(() => {
     console.log('🔄 useEffect triggered - Module:', selectedModule, 'DateRange:', dateRange);
-    fetchModuleData(selectedModule, dateRange);
+    
+    // Add a cleanup flag to prevent race conditions
+    let isCancelled = false;
+    
+    const loadData = async () => {
+      if (isCancelled) return;
+      await fetchModuleData(selectedModule, dateRange);
+    };
+    
+    loadData();
+    
+    // Cleanup function to cancel if effect runs again
+    return () => {
+      isCancelled = true;
+    };
   }, [selectedModule, dateRange]);
 
-  // Preload cache for other modules in background
+  // Preload cache for other modules in background - DISABLED to prevent unnecessary API calls
   useEffect(() => {
+    // Configuration: Set to false to disable preloading entirely
+    const ENABLE_PRELOADING = false;
+    
+    if (!ENABLE_PRELOADING) {
+      console.log('📦 Preloading disabled by configuration');
+      return;
+    }
+    
+    // Only preload if we have file analysis and multiple available dashboards
+    if (!fileAnalysis || !finalAvailableDashboards || finalAvailableDashboards.length <= 1) {
+      console.log('📦 Skipping preload - no file analysis or single dashboard only');
+      return;
+    }
+
     const preloadOtherModules = async () => {
-      const otherModules = ['ei-tech-dashboard', 'srs-dashboard', 'ni-tct-dashboard']
-        .filter(moduleId => moduleId !== selectedModule);
+      // Only preload modules that are actually available based on file analysis
+      const availableModules = finalAvailableDashboards.filter(dashboard => 
+        dashboard !== 'custom-dashboard' && dashboard !== selectedModule
+      );
       
-      console.log('📦 Preloading cache for other modules:', otherModules);
+      console.log('📦 Preloading cache for available modules only:', availableModules);
       
-      for (const moduleId of otherModules) {
+      for (const moduleId of availableModules) {
         try {
           await dashboardCache.preloadCommonData(moduleId, ApiService);
         } catch (error) {
@@ -314,7 +367,7 @@ const UnifiedSafetyDashboard = () => {
     const timeoutId = setTimeout(preloadOtherModules, 2000);
     
     return () => clearTimeout(timeoutId);
-  }, [selectedModule]);
+  }, [selectedModule, fileAnalysis, finalAvailableDashboards]);
 
   // Fetch AI analysis when module data changes and AI is enabled
   useEffect(() => {
@@ -529,6 +582,7 @@ const UnifiedSafetyDashboard = () => {
       console.log('🤖 AI API response:', aiData);
       const analysisData = aiData?.data || aiData?.ai_analysis || aiData;
       console.log('🤖 Setting AI analysis:', analysisData);
+      
       setAiAnalysis(analysisData);
     } catch (err) {
       console.error(`🤖 Error fetching AI analysis for ${moduleId}:`, err);

@@ -84,6 +84,10 @@ const FileUploadDialog = ({ open, onClose }) => {
       
       const result = await uploadAndAnalyzeFile(file);
       
+      console.log('📤 File upload result (dialog):', result);
+      console.log('📤 File type detected (dialog):', result.file_type);
+      console.log('📤 Available dashboards (dialog):', result.available_dashboards);
+      
       // Close dialog and redirect to dashboard with the analysis results
       onClose();
       navigate('/dashboard', { 

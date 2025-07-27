@@ -5,6 +5,7 @@
 
 import axios from 'axios';
 import requestOptimizer from '../utils/requestOptimizer';
+import insightsCache from './insightsCache';
 
 const API_BASE_URL ='http://13.50.248.45:8001';
 
@@ -71,7 +72,7 @@ class ApiService {
   // Only keeping the 4 required KPI endpoints and conversational AI
 
   // Incident Investigation KPIs - Optimized
-  async getIncidentInvestigationKPIs(customerId = null, daysBack = 30) {
+  async getIncidentInvestigationKPIs(customerId = null, daysBack = 90) {
     const params = { days_back: daysBack };
     if (customerId) params.customer_id = customerId;
 
@@ -83,7 +84,7 @@ class ApiService {
   }
 
   // Action Tracking KPIs - Optimized
-  async getActionTrackingKPIs(customerId = null, daysBack = 30) {
+  async getActionTrackingKPIs(customerId = null, daysBack = 90) {
     const params = { days_back: daysBack };
     if (customerId) params.customer_id = customerId;
 
@@ -94,7 +95,7 @@ class ApiService {
   }
 
   // Driver Safety Checklist KPIs - Optimized
-  async getDriverSafetyChecklistKPIs(customerId = null, daysBack = 30) {
+  async getDriverSafetyChecklistKPIs(customerId = null, daysBack = 90) {
     const params = { days_back: daysBack };
     if (customerId) params.customer_id = customerId;
 
@@ -360,7 +361,7 @@ class ApiService {
   }
 
   // AI Analysis Methods - New endpoints for individual modules
-  async getIncidentInvestigationAIAnalysis(customerId = null, daysBack = 30, includeAI = true) {
+  async getIncidentInvestigationAIAnalysis(customerId = null, daysBack = 90, includeAI = true) {
     const params = { days_back: daysBack, include_ai: includeAI };
     if (customerId) params.customer_id = customerId;
 
@@ -374,7 +375,7 @@ class ApiService {
     );
   }
 
-  async getActionTrackingAIAnalysis(customerId = null, daysBack = 30, includeAI = true) {
+  async getActionTrackingAIAnalysis(customerId = null, daysBack = 90, includeAI = true) {
     const params = { days_back: daysBack, include_ai: includeAI };
     if (customerId) params.customer_id = customerId;
 
@@ -388,7 +389,7 @@ class ApiService {
     );
   }
 
-  async getDriverSafetyAIAnalysis(customerId = null, daysBack = 30, includeAI = true) {
+  async getDriverSafetyAIAnalysis(customerId = null, daysBack = 90, includeAI = true) {
     const params = { days_back: daysBack, include_ai: includeAI };
     if (customerId) params.customer_id = customerId;
 
@@ -402,7 +403,7 @@ class ApiService {
     );
   }
 
-  async getObservationTrackerAIAnalysis(customerId = null, daysBack = 30, includeAI = true) {
+  async getObservationTrackerAIAnalysis(customerId = null, daysBack = 90, includeAI = true) {
     const params = { days_back: daysBack, include_ai: includeAI };
     if (customerId) params.customer_id = customerId;
 
@@ -416,7 +417,7 @@ class ApiService {
     );
   }
 
-  async getEquipmentAssetAIAnalysis(customerId = null, daysBack = 30, includeAI = true) {
+  async getEquipmentAssetAIAnalysis(customerId = null, daysBack = 90, includeAI = true) {
     const params = { days_back: daysBack, include_ai: includeAI };
     if (customerId) params.customer_id = customerId;
 
@@ -426,7 +427,7 @@ class ApiService {
     );
   }
 
-  async getRiskAssessmentAIAnalysis(customerId = null, daysBack = 30, includeAI = true) {
+  async getRiskAssessmentAIAnalysis(customerId = null, daysBack = 90, includeAI = true) {
     const params = { days_back: daysBack, include_ai: includeAI };
     if (customerId) params.customer_id = customerId;
 
@@ -436,7 +437,7 @@ class ApiService {
     );
   }
 
-  async getEmployeeTrainingAIAnalysis(customerId = null, daysBack = 30, includeAI = true) {
+  async getEmployeeTrainingAIAnalysis(customerId = null, daysBack = 90, includeAI = true) {
     const params = { days_back: daysBack, include_ai: includeAI };
     if (customerId) params.customer_id = customerId;
 
@@ -446,7 +447,7 @@ class ApiService {
     );
   }
 
-  async getComprehensiveAIAnalysis(customerId = null, daysBack = 30, includeAI = true, modules = 'all') {
+  async getComprehensiveAIAnalysis(customerId = null, daysBack = 90, includeAI = true, modules = 'all') {
     const params = {
       days_back: daysBack,
       include_ai: includeAI,
@@ -494,7 +495,7 @@ class ApiService {
   }
 
   // Legacy methods for backward compatibility
-  async generateAIAnalysis(module, customerId = null, daysBack = 30) {
+  async generateAIAnalysis(module, customerId = null, daysBack = 90) {
     // Map to new endpoints
     switch (module) {
       case 'incident_investigation':
@@ -516,7 +517,7 @@ class ApiService {
     }
   }
 
-  async generateComprehensiveAIAnalysis(customerId = null, daysBack = 30, modules = null) {
+  async generateComprehensiveAIAnalysis(customerId = null, daysBack = 90, modules = null) {
     const modulesList = modules ? modules.join(',') : 'all';
     return this.getComprehensiveAIAnalysis(customerId, daysBack, true, modulesList);
   }
@@ -580,7 +581,7 @@ class ApiService {
   }
 
   // Generic metrics fetcher for real-time updates - Optimized
-  async getMetrics(endpoint, customerId = null, daysBack = 30) {
+  async getMetrics(endpoint, customerId = null, daysBack = 90) {
     const params = { days_back: daysBack };
     if (customerId) params.customer_id = customerId;
 
@@ -634,8 +635,21 @@ class ApiService {
     return api.get('/dashboard/ni_tct', { params });
   }
 
-  // AI Insights Methods for New Dashboards
+  // AI Insights Methods for New Dashboards - Now with caching
   async getEITechInsights(startDate = null, endDate = null) {
+    return insightsCache.fetchWithCache('ei-tech-dashboard', startDate, endDate, this);
+  }
+
+  async getSRSInsights(startDate = null, endDate = null) {
+    return insightsCache.fetchWithCache('srs-dashboard', startDate, endDate, this);
+  }
+
+  async getNITCTInsights(startDate = null, endDate = null) {
+    return insightsCache.fetchWithCache('ni-tct-dashboard', startDate, endDate, this);
+  }
+
+  // Direct API calls for insights (used by cache service)
+  async _getEITechInsightsDirect(startDate = null, endDate = null) {
     console.log('API Request: GET /api/v1/ei_tech/insights');
     const params = {};
     if (startDate) params.start_date = startDate;
@@ -644,7 +658,7 @@ class ApiService {
     return api.get('/api/v1/ei_tech/insights', { params });
   }
 
-  async getSRSInsights(startDate = null, endDate = null) {
+  async _getSRSInsightsDirect(startDate = null, endDate = null) {
     console.log('API Request: GET /api/v1/srs/insights');
     const params = {};
     if (startDate) params.start_date = startDate;
@@ -653,7 +667,7 @@ class ApiService {
     return api.get('/api/v1/srs/insights', { params });
   }
 
-  async getNITCTInsights(startDate = null, endDate = null) {
+  async _getNITCTInsightsDirect(startDate = null, endDate = null) {
     console.log('API Request: GET /api/v1/ni_tct/insights');
     const params = {};
     if (startDate) params.start_date = startDate;
@@ -743,6 +757,19 @@ class ApiService {
     return sanitized;
   }
 
+  // Insights Cache Management Methods
+  clearInsightsCache(module = null, startDate = null, endDate = null) {
+    if (module) {
+      insightsCache.clear(module, startDate, endDate);
+    } else {
+      insightsCache.clearAll();
+    }
+  }
+
+  getInsightsCacheStats() {
+    return insightsCache.getStats();
+  }
+
   // File Upload Methods
   async uploadAndAnalyzeFile(file) {
     const formData = new FormData();
@@ -828,6 +855,9 @@ export const {
   getEITechInsights,
   getSRSInsights,
   getNITCTInsights,
+  // Insights Cache Management
+  clearInsightsCache,
+  getInsightsCacheStats,
   // File Upload methods
   uploadAndAnalyzeFile,
 } = apiService;
