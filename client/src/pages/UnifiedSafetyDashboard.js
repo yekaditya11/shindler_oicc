@@ -27,6 +27,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import UploadIcon from '@mui/icons-material/CloudUpload';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import StorageIcon from '@mui/icons-material/Storage';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Import components
@@ -50,11 +51,16 @@ import UnifiedInsightsPanel from '../components/insights/UnifiedInsightsPanel';
 // Import floating AI assistant
 import FloatingAIAssistant from '../components/common/FloatingAIAssistant';
 
+
+
 // Import chart resize handler
 import { ChartResizeHandler } from '../utils/chartResizeHandler';
 
 // Import API service
 import ApiService from '../services/api';
+
+// Import dashboard cache service
+import dashboardCache from '../services/dashboardCache';
 
 // All available modules
 const ALL_SAFETY_MODULES = [
@@ -86,15 +92,21 @@ const ALL_SAFETY_MODULES = [
 
 // Function to get available modules based on file analysis
 const getAvailableModules = (availableDashboards = null) => {
+  console.log('🔍 getAvailableModules called with:', availableDashboards);
+  
   if (!availableDashboards) {
     // If no file analysis, show all modules
+    console.log('📋 No availableDashboards provided, showing all modules');
     return ALL_SAFETY_MODULES;
   }
   
   // Filter modules based on available dashboards from file analysis
-  return ALL_SAFETY_MODULES.filter(module => 
+  const filteredModules = ALL_SAFETY_MODULES.filter(module => 
     availableDashboards.includes(module.id)
   );
+  
+  console.log('📋 Filtered modules:', filteredModules.map(m => m.id));
+  return filteredModules;
 };
 
 const UnifiedSafetyDashboard = () => {
@@ -105,8 +117,38 @@ const UnifiedSafetyDashboard = () => {
   const fileAnalysis = location.state?.fileAnalysis;
   const availableDashboards = location.state?.availableDashboards;
 
+  console.log('🏠 UnifiedSafetyDashboard - Location state:', {
+    fileAnalysis: !!fileAnalysis,
+    availableDashboards: availableDashboards
+  });
+
+  // Fallback: Try to get availableDashboards from localStorage if not in location state
+  const getAvailableDashboards = () => {
+    if (availableDashboards) {
+      // Store in localStorage for future use
+      localStorage.setItem('availableDashboards', JSON.stringify(availableDashboards));
+      return availableDashboards;
+    }
+    
+    // Try to get from localStorage
+    const stored = localStorage.getItem('availableDashboards');
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        console.log('📦 Retrieved availableDashboards from localStorage:', parsed);
+        return parsed;
+      } catch (e) {
+        console.warn('Failed to parse availableDashboards from localStorage:', e);
+      }
+    }
+    
+    return null;
+  };
+
+  const finalAvailableDashboards = getAvailableDashboards();
+
   // Get available modules based on file analysis
-  const SAFETY_MODULES = getAvailableModules(availableDashboards);
+  const SAFETY_MODULES = getAvailableModules(finalAvailableDashboards);
 
   // State management
   const [selectedModule, setSelectedModule] = useState(
@@ -139,8 +181,33 @@ const UnifiedSafetyDashboard = () => {
   // State to force chart re-render when AI panel toggles
   const [chartRenderKey, setChartRenderKey] = useState(0);
 
+
+
   // Chart resize handler reference
   const chartResizeHandlerRef = useRef(null);
+
+  // Effect to handle changes in availableDashboards and update selectedModule accordingly
+  useEffect(() => {
+    console.log('🔄 useEffect: availableDashboards changed:', finalAvailableDashboards);
+    const currentModules = getAvailableModules(finalAvailableDashboards);
+    
+    // If current selected module is not in available modules, select the first available one
+    if (currentModules.length > 0 && !currentModules.find(m => m.id === selectedModule)) {
+      console.log('🔄 Updating selectedModule from', selectedModule, 'to', currentModules[0].id);
+      setSelectedModule(currentModules[0].id);
+    }
+  }, [finalAvailableDashboards, selectedModule]);
+
+  // Effect to handle direct dashboard access (no file upload)
+  useEffect(() => {
+    // If no file analysis and no stored dashboards, this is a direct access
+    if (!fileAnalysis && !finalAvailableDashboards) {
+      console.log('🚀 Direct dashboard access detected - showing all available dashboards');
+      // Store all available dashboards in localStorage for consistency
+      const allDashboards = ['ei-tech-dashboard', 'srs-dashboard', 'ni-tct-dashboard', 'custom-dashboard'];
+      localStorage.setItem('availableDashboards', JSON.stringify(allDashboards));
+    }
+  }, [fileAnalysis, finalAvailableDashboards]);
 
   // Initialize chart resize handler and global event listeners
   useEffect(() => {
@@ -188,7 +255,9 @@ const UnifiedSafetyDashboard = () => {
   // Get current module info
   const currentModule = SAFETY_MODULES.find(m => m.id === selectedModule);
 
-  // Fetch module data
+
+
+  // Fetch module data with caching
   const fetchModuleData = async (moduleId, dateParams) => {
     console.log('🔄 Fetching data for module:', moduleId, 'with date params:', dateParams);
     
@@ -203,63 +272,11 @@ const UnifiedSafetyDashboard = () => {
     setError(null);
 
     try {
-      const { startDate, endDate, daysBack } = dateParams;
+      // Use cache service to fetch data
+      const data = await dashboardCache.fetchWithCache(moduleId, dateParams, ApiService);
       
-      // Calculate actual dates for API call
-      let apiStartDate, apiEndDate;
-      
-      if (startDate && endDate) {
-        // Custom date range - use provided dates
-        apiStartDate = startDate.toISOString().split('T')[0];
-        apiEndDate = endDate.toISOString().split('T')[0];
-      } else if (daysBack) {
-        // Quick date range - calculate dates from daysBack
-        const endDateCalc = new Date();
-        const startDateCalc = new Date();
-        startDateCalc.setDate(endDateCalc.getDate() - daysBack);
-        
-        apiStartDate = startDateCalc.toISOString().split('T')[0];
-        apiEndDate = endDateCalc.toISOString().split('T')[0];
-      } else {
-        // Default to last year if no dates provided
-        const endDateCalc = new Date();
-        const startDateCalc = new Date();
-        startDateCalc.setDate(endDateCalc.getDate() - 365);
-        
-        apiStartDate = startDateCalc.toISOString().split('T')[0];
-        apiEndDate = endDateCalc.toISOString().split('T')[0];
-      }
-      
-      console.log('📡 API Call Parameters:', { 
-        moduleId, 
-        apiStartDate, 
-        apiEndDate, 
-        originalDateParams: dateParams
-      });
-
-      let data;
-      switch (moduleId) {
-        case 'ei-tech-dashboard':
-          data = await ApiService.getEITechDashboard(
-            apiStartDate, apiEndDate, null, null
-          );
-          break;
-        case 'srs-dashboard':
-          data = await ApiService.getSRSDashboard(
-            apiStartDate, apiEndDate, null, null
-          );
-          break;
-        case 'ni-tct-dashboard':
-          data = await ApiService.getNITCTDashboard(
-            apiStartDate, apiEndDate, null, null
-          );
-          break;
-        default:
-          throw new Error(`Unknown module: ${moduleId}`);
-      }
-
       setModuleData(data?.data || data);
-      console.log('✅ API Call Successful for', moduleId, '- Data received:', data ? 'Yes' : 'No');
+      console.log('✅ Data fetched successfully for', moduleId, '- Data received:', data ? 'Yes' : 'No');
     } catch (err) {
       console.error(`❌ Error fetching ${moduleId} data:`, err);
       setError(`Failed to load ${currentModule?.label || moduleId} data. Please try again.`);
@@ -275,6 +292,29 @@ const UnifiedSafetyDashboard = () => {
     console.log('🔄 useEffect triggered - Module:', selectedModule, 'DateRange:', dateRange);
     fetchModuleData(selectedModule, dateRange);
   }, [selectedModule, dateRange]);
+
+  // Preload cache for other modules in background
+  useEffect(() => {
+    const preloadOtherModules = async () => {
+      const otherModules = ['ei-tech-dashboard', 'srs-dashboard', 'ni-tct-dashboard']
+        .filter(moduleId => moduleId !== selectedModule);
+      
+      console.log('📦 Preloading cache for other modules:', otherModules);
+      
+      for (const moduleId of otherModules) {
+        try {
+          await dashboardCache.preloadCommonData(moduleId, ApiService);
+        } catch (error) {
+          console.warn(`📦 Failed to preload ${moduleId}:`, error);
+        }
+      }
+    };
+
+    // Preload after a short delay to not interfere with current module loading
+    const timeoutId = setTimeout(preloadOtherModules, 2000);
+    
+    return () => clearTimeout(timeoutId);
+  }, [selectedModule]);
 
   // Fetch AI analysis when module data changes and AI is enabled
   useEffect(() => {
@@ -500,6 +540,10 @@ const UnifiedSafetyDashboard = () => {
 
   // Handle refresh
   const handleRefresh = () => {
+    // Clear cache for current module and date range
+    dashboardCache.clear(selectedModule, dateRange);
+    console.log('🔄 Cache cleared for module:', selectedModule);
+    
     fetchModuleData(selectedModule, dateRange);
     if (aiAnalysisEnabled) {
       fetchAIAnalysis(selectedModule, moduleData);
@@ -940,6 +984,10 @@ const UnifiedSafetyDashboard = () => {
                   </IconButton>
                 </Tooltip>
 
+
+
+
+
                 {/* Cosmic AI Assistant in header */}
                 <Box sx={{ ml: 1, display: 'flex', alignItems: 'center' }}>
                   <FloatingAIAssistant
@@ -1147,7 +1195,8 @@ const UnifiedSafetyDashboard = () => {
             </AnimatePresence>
           </Box>
         </Box>
-        
+
+
 
       </SafetyConnectLayout>
     </ErrorBoundary>

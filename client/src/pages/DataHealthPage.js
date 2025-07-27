@@ -23,7 +23,7 @@ import {
   ListItemText
 } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import RefreshIcon from '@mui/icons-material/Refresh';
+
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import WarningIcon from '@mui/icons-material/Warning';
 import ErrorIcon from '@mui/icons-material/Error';
@@ -426,12 +426,6 @@ const HEALTH_DATA = {
 
 const DataHealthPage = () => {
   const navigate = useNavigate();
-  const [refreshing, setRefreshing] = useState(false);
-
-  const handleRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 2000);
-  };
 
   const getHealthGradeColor = (grade) => {
     switch (grade.toLowerCase()) {
@@ -486,7 +480,7 @@ const DataHealthPage = () => {
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default', p: 3 }}>
       <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
         {/* Header */}
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 4 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <IconButton
               onClick={() => navigate('/dashboard')}
@@ -515,15 +509,6 @@ const DataHealthPage = () => {
               </Box>
             </Box>
           </Box>
-          
-          <Button
-            variant="outlined"
-            startIcon={<RefreshIcon className={refreshing ? 'animate-spin' : ''} />}
-            onClick={handleRefresh}
-            disabled={refreshing}
-          >
-            {refreshing ? 'Refreshing...' : 'Refresh'}
-          </Button>
         </Box>
 
         {/* Overall Health Score */}

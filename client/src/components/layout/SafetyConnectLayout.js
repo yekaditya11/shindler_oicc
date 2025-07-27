@@ -173,7 +173,7 @@ const SafetyConnectLayout = ({
                 elevation: 0,
                 sx: {
                   mt: 1.5,
-                  minWidth: 180,
+                  minWidth: 200,
                   border: '1px solid #e5e7eb',
                   '& .MuiMenuItem-root': {
                     px: 2,
@@ -189,7 +189,42 @@ const SafetyConnectLayout = ({
             >
               <MenuItem onClick={handleClose}>
                 <AccountIcon sx={{ mr: 2, color: '#092f57' }} />
-                Profile
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                  <Typography>Profile</Typography>
+                  <Box sx={{
+                    px: 1.25,
+                    py: 0.4,
+                    borderRadius: 2,
+                    bgcolor: 'white',
+                    border: '1px solid #d1d5db',
+                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
+                    display: 'inline-block',
+                    position: 'relative',
+                    ml: 1,
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      borderRadius: 2,
+                      background: 'linear-gradient(135deg, #092f57 0%, #1a4a7a 100%)',
+                      opacity: 0.05,
+                      zIndex: -1
+                    }
+                  }}>
+                    <Typography variant="caption" sx={{ 
+                      color: '#092f57', 
+                      fontWeight: 600,
+                      fontSize: '0.65rem',
+                      letterSpacing: '0.03em',
+                      textTransform: 'uppercase'
+                    }}>
+                      Safety Head
+                    </Typography>
+                  </Box>
+                </Box>
               </MenuItem>
               <Divider />
               <MenuItem onClick={handleClose}>

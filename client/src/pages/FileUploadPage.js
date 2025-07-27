@@ -81,6 +81,9 @@ const FileUploadPage = () => {
     setError(null);
 
     try {
+      // Clear any previous dashboard state
+      localStorage.removeItem('availableDashboards');
+      
       const result = await uploadAndAnalyzeFile(file);
       
       // Directly redirect to dashboard with the analysis results

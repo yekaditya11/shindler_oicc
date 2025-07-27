@@ -79,6 +79,9 @@ const FileUploadDialog = ({ open, onClose }) => {
     setError(null);
 
     try {
+      // Clear any previous dashboard state
+      localStorage.removeItem('availableDashboards');
+      
       const result = await uploadAndAnalyzeFile(file);
       
       // Close dialog and redirect to dashboard with the analysis results

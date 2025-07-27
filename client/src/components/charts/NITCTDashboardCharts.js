@@ -503,11 +503,11 @@ const NITCTDashboardCharts = ({ data }) => {
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
             <StatCard
-              title="Serious Events"
-              value={formatNumber(dashboardData.serious_near_miss_rate?.count?.serious_near_miss_count)}
-              subtitle={`${dashboardData.serious_near_miss_rate?.count?.serious_near_miss_percentage || '0'}% rate`}
+              title="Critical Incidents"
+              value={formatNumber(dashboardData.incident_severity_distribution?.find(item => item.severity_level === 'Critical')?.incident_count || 0)}
+              subtitle={`${dashboardData.incident_severity_distribution?.find(item => item.severity_level === 'Critical')?.percentage || '0'}% of total`}
               icon={<AlertIcon />}
-              color="warning"
+              color="error"
             />
           </Grid>
           <Grid item xs={12} sm={6} md={3}>
