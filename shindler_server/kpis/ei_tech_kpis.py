@@ -51,9 +51,13 @@ class EITechKPIQueries:
         """Get database session"""
         return get_session()
     
-    def execute_query(self, query: str, params: Dict = None) -> List[Dict]:
+    def execute_query(self, query: str, params: Dict = None, session: Session = None) -> List[Dict]:
         """Execute SQL query and return results"""
-        session = self.get_session()
+        # Use provided session or create a new one
+        use_existing_session = session is not None
+        if not session:
+            session = self.get_session()
+
         try:
             result = session.execute(text(query), params or {})
             columns = result.keys()
@@ -62,11 +66,13 @@ class EITechKPIQueries:
             logger.error(f"Error executing query: {e}")
             raise
         finally:
-            session.close()
+            # Only close session if we created it
+            if not use_existing_session:
+                session.close()
     
     # ==================== EVENT VOLUME & FREQUENCY ====================
     
-    def get_total_events_count(self) -> Dict[str, Any]:
+    def get_total_events_count(self, session: Session = None) -> Dict[str, Any]:
         """Total events count with date filtering"""
         query = f"""
         SELECT 
@@ -75,9 +81,9 @@ class EITechKPIQueries:
         FROM {self.table_name}
         WHERE event_id IS NOT NULL {self.date_filter}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
     
-    def get_events_per_time_period(self, period: str = 'month') -> List[Dict]:
+    def get_events_per_time_period(self, period: str = 'month', session: Session = None) -> List[Dict]:
         """Events per time period using date_of_unsafe_event and reported_date with date filtering"""
         if period == 'month':
             date_part = "TO_CHAR(date_of_unsafe_event, 'YYYY-MM')"
@@ -102,11 +108,11 @@ class EITechKPIQueries:
         GROUP BY {date_part}
         ORDER BY event_period
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
     
     # ==================== SAFETY SEVERITY ====================
     
-    def get_serious_near_miss_count(self) -> Dict[str, Any]:
+    def get_serious_near_miss_count(self, session: Session = None) -> Dict[str, Any]:
         """Serious near miss count with date filtering"""
         query = f"""
         SELECT 
@@ -118,11 +124,11 @@ class EITechKPIQueries:
         FROM {self.table_name}
         WHERE 1=1 {self.date_filter}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
     
 
     
-    def get_nogo_violations_count(self) -> List[Dict]:
+    def get_nogo_violations_count(self, session: Session = None) -> List[Dict]:
         """NOGO violations count with date filtering"""
         query = f"""
         SELECT 
@@ -135,11 +141,11 @@ class EITechKPIQueries:
         GROUP BY stop_work_nogo_violation
         ORDER BY violation_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
     
     # ==================== GEOGRAPHIC DISTRIBUTION ====================
 
-    def get_events_by_region_country_division(self) -> List[Dict]:
+    def get_events_by_region_country_division(self, session: Session = None) -> List[Dict]:
         """Events by region, country_name, division, department with date filtering"""
         query = f"""
         SELECT
@@ -155,9 +161,9 @@ class EITechKPIQueries:
         GROUP BY region, country_name, division, department
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
     
-    def get_events_by_branch(self) -> List[Dict]:
+    def get_events_by_branch(self, session: Session = None) -> List[Dict]:
         """Events by branch with date filtering"""
         query = f"""
         SELECT 
@@ -169,11 +175,11 @@ class EITechKPIQueries:
         GROUP BY branch
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
     
     # ==================== OPERATIONAL METRICS ====================
 
-    def get_events_by_business_details(self) -> List[Dict]:
+    def get_events_by_business_details(self, session: Session = None) -> List[Dict]:
         """Events by business_details with date filtering"""
         query = f"""
         SELECT
@@ -185,9 +191,9 @@ class EITechKPIQueries:
         GROUP BY business_details
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_events_by_unsafe_event_location(self) -> List[Dict]:
+    def get_events_by_unsafe_event_location(self, session: Session = None) -> List[Dict]:
         """Events by unsafe_event_location with date filtering"""
         query = f"""
         SELECT
@@ -199,9 +205,9 @@ class EITechKPIQueries:
         GROUP BY unsafe_event_location
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_stop_work_duration_analysis(self) -> List[Dict]:
+    def get_stop_work_duration_analysis(self, session: Session = None) -> List[Dict]:
         """Stop work duration analysis with date filtering"""
         query = f"""
         SELECT
@@ -214,11 +220,11 @@ class EITechKPIQueries:
         GROUP BY stop_work_duration
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== RESPONSE & ACTIONS ====================
 
-    def get_action_completion_rate(self) -> Dict[str, Any]:
+    def get_action_completion_rate(self, session: Session = None) -> Dict[str, Any]:
         """Action completion rate with date filtering"""
         query = f"""
         SELECT
@@ -241,11 +247,11 @@ class EITechKPIQueries:
         FROM {self.table_name}
         WHERE 1=1 {self.date_filter}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
 
     # ==================== ADDITIONAL ANALYSIS METHODS ====================
 
-    def get_unsafe_acts_and_conditions_analysis(self) -> List[Dict]:
+    def get_unsafe_acts_and_conditions_analysis(self, session: Session = None) -> List[Dict]:
         """Analysis of unsafe acts and conditions with date filtering"""
         query = f"""
         SELECT
@@ -268,9 +274,9 @@ class EITechKPIQueries:
 
         ORDER BY count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_branch_risk_index(self) -> List[Dict]:
+    def get_branch_risk_index(self, session: Session = None) -> List[Dict]:
         """Branch Risk Index calculation with date filtering"""
         query = f"""
         SELECT
@@ -292,9 +298,9 @@ class EITechKPIQueries:
         GROUP BY branch
         ORDER BY branch_risk_index DESC, total_incidents DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_time_based_trends(self) -> List[Dict]:
+    def get_time_based_trends(self, session: Session = None) -> List[Dict]:
         """Time-based trend analysis with date filtering"""
         query = f"""
         SELECT
@@ -309,11 +315,11 @@ class EITechKPIQueries:
         GROUP BY EXTRACT(YEAR FROM date_of_unsafe_event), EXTRACT(MONTH FROM date_of_unsafe_event)
         ORDER BY year, month
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== ENHANCED KPIs FOR BETTER INSIGHTS ====================
 
-    def get_reporting_delay_analysis(self) -> Dict[str, Any]:
+    def get_reporting_delay_analysis(self, session: Session = None) -> Dict[str, Any]:
         """Analyze reporting delays and patterns with date filtering"""
         query = f"""
         SELECT
@@ -330,11 +336,11 @@ class EITechKPIQueries:
         WHERE date_of_unsafe_event IS NOT NULL
         AND reported_date IS NOT NULL {self.date_filter}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
 
 
 
-    def get_action_effectiveness_analysis(self) -> Dict[str, Any]:
+    def get_action_effectiveness_analysis(self, session: Session = None) -> Dict[str, Any]:
         """Analyze action plan effectiveness and completeness with date filtering"""
         query = f"""
         SELECT
@@ -354,11 +360,11 @@ class EITechKPIQueries:
         FROM {self.table_name}
         WHERE 1=1 {self.date_filter}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
 
 
 
-    def get_high_risk_location_analysis(self) -> List[Dict]:
+    def get_high_risk_location_analysis(self, session: Session = None) -> List[Dict]:
         """Identify high-risk locations and unsafe event hotspots with date filtering"""
         query = f"""
         SELECT
@@ -377,11 +383,11 @@ class EITechKPIQueries:
         ORDER BY total_incidents DESC, serious_incident_rate DESC
         LIMIT 30
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
 
 
-    def get_time_of_day_incident_patterns(self) -> List[Dict]:
+    def get_time_of_day_incident_patterns(self, session: Session = None) -> List[Dict]:
         """Time of day incident patterns with date filtering"""
         query = f"""
         SELECT
@@ -421,11 +427,11 @@ class EITechKPIQueries:
             END
         ORDER BY incident_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
 
 
-    def get_regional_safety_performance(self) -> List[Dict]:
+    def get_regional_safety_performance(self, session: Session = None) -> List[Dict]:
         """Comprehensive regional safety performance analysis with date filtering"""
         query = f"""
         SELECT
@@ -450,11 +456,11 @@ class EITechKPIQueries:
         GROUP BY region, country_name
         ORDER BY total_incidents DESC, serious_incident_rate DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== OPERATIONAL ALERTS & INSIGHTS ====================
 
-    def get_regional_operational_alerts(self, days_back: int = 30) -> List[Dict]:
+    def get_regional_operational_alerts(self, days_back: int = 30, session: Session = None) -> List[Dict]:
         """Generate operational alerts comparing recent performance to historical averages"""
         query = f"""
         WITH recent_data AS (
@@ -510,9 +516,9 @@ class EITechKPIQueries:
         WHERE h.avg_monthly_incidents > 0
         ORDER BY incident_variance_percent DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_branch_workload_alerts(self, days_back: int = 7) -> List[Dict]:
+    def get_branch_workload_alerts(self, days_back: int = 7, session: Session = None) -> List[Dict]:
         """Identify branches with unusual workload patterns"""
         query = f"""
         WITH recent_branch_data AS (
@@ -566,11 +572,11 @@ class EITechKPIQueries:
         WHERE b.avg_weekly_incidents > 0
         ORDER BY workload_variance_percent DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== VIOLATION CLUSTERS & PATTERNS ====================
 
-    def get_violation_clusters_with_reasons(self, days_back: int = 30) -> List[Dict]:
+    def get_violation_clusters_with_reasons(self, days_back: int = 30, session: Session = None) -> List[Dict]:
         """Identify violation clusters with detailed reasons from comments"""
         query = f"""
         SELECT
@@ -601,9 +607,9 @@ class EITechKPIQueries:
         ORDER BY violation_count DESC, branch
         LIMIT 20
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_location_incident_clusters(self, min_incidents: int = 3) -> List[Dict]:
+    def get_location_incident_clusters(self, min_incidents: int = 3, session: Session = None) -> List[Dict]:
         """Identify high-risk locations with incident clustering and reasons"""
         query = f"""
         SELECT
@@ -632,11 +638,11 @@ class EITechKPIQueries:
         ORDER BY total_incidents DESC, serious_incident_rate DESC
         LIMIT 25
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== STAFF IMPACT & PERFORMANCE ANALYSIS ====================
 
-    def get_staff_performance_analysis(self) -> List[Dict]:
+    def get_staff_performance_analysis(self, session: Session = None) -> List[Dict]:
         """Analyze staff performance with work stoppage and incident rates"""
         query = f"""
         SELECT
@@ -672,9 +678,9 @@ class EITechKPIQueries:
         ORDER BY work_continuation_rate DESC, safety_performance_rate DESC, total_incidents DESC
         LIMIT 30
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_high_performing_staff(self) -> List[Dict]:
+    def get_high_performing_staff(self, session: Session = None) -> List[Dict]:
         """Identify high-performing staff with minimal disruptions"""
         query = f"""
         SELECT
@@ -704,11 +710,11 @@ class EITechKPIQueries:
         ORDER BY job_completion_rate DESC, proactive_action_rate DESC
         LIMIT 20
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== RESOURCE OPTIMIZATION INSIGHTS ====================
 
-    def get_resource_optimization_patterns(self) -> List[Dict]:
+    def get_resource_optimization_patterns(self, session: Session = None) -> List[Dict]:
         """Identify patterns for resource optimization based on incident analysis"""
         query = f"""
         SELECT
@@ -740,9 +746,9 @@ class EITechKPIQueries:
         ORDER BY incident_frequency DESC, disruption_rate DESC
         LIMIT 25
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_seasonal_resource_recommendations(self) -> List[Dict]:
+    def get_seasonal_resource_recommendations(self, session: Session = None) -> List[Dict]:
         """Generate seasonal resource recommendations based on incident patterns"""
         query = f"""
         WITH seasonal_patterns AS (
@@ -790,11 +796,11 @@ class EITechKPIQueries:
         ORDER BY total_seasonal_incidents DESC, seasonal_disruption_rate DESC
         LIMIT 30
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== ENHANCED KPIs FOR LLM INSIGHTS ====================
 
-    def get_site_risk_profiles(self) -> List[Dict]:
+    def get_site_risk_profiles(self, session: Session = None) -> List[Dict]:
         """Comprehensive site-level risk analysis for LLM insights"""
         query = f"""
         SELECT
@@ -820,9 +826,9 @@ class EITechKPIQueries:
         HAVING COUNT(*) >= 2
         ORDER BY serious_incident_rate DESC, total_incidents DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_workforce_risk_profiles(self) -> List[Dict]:
+    def get_workforce_risk_profiles(self, session: Session = None) -> List[Dict]:
         """Analyze risk patterns by workforce type for people-focused insights"""
         query = f"""
         SELECT
@@ -852,9 +858,9 @@ class EITechKPIQueries:
             COALESCE(subcontractor_company_name, 'Internal')
         ORDER BY serious_incident_rate DESC, total_incidents DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_day_of_week_patterns(self) -> List[Dict]:
+    def get_day_of_week_patterns(self, session: Session = None) -> List[Dict]:
         """Analyze incidents by day of week for temporal insights"""
         query = f"""
         SELECT
@@ -874,49 +880,59 @@ class EITechKPIQueries:
         GROUP BY TO_CHAR(date_of_unsafe_event, 'Day'), EXTRACT(DOW FROM date_of_unsafe_event)
         ORDER BY day_number
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== ESSENTIAL KPI EXECUTION ====================
 
-    def get_all_kpis(self) -> Dict[str, Any]:
+    def get_all_kpis(self, session: Session = None) -> Dict[str, Any]:
         """Execute essential KPI queries optimized for analysis with date filtering"""
         try:
             logger.info(f"Executing essential EI Tech KPI queries with date filter: {self.date_filter}")
 
-            results = {
-                # ==================== CORE SAFETY METRICS ====================
-                "number_of_unsafe_events": self.get_total_events_count(),
-                "monthly_unsafe_events_trend": self.get_events_per_time_period('month'),
-                "near_misses": self.get_serious_near_miss_count(),
-                "serious_near_misses_trend": self.get_events_per_time_period('month'),
+            # Use provided session or create a new one for all KPI queries
+            use_existing_session = session is not None
+            if not session:
+                session = self.get_session()
 
-                # ==================== GEOGRAPHIC & RISK ANALYSIS ====================
-                "unsafe_events_by_branch": self.get_events_by_branch(),
-                "unsafe_events_by_region": self.get_events_by_region_country_division(),
-                "at_risk_regions": self.get_high_risk_location_analysis(),
-                "branch_risk_index": self.get_branch_risk_index(),
-                "frequent_unsafe_event_locations": self.get_events_by_unsafe_event_location(),
+            try:
+                results = {
+                    # ==================== CORE SAFETY METRICS ====================
+                    "number_of_unsafe_events": self.get_total_events_count(session),
+                    "monthly_unsafe_events_trend": self.get_events_per_time_period('month', session),
+                    "near_misses": self.get_serious_near_miss_count(session),
+                    "serious_near_misses_trend": self.get_events_per_time_period('month', session),
 
-                # ==================== BEHAVIORAL ANALYSIS ====================
-                "common_unsafe_behaviors": self.get_unsafe_acts_and_conditions_analysis(),
-                "common_unsafe_conditions": self.get_unsafe_acts_and_conditions_analysis(),
-                "monthly_weekly_trends_unsafe_behaviors": self.get_time_based_trends(),
-                "monthly_weekly_trends_unsafe_conditions": self.get_time_based_trends(),
+                    # ==================== GEOGRAPHIC & RISK ANALYSIS ====================
+                    "unsafe_events_by_branch": self.get_events_by_branch(session),
+                    "unsafe_events_by_region": self.get_events_by_region_country_division(session),
+                    "at_risk_regions": self.get_high_risk_location_analysis(session),
+                    "branch_risk_index": self.get_branch_risk_index(session),
+                    "frequent_unsafe_event_locations": self.get_events_by_unsafe_event_location(session),
 
-                # ==================== OPERATIONAL IMPACT ====================
-                "number_of_nogo_violations": self.get_nogo_violations_count(),
-                "work_hours_lost": self.get_stop_work_duration_analysis(),
-                "time_taken_to_report_incidents": self.get_reporting_delay_analysis(),
+                    # ==================== BEHAVIORAL ANALYSIS ====================
+                    "common_unsafe_behaviors": self.get_unsafe_acts_and_conditions_analysis(session),
+                    "common_unsafe_conditions": self.get_unsafe_acts_and_conditions_analysis(session),
+                    "monthly_weekly_trends_unsafe_behaviors": self.get_time_based_trends(session),
+                    "monthly_weekly_trends_unsafe_conditions": self.get_time_based_trends(session),
 
-                # ==================== ACTION & COMPLIANCE ====================
-                "action_creation_and_compliance": self.get_action_effectiveness_analysis(),
-                "action_closure_rate": self.get_action_completion_rate(),
+                    # ==================== OPERATIONAL IMPACT ====================
+                    "number_of_nogo_violations": self.get_nogo_violations_count(session),
+                    "work_hours_lost": self.get_stop_work_duration_analysis(session),
+                    "time_taken_to_report_incidents": self.get_reporting_delay_analysis(session),
 
-                # ==================== SECONDARY ANALYSIS ====================
-                "unsafe_events_by_time_of_day": self.get_time_of_day_incident_patterns(),
-                "unsafe_event_distribution_by_business_type": self.get_events_by_business_details(),
-                "nogo_violation_trends_by_regions_branches": self.get_regional_safety_performance(),
-            }
+                    # ==================== ACTION & COMPLIANCE ====================
+                    "action_creation_and_compliance": self.get_action_effectiveness_analysis(session),
+                    "action_closure_rate": self.get_action_completion_rate(session),
+
+                    # ==================== SECONDARY ANALYSIS ====================
+                    "unsafe_events_by_time_of_day": self.get_time_of_day_incident_patterns(session),
+                    "unsafe_event_distribution_by_business_type": self.get_events_by_business_details(session),
+                    "nogo_violation_trends_by_regions_branches": self.get_regional_safety_performance(session),
+                }
+            finally:
+                # Only close session if we created it
+                if not use_existing_session:
+                    session.close()
 
             # Add filter information to the results
             results["query_metadata"] = {

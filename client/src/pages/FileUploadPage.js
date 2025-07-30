@@ -20,7 +20,7 @@ import {
   IconButton
 } from '@mui/material';
 import UploadIcon from '@mui/icons-material/CloudUpload';
-import FinancialIcon from '@mui/icons-material/AccountBalance';
+import SecurityIcon from '@mui/icons-material/Security';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import PerformanceIcon from '@mui/icons-material/Speed';
 import HighlightIcon from '@mui/icons-material/Highlight';
@@ -169,7 +169,7 @@ const FileUploadPage = () => {
               >
                 <CardContent sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <FinancialIcon sx={{ color: '#092f57', mr: 2, fontSize: 28 }} />
+                    <SecurityIcon sx={{ color: '#092f57', mr: 2, fontSize: 28 }} />
                     <Typography variant="h6" sx={{ fontWeight: 600, color: '#092f57' }}>
                       Safety Overview
                     </Typography>

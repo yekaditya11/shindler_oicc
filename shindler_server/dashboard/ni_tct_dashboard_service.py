@@ -54,9 +54,13 @@ class NITCTDashboardService:
         """Get database session"""
         return self.db_manager.get_session()
 
-    def execute_query(self, query: str, params: Dict = None) -> List[Dict]:
+    def execute_query(self, query: str, params: Dict = None, session: Session = None) -> List[Dict]:
         """Execute SQL query and return results"""
-        session = self.get_session()
+        # Use provided session or create a new one
+        use_existing_session = session is not None
+        if not session:
+            session = self.get_session()
+
         try:
             result = session.execute(text(query), params or {})
             columns = result.keys()
@@ -65,13 +69,15 @@ class NITCTDashboardService:
             logger.error(f"Error executing query: {e}")
             raise
         finally:
-            session.close()
+            # Only close session if we created it
+            if not use_existing_session:
+                session.close()
 
     def get_dashboard_data(self, start_date: Optional[str] = None,
                           end_date: Optional[str] = None, user_role: str = None,
                           region: str = None) -> Dict[str, Any]:
         """
-        Get NI TCT dashboard data
+        Get NI TCT dashboard data with optimized single session
 
         Args:
             start_date: Start date for filtering (YYYY-MM-DD format)
@@ -97,49 +103,54 @@ class NITCTDashboardService:
             if user_role == "safety_manager" and region:
                 logger.info(f"Regional scope: {region}")
 
-            # Get all KPI data
-            kpi_data = self._get_all_kpis(start_date, end_date, region)
+            # Create single session for all KPI queries - PERFORMANCE OPTIMIZATION
+            session = self.get_session()
+            try:
+                # Get all KPI data using the same session
+                kpi_data = self._get_all_kpis(start_date, end_date, region, session)
 
-            # Build response
-            dashboard_data = {
-                "schema_type": "ni_tct",
-                "date_range": {
-                    "start_date": start_date,
-                    "end_date": end_date
-                },
-                "generated_at": datetime.now().isoformat(),
-                "user_context": {
-                    "user_role": user_role or "unknown",
-                    "region": region,
-                    "data_scope": "regional" if region else "global"
-                },
-                "dashboard_data": kpi_data
-            }
+                # Build response
+                dashboard_data = {
+                    "schema_type": "ni_tct",
+                    "date_range": {
+                        "start_date": start_date,
+                        "end_date": end_date
+                    },
+                    "generated_at": datetime.now().isoformat(),
+                    "user_context": {
+                        "user_role": user_role or "unknown",
+                        "region": region,
+                        "data_scope": "regional" if region else "global"
+                    },
+                    "dashboard_data": kpi_data
+                }
 
-            return dashboard_data
+                return dashboard_data
+            finally:
+                session.close()
 
         except Exception as e:
             logger.error(f"Error generating NI TCT dashboard data: {e}")
             raise
 
-    def _get_all_kpis(self, start_date: str, end_date: str, region: str = None) -> Dict[str, Any]:
-        """Get all KPIs for the NI TCT dashboard"""
+    def _get_all_kpis(self, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
+        """Get all KPIs for the NI TCT dashboard using a single session"""
         try:
             config = self.schema_config
 
-            # Execute KPI queries
-            total_events = self._get_total_events_count(config, start_date, end_date, region)
-            serious_near_miss = self._get_serious_near_miss_rate(config, start_date, end_date, region)
-            work_stoppage = self._get_work_stoppage_rate(config, start_date, end_date, region)
-            monthly_trends = self._get_monthly_trends(config, start_date, end_date, region)
-            branch_performance = self._get_branch_performance_analysis(config, start_date, end_date, region)
-            event_types = self._get_event_type_distribution(config, start_date, end_date, region)
-            repeat_locations = self._get_repeat_locations(config, start_date, end_date, region)
-            response_time = self._get_response_time_analysis(config, start_date, end_date, region)
-            safety_performance_trends = self._get_safety_performance_trends(config, start_date, end_date, region)
-            incident_severity = self._get_incident_severity_distribution(config, start_date, end_date, region)
-            operational_impact = self._get_operational_impact_analysis(config, start_date, end_date, region)
-            time_based_analysis = self._get_time_based_analysis(config, start_date, end_date, region)
+            # Execute KPI queries using the shared session - PERFORMANCE OPTIMIZATION
+            total_events = self._get_total_events_count(config, start_date, end_date, region, session)
+            serious_near_miss = self._get_serious_near_miss_rate(config, start_date, end_date, region, session)
+            work_stoppage = self._get_work_stoppage_rate(config, start_date, end_date, region, session)
+            monthly_trends = self._get_monthly_trends(config, start_date, end_date, region, session)
+            branch_performance = self._get_branch_performance_analysis(config, start_date, end_date, region, session)
+            event_types = self._get_event_type_distribution(config, start_date, end_date, region, session)
+            repeat_locations = self._get_repeat_locations(config, start_date, end_date, region, session)
+            response_time = self._get_response_time_analysis(config, start_date, end_date, region, session)
+            safety_performance_trends = self._get_safety_performance_trends(config, start_date, end_date, region, session)
+            incident_severity = self._get_incident_severity_distribution(config, start_date, end_date, region, session)
+            operational_impact = self._get_operational_impact_analysis(config, start_date, end_date, region, session)
+            time_based_analysis = self._get_time_based_analysis(config, start_date, end_date, region, session)
 
             return {
                 "total_events": total_events,
@@ -162,7 +173,7 @@ class NITCTDashboardService:
 
     # ==================== KPI QUERY METHODS ====================
 
-    def _get_total_events_count(self, config: Dict, start_date: str, end_date: str, region: str = None) -> Dict[str, Any]:
+    def _get_total_events_count(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 1: Total Events Count"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -181,7 +192,7 @@ class NITCTDashboardService:
             if region:
                 params["region"] = region
 
-            result = self.execute_query(query, params)
+            result = self.execute_query(query, params, session)
             data = result[0] if result else {"total_events": 0, "unique_events": 0}
 
             return {
@@ -196,7 +207,7 @@ class NITCTDashboardService:
             logger.error(f"Error getting total events count: {e}")
             return {"count": {"total_events": 0, "unique_events": 0}, "description": "Error retrieving data"}
 
-    def _get_serious_near_miss_rate(self, config: Dict, start_date: str, end_date: str, region: str = None) -> Dict[str, Any]:
+    def _get_serious_near_miss_rate(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 2: Serious Near Miss Rate"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -216,7 +227,7 @@ class NITCTDashboardService:
             if region:
                 params["region"] = region
 
-            result = self.execute_query(query, params)
+            result = self.execute_query(query, params, session)
             data = result[0] if result else {"serious_count": 0, "total_events": 0, "serious_percentage": 0.0}
 
             # Safe conversion to handle None values
@@ -238,7 +249,7 @@ class NITCTDashboardService:
             logger.error(f"Error getting serious near miss rate: {e}")
             return {"rate": 0.0, "count": {"serious_near_miss_count": 0, "non_serious_count": 0, "total_events": 0, "serious_near_miss_percentage": "0.0"}, "description": "Error retrieving data"}
 
-    def _get_work_stoppage_rate(self, config: Dict, start_date: str, end_date: str, region: str = None) -> Dict[str, Any]:
+    def _get_work_stoppage_rate(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 3: Work Stoppage Rate"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -258,7 +269,7 @@ class NITCTDashboardService:
             if region:
                 params["region"] = region
 
-            result = self.execute_query(query, params)
+            result = self.execute_query(query, params, session)
             data = result[0] if result else {"work_stopped_count": 0, "total_events": 0, "work_stoppage_percentage": 0.0}
 
             # Safe conversion to handle None values
@@ -279,7 +290,7 @@ class NITCTDashboardService:
             logger.error(f"Error getting work stoppage rate: {e}")
             return {"rate": 0.0, "count": 0, "total": {"total_events": 0, "unique_events": 0}, "description": "Error retrieving data"}
 
-    def _get_monthly_trends(self, config: Dict, start_date: str, end_date: str, region: str = None) -> List[Dict]:
+    def _get_monthly_trends(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 4: Monthly Trends"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -301,13 +312,13 @@ class NITCTDashboardService:
             if region:
                 params["region"] = region
 
-            return self.execute_query(query, params)
+            return self.execute_query(query, params, session)
 
         except Exception as e:
             logger.error(f"Error getting monthly trends: {e}")
             return []
 
-    def _get_branch_performance_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None) -> List[Dict]:
+    def _get_branch_performance_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 5: Branch Performance Analysis"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -344,13 +355,13 @@ class NITCTDashboardService:
             if region:
                 params["region"] = region
 
-            return self.execute_query(query, params)
+            return self.execute_query(query, params, session)
 
         except Exception as e:
             logger.error(f"Error getting branch performance analysis: {e}")
             return []
 
-    def _get_event_type_distribution(self, config: Dict, start_date: str, end_date: str, region: str = None) -> List[Dict]:
+    def _get_event_type_distribution(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 6: Event Type Distribution"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -373,13 +384,13 @@ class NITCTDashboardService:
             if region:
                 params["region"] = region
 
-            return self.execute_query(query, params)
+            return self.execute_query(query, params, session)
 
         except Exception as e:
             logger.error(f"Error getting event type distribution: {e}")
             return []
 
-    def _get_repeat_locations(self, config: Dict, start_date: str, end_date: str, region: str = None) -> List[Dict]:
+    def _get_repeat_locations(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 7: Repeat Locations"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -408,13 +419,13 @@ class NITCTDashboardService:
             if region:
                 params["region"] = region
 
-            return self.execute_query(query, params)
+            return self.execute_query(query, params, session)
 
         except Exception as e:
             logger.error(f"Error getting repeat locations: {e}")
             return []
 
-    def _get_response_time_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None) -> Dict[str, Any]:
+    def _get_response_time_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 8: Response Time Analysis"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -438,7 +449,7 @@ class NITCTDashboardService:
             if region:
                 params["region"] = region
 
-            result = self.execute_query(query, params)
+            result = self.execute_query(query, params, session)
             data = result[0] if result else {"avg_reporting_delay_days": None, "events_with_timing_data": 0}
 
             avg_delay = data.get("avg_reporting_delay_days")
@@ -466,7 +477,7 @@ class NITCTDashboardService:
                 "description": "Error retrieving response time data"
             }
 
-    def _get_safety_performance_trends(self, config: Dict, start_date: str, end_date: str, region: str = None) -> List[Dict]:
+    def _get_safety_performance_trends(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 9: Safety Performance Trends"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -502,13 +513,13 @@ class NITCTDashboardService:
             if region:
                 params["region"] = region
 
-            return self.execute_query(query, params)
+            return self.execute_query(query, params, session)
 
         except Exception as e:
             logger.error(f"Error getting safety performance trends: {e}")
             return []
 
-    def _get_incident_severity_distribution(self, config: Dict, start_date: str, end_date: str, region: str = None) -> List[Dict]:
+    def _get_incident_severity_distribution(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 10: Incident Severity Distribution"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -555,7 +566,7 @@ class NITCTDashboardService:
             if region:
                 params["region"] = region
 
-            result = self.execute_query(query, params)
+            result = self.execute_query(query, params, session)
 
             if not result:
                 count_query = f"""
@@ -583,7 +594,7 @@ class NITCTDashboardService:
             logger.error(f"Error getting incident severity distribution: {e}")
             return []
 
-    def _get_operational_impact_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None) -> Dict[str, Any]:
+    def _get_operational_impact_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 11: Operational Impact Analysis"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -614,7 +625,7 @@ class NITCTDashboardService:
             if region:
                 params["region"] = region
 
-            result = self.execute_query(query, params)
+            result = self.execute_query(query, params, session)
             data = result[0] if result else {}
 
             return {
@@ -645,7 +656,7 @@ class NITCTDashboardService:
                 "description": "Error retrieving operational impact data"
             }
 
-    def _get_time_based_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None) -> Dict[str, Any]:
+    def _get_time_based_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 12: Time-based Analysis"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""

@@ -142,19 +142,23 @@ async def generate_more_ni_tct_insights(
         start_date = request_data.get('start_date')
         end_date = request_data.get('end_date')
         
-        # Get fresh KPI data
+        # Get fresh KPI data with optimized single session - PERFORMANCE OPTIMIZATION
         kpi_queries = NITCTKPIQueries(start_date=start_date, end_date=end_date)
-        kpi_data = kpi_queries.get_all_kpis()
-        
-        # Generate additional insights with different prompts/angles
-        insights_generator = AIInsightsGenerator()
-        additional_insights = insights_generator.generate_additional_insights(
-            kpi_data=kpi_data,
-            existing_insights=existing_insights,
-            positive_examples=positive_examples,
-            count=count,
-            focus_areas=['operational_efficiency', 'predictive_analysis', 'strategic_recommendations']
-        )
+        session = kpi_queries.get_session()
+        try:
+            kpi_data = kpi_queries.get_all_kpis(session)
+
+            # Generate additional insights with different prompts/angles
+            insights_generator = AIInsightsGenerator()
+            additional_insights = insights_generator.generate_additional_insights(
+                kpi_data=kpi_data,
+                existing_insights=existing_insights,
+                positive_examples=positive_examples,
+                count=count,
+                focus_areas=['operational_efficiency', 'predictive_analysis', 'strategic_recommendations']
+            )
+        finally:
+            session.close()
         
         logger.info(f"Generated {len(additional_insights)} additional NI TCT insights")
         
@@ -239,14 +243,18 @@ async def get_ni_tct_insights(
                 )
         
         logger.info(f"Processing NI TCT AI insights request with date range: {start_date} to {end_date}")
-        
-        # Get KPI data first
+
+        # Get KPI data with optimized single session - PERFORMANCE OPTIMIZATION
         kpi_queries = NITCTKPIQueries(start_date=start_date, end_date=end_date)
-        kpi_data = kpi_queries.get_all_kpis()
-        
-        # Generate AI insights
-        insights_generator = AIInsightsGenerator()
-        insights_result = insights_generator.generate_insights(kpi_data)
+        session = kpi_queries.get_session()
+        try:
+            kpi_data = kpi_queries.get_all_kpis(session)
+
+            # Generate AI insights
+            insights_generator = AIInsightsGenerator()
+            insights_result = insights_generator.generate_insights(kpi_data)
+        finally:
+            session.close()
         
         logger.info("NI TCT AI insights request completed successfully")
         

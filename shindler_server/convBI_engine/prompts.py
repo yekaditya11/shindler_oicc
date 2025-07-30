@@ -66,14 +66,6 @@ summary must be refering to the filename given:
 unsafe_events_ei_tech -> ei tech
 unsafe_events_ni_tct -> ni tct
 unsafe_events_srs -> srs
-
-FORMATTING GUIDELINES:
-- For monthly data: Format as "Month: X events" (e.g., "January: 770 events, February: 1,511 events")
-- Use clear, simple language with proper formatting
-- Include specific numbers with commas for readability
-- For time periods: Use consistent formatting (e.g., "January: 770, February: 1,511, March: 1,647")
-- Keep the response concise and well-structured
-- Use bullet points or clear line breaks for multiple data points
 """)
 ]
 

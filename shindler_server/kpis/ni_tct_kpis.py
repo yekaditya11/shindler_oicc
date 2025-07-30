@@ -57,9 +57,13 @@ class NITCTKPIQueries:
         """Get database session"""
         return db_manager.get_session()
     
-    def execute_query(self, query: str, params: Dict = None) -> List[Dict]:
+    def execute_query(self, query: str, params: Dict = None, session: Session = None) -> List[Dict]:
         """Execute SQL query and return results"""
-        session = self.get_session()
+        # Use provided session or create a new one
+        use_existing_session = session is not None
+        if not session:
+            session = self.get_session()
+
         try:
             result = session.execute(text(query), params or {})
             columns = result.keys()
@@ -68,11 +72,13 @@ class NITCTKPIQueries:
             logger.error(f"Error executing query: {e}")
             raise
         finally:
-            session.close()
+            # Only close session if we created it
+            if not use_existing_session:
+                session.close()
     
     # ==================== EVENT VOLUME & FREQUENCY ====================
     
-    def get_total_events_count(self) -> Dict[str, Any]:
+    def get_total_events_count(self, session: Session = None) -> Dict[str, Any]:
         """Total events count"""
         query = f"""
         SELECT 
@@ -83,9 +89,9 @@ class NITCTKPIQueries:
         WHERE reporting_id IS NOT NULL
         {self.date_filter}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
     
-    def get_events_by_unsafe_event_type(self) -> List[Dict]:
+    def get_events_by_unsafe_event_type(self, session: Session = None) -> List[Dict]:
         """Events by type_of_unsafe_event"""
         query = f"""
         SELECT 
@@ -98,9 +104,9 @@ class NITCTKPIQueries:
         GROUP BY type_of_unsafe_event
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
     
-    def get_events_per_time_period(self, period: str = 'month') -> List[Dict]:
+    def get_events_per_time_period(self, period: str = 'month', session: Session = None) -> List[Dict]:
         """Events per time period (month/week/quarter)"""
         if period == 'month':
             date_part = "EXTRACT(YEAR FROM date_and_time_of_unsafe_event), EXTRACT(MONTH FROM date_and_time_of_unsafe_event)"
@@ -128,9 +134,9 @@ class NITCTKPIQueries:
         GROUP BY {date_part}
         ORDER BY {date_part}
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
     
-    def get_event_status_distribution(self) -> List[Dict]:
+    def get_event_status_distribution(self, session: Session = None) -> List[Dict]:
         """Distribution of events by status"""
         query = f"""
         SELECT 
@@ -142,11 +148,11 @@ class NITCTKPIQueries:
         GROUP BY status
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
     
     # ==================== SAFETY SEVERITY ====================
     
-    def get_high_risk_situation_analysis(self) -> Dict[str, Any]:
+    def get_high_risk_situation_analysis(self, session: Session = None) -> Dict[str, Any]:
         """Analysis of high-risk situation actions"""
         query = f"""
         SELECT 
@@ -159,9 +165,9 @@ class NITCTKPIQueries:
         WHERE action_related_to_high_risk_situation IS NOT NULL
         {self.date_filter}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
     
-    def get_work_stopped_incidents(self) -> Dict[str, Any]:
+    def get_work_stopped_incidents(self, session: Session = None) -> Dict[str, Any]:
         """Work stoppage incidents analysis"""
         query = f"""
         SELECT 
@@ -175,9 +181,9 @@ class NITCTKPIQueries:
         WHERE work_was_stopped IS NOT NULL
         {self.date_filter}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
     
-    def get_nogo_violations_count(self) -> Dict[str, Any]:
+    def get_nogo_violations_count(self, session: Session = None) -> Dict[str, Any]:
         """No-Go violations analysis"""
         query = f"""
         SELECT
@@ -189,9 +195,9 @@ class NITCTKPIQueries:
         WHERE 1=1
         {self.date_filter}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
 
-    def get_work_stoppage_duration_analysis(self) -> List[Dict]:
+    def get_work_stoppage_duration_analysis(self, session: Session = None) -> List[Dict]:
         """Analysis of work stoppage durations"""
         query = f"""
         SELECT
@@ -205,11 +211,11 @@ class NITCTKPIQueries:
         GROUP BY work_stopped_hours
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== GEOGRAPHIC DISTRIBUTION ====================
 
-    def get_events_by_region(self) -> List[Dict]:
+    def get_events_by_region(self, session: Session = None) -> List[Dict]:
         """Events by region"""
         query = f"""
         SELECT
@@ -226,9 +232,9 @@ class NITCTKPIQueries:
         GROUP BY region
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_events_by_branch(self) -> List[Dict]:
+    def get_events_by_branch(self, session: Session = None) -> List[Dict]:
         """Events by branch"""
         query = f"""
         SELECT
@@ -246,9 +252,9 @@ class NITCTKPIQueries:
         ORDER BY event_count DESC
         LIMIT 25
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_events_by_location(self) -> List[Dict]:
+    def get_events_by_location(self, session: Session = None) -> List[Dict]:
         """Events by location"""
         query = f"""
         SELECT
@@ -265,11 +271,11 @@ class NITCTKPIQueries:
         ORDER BY event_count DESC
         LIMIT 25
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== PERSONNEL METRICS ====================
 
-    def get_events_by_reporter(self) -> List[Dict]:
+    def get_events_by_reporter(self, session: Session = None) -> List[Dict]:
         """Events by reporter"""
         query = f"""
         SELECT
@@ -286,9 +292,9 @@ class NITCTKPIQueries:
         ORDER BY event_count DESC
         LIMIT 25
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_events_by_designation(self) -> List[Dict]:
+    def get_events_by_designation(self, session: Session = None) -> List[Dict]:
         """Events by designation"""
         query = f"""
         SELECT
@@ -305,11 +311,11 @@ class NITCTKPIQueries:
         GROUP BY designation
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== HIERARCHICAL ANALYSIS ====================
 
-    def get_gl_pe_hierarchy_analysis(self) -> List[Dict]:
+    def get_gl_pe_hierarchy_analysis(self, session: Session = None) -> List[Dict]:
         """Analysis of Group Leader (GL) and Project Engineer (PE) hierarchy"""
         query = f"""
         SELECT
@@ -329,9 +335,9 @@ class NITCTKPIQueries:
         ORDER BY event_count DESC
         LIMIT 25
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_group_leader_performance(self) -> List[Dict]:
+    def get_group_leader_performance(self, session: Session = None) -> List[Dict]:
         """Performance analysis by Group Leader"""
         query = f"""
         SELECT
@@ -354,9 +360,9 @@ class NITCTKPIQueries:
         ORDER BY total_events DESC
         LIMIT 20
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_project_engineer_performance(self) -> List[Dict]:
+    def get_project_engineer_performance(self, session: Session = None) -> List[Dict]:
         """Performance analysis by Project Engineer"""
         query = f"""
         SELECT
@@ -379,11 +385,11 @@ class NITCTKPIQueries:
         ORDER BY total_events DESC
         LIMIT 20
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== OPERATIONAL METRICS ====================
 
-    def get_events_by_product_type(self) -> List[Dict]:
+    def get_events_by_product_type(self, session: Session = None) -> List[Dict]:
         """Events by product type"""
         query = f"""
         SELECT
@@ -399,9 +405,9 @@ class NITCTKPIQueries:
         GROUP BY product_type
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_events_by_business_details(self) -> List[Dict]:
+    def get_events_by_business_details(self, session: Session = None) -> List[Dict]:
         """Events by business details"""
         query = f"""
         SELECT
@@ -417,9 +423,9 @@ class NITCTKPIQueries:
         GROUP BY business_details
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_attachment_utilization_analysis(self) -> Dict[str, Any]:
+    def get_attachment_utilization_analysis(self, session: Session = None) -> Dict[str, Any]:
         """Analysis of attachment utilization"""
         query = f"""
         SELECT
@@ -431,9 +437,9 @@ class NITCTKPIQueries:
             COUNT(CASE WHEN has_attachment IS NOT NULL THEN 1 END) as events_with_attachment_data
         FROM {self.table_name}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
 
-    def get_job_specific_analysis(self) -> List[Dict]:
+    def get_job_specific_analysis(self, session: Session = None) -> List[Dict]:
         """Analysis by job number"""
         query = f"""
         SELECT
@@ -453,11 +459,11 @@ class NITCTKPIQueries:
         ORDER BY event_count DESC
         LIMIT 25
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== ADVANCED ANALYTICS ====================
 
-    def get_reporting_delay_analysis(self) -> Dict[str, Any]:
+    def get_reporting_delay_analysis(self, session: Session = None) -> Dict[str, Any]:
         """Analysis of reporting delays"""
         query = f"""
         SELECT
@@ -472,9 +478,9 @@ class NITCTKPIQueries:
         FROM {self.table_name}
         WHERE created_on IS NOT NULL AND date_and_time_of_unsafe_event IS NOT NULL
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
 
-    def get_repeat_location_analysis(self) -> List[Dict]:
+    def get_repeat_location_analysis(self, session: Session = None) -> List[Dict]:
         """Analysis of repeat incidents at same locations"""
         query = f"""
         SELECT
@@ -495,9 +501,9 @@ class NITCTKPIQueries:
         ORDER BY incident_count DESC
         LIMIT 20
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_high_risk_response_effectiveness(self) -> List[Dict]:
+    def get_high_risk_response_effectiveness(self, session: Session = None) -> List[Dict]:
         """Analysis of high-risk situation response effectiveness"""
         query = f"""
         SELECT
@@ -520,9 +526,9 @@ class NITCTKPIQueries:
         HAVING COUNT(*) >= 5
         ORDER BY total_events DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_documentation_quality_score(self) -> Dict[str, Any]:
+    def get_documentation_quality_score(self, session: Session = None) -> Dict[str, Any]:
         """Calculate documentation quality score"""
         query = f"""
         SELECT
@@ -541,7 +547,7 @@ class NITCTKPIQueries:
                   NULLIF(COUNT(*), 0)) AS DECIMAL(10,2)) as persons_involved_completion_rate
         FROM {self.table_name}
         """
-        result = self.execute_query(query)[0]
+        result = self.execute_query(query, {}, session)[0]
 
         # Calculate overall quality score (weighted average) - Convert to float to handle Decimal types
         detailed_rate = float(result['detailed_description_rate']) if result['detailed_description_rate'] is not None else 0.0
@@ -559,7 +565,7 @@ class NITCTKPIQueries:
 
         return result
 
-    def get_seasonal_trend_analysis(self) -> List[Dict]:
+    def get_seasonal_trend_analysis(self, session: Session = None) -> List[Dict]:
         """Analyze seasonal trends in safety incidents"""
         query = f"""
         SELECT
@@ -579,11 +585,11 @@ class NITCTKPIQueries:
                  TO_CHAR(date_and_time_of_unsafe_event, 'Month')
         ORDER BY quarter, month
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== OPERATIONAL INTELLIGENCE ENHANCEMENTS ====================
 
-    def get_job_performance_analysis(self) -> List[Dict]:
+    def get_job_performance_analysis(self, session: Session = None) -> List[Dict]:
         """Analyze job performance with work completion rates and delays"""
         query = f"""
         SELECT
@@ -620,9 +626,9 @@ class NITCTKPIQueries:
         ORDER BY job_completion_rate DESC, total_hours_lost ASC
         LIMIT 30
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_staff_performance_with_job_context(self) -> List[Dict]:
+    def get_staff_performance_with_job_context(self, session: Session = None) -> List[Dict]:
         """Analyze staff performance in context of job completion and efficiency"""
         query = f"""
         SELECT
@@ -659,9 +665,9 @@ class NITCTKPIQueries:
         ORDER BY work_continuation_rate DESC, proactive_action_rate DESC, total_hours_lost ASC
         LIMIT 25
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_operational_efficiency_alerts(self, days_back: int = 14) -> List[Dict]:
+    def get_operational_efficiency_alerts(self, days_back: int = 14, session: Session = None) -> List[Dict]:
         """Generate operational efficiency alerts based on recent performance"""
         query = f"""
         WITH recent_performance AS (
@@ -705,11 +711,11 @@ class NITCTKPIQueries:
         WHERE recent_incidents >= 3
         ORDER BY work_stoppage_rate DESC, total_hours_lost DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== TIME-BASED ANALYSIS ====================
 
-    def get_incidents_by_time_of_day(self) -> List[Dict]:
+    def get_incidents_by_time_of_day(self, session: Session = None) -> List[Dict]:
         """Analyze incidents by time of day (morning, afternoon, night)"""
         query = f"""
         SELECT
@@ -739,9 +745,9 @@ class NITCTKPIQueries:
             END
         ORDER BY incident_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_hourly_incident_distribution(self) -> List[Dict]:
+    def get_hourly_incident_distribution(self, session: Session = None) -> List[Dict]:
         """Detailed hourly breakdown of incidents"""
         query = f"""
         SELECT
@@ -757,9 +763,9 @@ class NITCTKPIQueries:
         GROUP BY EXTRACT(HOUR FROM date_and_time_of_unsafe_event)
         ORDER BY hour_of_day
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_time_based_incident_trends(self) -> List[Dict]:
+    def get_time_based_incident_trends(self, session: Session = None) -> List[Dict]:
         """Analyze incident trends by time periods with additional context"""
         query = f"""
         SELECT
@@ -795,9 +801,9 @@ class NITCTKPIQueries:
         HAVING COUNT(*) >= 2
         ORDER BY time_period, incident_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_peak_incident_hours_analysis(self) -> Dict[str, Any]:
+    def get_peak_incident_hours_analysis(self, session: Session = None) -> Dict[str, Any]:
         """Identify peak incident hours and provide insights"""
         query = f"""
         WITH hourly_stats AS (
@@ -826,71 +832,81 @@ class NITCTKPIQueries:
             (SELECT AVG(incident_count) FROM hourly_stats) as avg_incidents_per_hour,
             (SELECT COUNT(*) FROM hourly_stats WHERE incident_count > (SELECT AVG(incident_count) FROM hourly_stats)) as above_avg_hours
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
 
     # ==================== COMPREHENSIVE KPI EXECUTION ====================
 
-    def get_all_kpis(self) -> Dict[str, Any]:
+    def get_all_kpis(self, session: Session = None) -> Dict[str, Any]:
         """Execute all KPI queries and return comprehensive results"""
         try:
             logger.info("Executing all NI TCT KPI queries...")
 
-            results = {
-                # Event Volume & Frequency
-                "total_events": self.get_total_events_count(),
-                "events_by_type": self.get_events_by_unsafe_event_type(),
-                "events_monthly": self.get_events_per_time_period('month'),
-                "events_weekly": self.get_events_per_time_period('week'),
-                "events_quarterly": self.get_events_per_time_period('quarter'),
-                "status_distribution": self.get_event_status_distribution(),
+            # Use provided session or create a new one for all KPI queries - PERFORMANCE OPTIMIZATION
+            use_existing_session = session is not None
+            if not session:
+                session = self.get_session()
 
-                # Safety Severity
-                "high_risk_situation_analysis": self.get_high_risk_situation_analysis(),
-                "work_stopped": self.get_work_stopped_incidents(),
-                "nogo_violations": self.get_nogo_violations_count(),
-                "work_stoppage_duration": self.get_work_stoppage_duration_analysis(),
+            try:
+                results = {
+                    # Event Volume & Frequency
+                    "total_events": self.get_total_events_count(session),
+                    "events_by_type": self.get_events_by_unsafe_event_type(session),
+                    "events_monthly": self.get_events_per_time_period('month', session),
+                    "events_weekly": self.get_events_per_time_period('week', session),
+                    "events_quarterly": self.get_events_per_time_period('quarter', session),
+                    "status_distribution": self.get_event_status_distribution(session),
 
-                # Geographic Distribution
-                "regional_distribution": self.get_events_by_region(),
-                "branch_distribution": self.get_events_by_branch(),
-                "location_distribution": self.get_events_by_location(),
+                    # Safety Severity
+                    "high_risk_situation_analysis": self.get_high_risk_situation_analysis(session),
+                    "work_stopped": self.get_work_stopped_incidents(session),
+                    "nogo_violations": self.get_nogo_violations_count(session),
+                    "work_stoppage_duration": self.get_work_stoppage_duration_analysis(session),
 
-                # Personnel Metrics
-                "top_reporters": self.get_events_by_reporter(),
-                "designation_analysis": self.get_events_by_designation(),
+                    # Geographic Distribution
+                    "regional_distribution": self.get_events_by_region(session),
+                    "branch_distribution": self.get_events_by_branch(session),
+                    "location_distribution": self.get_events_by_location(session),
 
-                # Hierarchical Analysis (NI TCT Specific)
-                "gl_pe_hierarchy": self.get_gl_pe_hierarchy_analysis(),
-                "group_leader_performance": self.get_group_leader_performance(),
-                "project_engineer_performance": self.get_project_engineer_performance(),
+                    # Personnel Metrics
+                    "top_reporters": self.get_events_by_reporter(session),
+                    "designation_analysis": self.get_events_by_designation(session),
 
-                # Operational Metrics
-                "product_types": self.get_events_by_product_type(),
-                "business_details": self.get_events_by_business_details(),
-                "attachment_utilization": self.get_attachment_utilization_analysis(),
-                "job_specific_analysis": self.get_job_specific_analysis(),
+                    # Hierarchical Analysis (NI TCT Specific)
+                    "gl_pe_hierarchy": self.get_gl_pe_hierarchy_analysis(session),
+                    "group_leader_performance": self.get_group_leader_performance(session),
+                    "project_engineer_performance": self.get_project_engineer_performance(session),
 
-                # Advanced Analytics
-                "reporting_delay_analysis": self.get_reporting_delay_analysis(),
-                "repeat_location_analysis": self.get_repeat_location_analysis(),
-                "high_risk_response_effectiveness": self.get_high_risk_response_effectiveness(),
-                "documentation_quality": self.get_documentation_quality_score(),
-                "seasonal_trends": self.get_seasonal_trend_analysis(),
+                    # Operational Metrics
+                    "product_types": self.get_events_by_product_type(session),
+                    "business_details": self.get_events_by_business_details(session),
+                    "attachment_utilization": self.get_attachment_utilization_analysis(session),
+                    "job_specific_analysis": self.get_job_specific_analysis(session),
 
-                # ==================== ENHANCED OPERATIONAL INTELLIGENCE ====================
-                "job_performance_analysis": self.get_job_performance_analysis(),
-                "staff_performance_with_job_context": self.get_staff_performance_with_job_context(),
-                "operational_efficiency_alerts": self.get_operational_efficiency_alerts(),
+                    # Advanced Analytics
+                    "reporting_delay_analysis": self.get_reporting_delay_analysis(session),
+                    "repeat_location_analysis": self.get_repeat_location_analysis(session),
+                    "high_risk_response_effectiveness": self.get_high_risk_response_effectiveness(session),
+                    "documentation_quality": self.get_documentation_quality_score(session),
+                    "seasonal_trends": self.get_seasonal_trend_analysis(session),
 
-                # ==================== TIME-BASED ANALYSIS ====================
-                "incidents_by_time_of_day": self.get_incidents_by_time_of_day(),
-                "hourly_incident_distribution": self.get_hourly_incident_distribution(),
-                "time_based_incident_trends": self.get_time_based_incident_trends(),
-                "peak_incident_hours_analysis": self.get_peak_incident_hours_analysis(),
-            }
+                    # ==================== ENHANCED OPERATIONAL INTELLIGENCE ====================
+                    "job_performance_analysis": self.get_job_performance_analysis(session),
+                    "staff_performance_with_job_context": self.get_staff_performance_with_job_context(session),
+                    "operational_efficiency_alerts": self.get_operational_efficiency_alerts(14, session),
 
-            logger.info("All NI TCT KPI queries executed successfully")
-            return results
+                    # ==================== TIME-BASED ANALYSIS ====================
+                    "incidents_by_time_of_day": self.get_incidents_by_time_of_day(session),
+                    "hourly_incident_distribution": self.get_hourly_incident_distribution(session),
+                    "time_based_incident_trends": self.get_time_based_incident_trends(session),
+                    "peak_incident_hours_analysis": self.get_peak_incident_hours_analysis(session),
+                }
+
+                logger.info("All NI TCT KPI queries executed successfully")
+                return results
+            finally:
+                # Only close session if we created it
+                if not use_existing_session:
+                    session.close()
 
         except Exception as e:
             logger.error(f"Error executing NI TCT KPIs: {e}")

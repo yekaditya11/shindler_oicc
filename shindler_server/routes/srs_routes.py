@@ -142,19 +142,23 @@ async def generate_more_srs_insights(
         start_date = request_data.get('start_date')
         end_date = request_data.get('end_date')
         
-        # Get fresh KPI data
+        # Get fresh KPI data with optimized single session - PERFORMANCE OPTIMIZATION
         kpi_queries = SRSKPIQueries()
-        kpi_data = kpi_queries.get_all_kpis()
-        
-        # Generate additional insights with different prompts/angles
-        insights_generator = AIInsightsGenerator()
-        additional_insights = insights_generator.generate_additional_insights(
-            kpi_data=kpi_data,
-            existing_insights=existing_insights,
-            positive_examples=positive_examples,
-            count=count,
-            focus_areas=['compliance_analysis', 'behavioral_patterns', 'systemic_issues']
-        )
+        session = kpi_queries.get_session()
+        try:
+            kpi_data = kpi_queries.get_all_kpis(session)
+
+            # Generate additional insights with different prompts/angles
+            insights_generator = AIInsightsGenerator()
+            additional_insights = insights_generator.generate_additional_insights(
+                kpi_data=kpi_data,
+                existing_insights=existing_insights,
+                positive_examples=positive_examples,
+                count=count,
+                focus_areas=['compliance_analysis', 'behavioral_patterns', 'systemic_issues']
+            )
+        finally:
+            session.close()
         
         logger.info(f"Generated {len(additional_insights)} additional SRS insights")
         
@@ -239,14 +243,18 @@ async def get_srs_insights(
                 )
         
         logger.info(f"Processing SRS AI insights request with date range: {start_date} to {end_date}")
-        
-        # Get KPI data first
+
+        # Get KPI data with optimized single session - PERFORMANCE OPTIMIZATION
         kpi_queries = SRSKPIQueries()
-        kpi_data = kpi_queries.get_all_kpis()
-        
-        # Generate AI insights
-        insights_generator = AIInsightsGenerator()
-        insights_result = insights_generator.generate_insights(kpi_data)
+        session = kpi_queries.get_session()
+        try:
+            kpi_data = kpi_queries.get_all_kpis(session)
+
+            # Generate AI insights
+            insights_generator = AIInsightsGenerator()
+            insights_result = insights_generator.generate_insights(kpi_data)
+        finally:
+            session.close()
         
         logger.info("SRS AI insights request completed successfully")
         

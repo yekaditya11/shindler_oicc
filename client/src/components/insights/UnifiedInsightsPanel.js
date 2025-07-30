@@ -71,14 +71,11 @@ const UnifiedInsightsPanel = ({
 
   const [isExpanded, setIsExpanded] = useState(false); // New expand state
   const [persistentSuggestions] = useState([
-    "Show recent incidents",
-    "Driver safety status",
-    "Action tracking summary",
-    "Observation trends",
-    "Equipment inspection status",
-    "Training compliance overview",
-    "Risk assessment summary",
-    "Safety performance metrics"
+    "How many days of work were lost due to an unsafe event?",
+    "Create a graph showing a trend of incidents reported in SR1, SR2, NR1 and NR2 for the last three months.",
+    "Which hazards are commonly occurring in all regions?",
+    "Are there any recurring patterns observed for the unsafe events reported this year?",
+    "Which region has reported the most number of unsafe events?"
   ]);
 
   const messagesEndRef = useRef(null);

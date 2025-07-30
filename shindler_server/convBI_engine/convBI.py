@@ -2,19 +2,21 @@ from dotenv import load_dotenv
 load_dotenv()
 import os
 from typing import Annotated
+import logging
+from datetime import datetime
 
 from typing_extensions import TypedDict
 
 from langgraph.graph import StateGraph, START, END
 from langgraph.graph.message import add_messages
-from langgraph.checkpoint.postgres import PostgresSaver
 from langchain_openai import AzureChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate 
 from typing import TypedDict, Dict, Any, List, Optional
-from convBI_engine.prompts import intent_prompt,greeting_prompt,file_identification_prompt,required_columns_prompt,text_to_sql_prompt,prompt_ddl,summarizer_prompt,clarification_prompt
+from .prompts import intent_prompt,greeting_prompt,file_identification_prompt,required_columns_prompt,text_to_sql_prompt,prompt_ddl,summarizer_prompt,clarification_prompt
 import json
 import psycopg
 
+logger = logging.getLogger(__name__)
 
 class WorkflowState(TypedDict):
 
@@ -42,7 +44,7 @@ class TextToSQLWorkflow:
         with open("convBI_engine/round_robin.json", "r") as round_robin_json:
             self.round_robin_count = json.load(round_robin_json)["count"]
         self.round_robin_count = self.round_robin_count 
-        print(self.round_robin_count)
+        logger.info(f"Using Azure OpenAI endpoint {self.round_robin_count}")
         self.llm = AzureChatOpenAI(
         azure_endpoint=os.environ[f"AZURE_OPENAI_ENDPOINT_{self.round_robin_count}"],
         azure_deployment=os.environ[f"AZURE_OPENAI_DEPLOYMENT_NAME_{self.round_robin_count}"],
@@ -90,10 +92,12 @@ class TextToSQLWorkflow:
         return graph_builder
     
     def _intent_classification_agent(self, state: WorkflowState)-> WorkflowState:
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - INTENT CLASSIFICATION STARTED")
+        start_time = datetime.now()
+        
         prompt=ChatPromptTemplate.from_messages(intent_prompt)
-        prez_conv=state["history"]
-        if len(state["history"])>2:
-            prez_conv=state["history"][-2:]
+        # Optimize history to reduce state size
+        prez_conv = state["history"][-1:] if state["history"] else []
 
         chain = prompt | self.llm
         result = chain.invoke({
@@ -101,24 +105,35 @@ class TextToSQLWorkflow:
             "history": prez_conv
         })
         state["intent"] = result.content.strip().lower()
+        
+        process_time = (datetime.now() - start_time).total_seconds()
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - INTENT CLASSIFICATION COMPLETED: {state['intent']} - TIME: {process_time:.3f}s")
 
         return state
     
     def _greeting_agent(self, state: WorkflowState)-> WorkflowState:
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - GREETING AGENT STARTED")
+        start_time = datetime.now()
+        
         prompt=ChatPromptTemplate.from_messages(greeting_prompt)
         chain = prompt | self.llm
         result = chain.invoke({
             "question": state["question"]
         })
         state["final_answer"] = result.content.strip().lower()
+        
+        process_time = (datetime.now() - start_time).total_seconds()
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - GREETING AGENT COMPLETED - TIME: {process_time:.3f}s")
 
         return state
     
     def _file_identification_agent(self, state: WorkflowState)-> WorkflowState:
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - FILE IDENTIFICATION STARTED")
+        start_time = datetime.now()
+        
         prompt=ChatPromptTemplate.from_messages(file_identification_prompt)
-        prez_conv=state["history"]
-        if len(state["history"])>2:
-            prez_conv=state["history"][-2:]
+        # Optimize history to reduce state size
+        prez_conv = state["history"][-1:] if state["history"] else []
         chain = prompt | self.llm
         result = chain.invoke({
             "question": state["question"],
@@ -126,23 +141,34 @@ class TextToSQLWorkflow:
             "ddl": state["database_ddl"]
         })
         state["filename"] = result.content.strip().lower()
+        
+        process_time = (datetime.now() - start_time).total_seconds()
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - FILE IDENTIFICATION COMPLETED: {state['filename']} - TIME: {process_time:.3f}s")
 
         return state
     
     def _top_5_unique_values_of_columns_retriever_agent(self, state: WorkflowState) -> WorkflowState:
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - TOP 5 COLUMNS RETRIEVER STARTED")
+        start_time = datetime.now()
+        
         try:
             with open("convBI_engine/column_analysis_top5.json", "r") as top_5_context_info_json:
                 top_5_context_info = json.load(top_5_context_info_json)
             if state["filename"]:
                state["top_5_unique_values_of_columns"] = top_5_context_info.get(state["filename"], {})
-            #    print(f"Top 5 unique values of columns: {state['top_5_unique_values_of_columns']}")
+            
+            process_time = (datetime.now() - start_time).total_seconds()
+            logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - TOP 5 COLUMNS RETRIEVER COMPLETED - TIME: {process_time:.3f}s")
         except FileNotFoundError:
-            print("Warning: column_analysis_top5.json not found")
+            logger.warning(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - column_analysis_top5.json not found")
             state["top_5_unique_values_of_columns"] = {}
         return state
 
 
     def _required_columns_info_retriever_agent(self, state: WorkflowState) -> WorkflowState:
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - REQUIRED COLUMNS RETRIEVER STARTED")
+        start_time = datetime.now()
+        
         prompt = ChatPromptTemplate.from_messages(required_columns_prompt)
 
         chain = prompt | self.llm
@@ -160,17 +186,20 @@ class TextToSQLWorkflow:
         try:
             state["required_unique_column_names"] = json.loads(final_result)
         except json.JSONDecodeError:
-            # Fallback if JSON parsing fails
+            logger.warning(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - JSON parsing failed for required columns")
             state["required_unique_column_names"] = []
+        
+        process_time = (datetime.now() - start_time).total_seconds()
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - REQUIRED COLUMNS RETRIEVER COMPLETED - TIME: {process_time:.3f}s")
         return state
     
     def _text_to_sql_agent(self, state: WorkflowState) -> WorkflowState:
-        # Extract previous SQL queries from PostgreSQL history for context
-
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - TEXT TO SQL STARTED")
+        start_time = datetime.now()
+        
         prompt = ChatPromptTemplate.from_messages(text_to_sql_prompt)
-        prez_conv=state["history"]
-        if len(state["history"])>2:
-            prez_conv=state["history"][-2:]
+        # Optimize history to reduce state size
+        prez_conv = state["history"][-1:] if state["history"] else []
         chain = prompt | self.llm
         result = chain.invoke({
             "ddl": state["database_ddl"],
@@ -187,63 +216,28 @@ class TextToSQLWorkflow:
         if sql_content.endswith("```"):
             sql_content = sql_content[:-3]  # Remove trailing ```
         state["sql_query"] = sql_content.strip()
-        # state["history"]=[result]
-        print(f"SQL Query generated: {state['sql_query']}")
+        
+        process_time = (datetime.now() - start_time).total_seconds()
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - TEXT TO SQL COMPLETED: {state['sql_query']} - TIME: {process_time:.3f}s")
         return state
     
     def _get_db_connection(self):
         try:
-            # Get connection parameters from environment
-            host = os.getenv('POSTGRES_HOST', 'localhost')
-            port = os.getenv('POSTGRES_PORT', '5432')
-            database = os.getenv('POSTGRES_DB', 'defaultdb')
-            user = os.getenv('POSTGRES_USER', 'postgres')
-            password = os.getenv('POSTGRES_PASSWORD', '')
-            
-            # Determine SSL mode based on host
-            sslmode = 'require' if 'aiven' in host or 'cloud' in host else 'prefer'
-            
-            # Create connection with proper SSL configuration
-            connection = psycopg.connect(
-                host=host,
-                port=port,
-                dbname=database,
-                user=user,
-                password=password,
-                sslmode=sslmode,
-                connect_timeout=10,
-                application_name='Shindler_ConvBI'
-            )
-            
+            DATABASE_URL = f"postgresql://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
+            connection = psycopg.connect(DATABASE_URL)
             return connection
         except psycopg.Error as e:
-            print(f"Database connection error: {e}")
-            # Try fallback connection without SSL for local development
-            try:
-                print("Attempting fallback connection without SSL...")
-                connection = psycopg.connect(
-                    host=host,
-                    port=port,
-                    dbname=database,
-                    user=user,
-                    password=password,
-                    sslmode='disable',
-                    connect_timeout=10,
-                    application_name='Shindler_ConvBI'
-                )
-                print("Fallback connection successful")
-                return connection
-            except psycopg.Error as fallback_error:
-                print(f"Fallback connection also failed: {fallback_error}")
-                return None
+            logger.error(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - DATABASE CONNECTION ERROR: {e}")
+            return None
   
     def _execute_sql_query(self, state: WorkflowState) -> WorkflowState:
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - SQL EXECUTION STARTED")
+        start_time = datetime.now()
+        
         try:
             conn = self._get_db_connection()
             if not conn:
-                state["error_message"] = "Could not establish database connection. Please check your database configuration."
-                state["needs_clarification"] = True
-                return state
+                raise Exception("Could not establish database connection")
             
             cursor = conn.cursor()
             cursor.execute(state["sql_query"])
@@ -256,29 +250,32 @@ class TextToSQLWorkflow:
                 formatted_results.append(row_dict)
             
             state["query_result"] = str(formatted_results)
-            state["history"]=[{"role":"system", "content":f"query_result: {state['query_result']}"}]
-            # print(f"SQL Query executed: {state['query_result']}")
+            # Optimize state by storing only essential query info
+            state["history"] = [{"role":"system", "content":f"query_result_count: {len(results)}"}]
             state["needs_clarification"] = False
+            
+            process_time = (datetime.now() - start_time).total_seconds()
+            logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - SQL EXECUTION SUCCESS - ROWS: {len(results)} - TIME: {process_time:.3f}s")
+            
             cursor.close()
             conn.close()
             
-        except psycopg.Error as db_error:
-            error_msg = f"Database error: {str(db_error)}"
-            state["error_message"] = error_msg
-            state["needs_clarification"] = True
-            print(f"SQL execution database error: {db_error}")
         except Exception as e:
-            error_msg = f"Query execution error: {str(e)}"
-            state["error_message"] = error_msg
+            state["error_message"] = str(e)
             state["needs_clarification"] = True
-            print(f"SQL execution general error: {e}")
+            
+            process_time = (datetime.now() - start_time).total_seconds()
+            logger.error(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - SQL EXECUTION ERROR: {e} - TIME: {process_time:.3f}s")
+            
         return state
     
     def _summarizer_agent(self, state: WorkflowState) -> WorkflowState:
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - SUMMARIZER STARTED")
+        start_time = datetime.now()
+        
         prompt = ChatPromptTemplate.from_messages(summarizer_prompt)
-        prez_conv=state["history"]
-        if len(state["history"])>2:
-            prez_conv=state["history"][-2:]
+        # Optimize history to reduce state size
+        prez_conv = state["history"][-1:] if state["history"] else []
         chain = prompt | self.llm
         result = chain.invoke({
             "question": state["question"],
@@ -287,10 +284,16 @@ class TextToSQLWorkflow:
             "filename": state["filename"]
         })
         state["final_answer"] = result.content.strip().lower()
-        print(f"Final answer: {state['final_answer']}")
+        
+        process_time = (datetime.now() - start_time).total_seconds()
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - SUMMARIZER COMPLETED - TIME: {process_time:.3f}s")
+        
         return state
     
     def _clarification_agent(self, state: WorkflowState) -> WorkflowState:
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - CLARIFICATION AGENT STARTED")
+        start_time = datetime.now()
+        
         prompt = ChatPromptTemplate.from_messages(clarification_prompt)
         prez_conv=state["history"]
         if len(state["history"])>2:
@@ -302,10 +305,16 @@ class TextToSQLWorkflow:
             "error_message": state["error_message"]
         })
         state["final_answer"] = result.content.strip().lower()
-        print(f"Clarification answer: {state['final_answer']}")
+        
+        process_time = (datetime.now() - start_time).total_seconds()
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - CLARIFICATION AGENT COMPLETED - TIME: {process_time:.3f}s")
+        
         return state
     
     def _visualization_agent(self, state: WorkflowState) -> WorkflowState:
+        logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - VISUALIZATION AGENT STARTED")
+        start_time = datetime.now()
+        
         """
         This agent uses GPT to generate a JSON for Apache ECharts based on the summary data.
         It creates a chart configuration in the ECharts JSON format.
@@ -337,9 +346,8 @@ class TextToSQLWorkflow:
             )
 
             chain = prompt | self.llm  # Assuming `self.llm` is already initialized as AzureChatOpenAI
-            prez_conv=state["history"]
-            if len(state["history"])>2:
-                prez_conv=state["history"][-2:]
+            # Optimize history to reduce state size
+            prez_conv = state["history"][-1:] if state["history"] else []
 
             result = chain.invoke({
                 "question": question,
@@ -349,12 +357,16 @@ class TextToSQLWorkflow:
             # Parse the output and save the JSON to state
 
             state["visualization_data"] = json.loads(result.content.strip())  # Save the generated JSON
-            print(state["visualization_data"])
+            
+            process_time = (datetime.now() - start_time).total_seconds()
+            logger.info(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - VISUALIZATION AGENT COMPLETED - TIME: {process_time:.3f}s")
             
         except json.JSONDecodeError as e:
             state["error_message"] = f"Error generating visualization data: {e}"
             state["needs_clarification"] = True
-            print(f"hi Error: {e}")
+            
+            process_time = (datetime.now() - start_time).total_seconds()
+            logger.error(f"REQUEST_ID: {getattr(self, 'request_id', 'unknown')} - VISUALIZATION AGENT ERROR: {e} - TIME: {process_time:.3f}s")
         
         return state
      
@@ -363,7 +375,13 @@ class TextToSQLWorkflow:
     
     
     
-    def run_workflow(self, question: str,  thread_id: str = "1") -> Dict[str, Any]:
+    def run_workflow(self, question: str,  thread_id: str = "1", request_id: str = None) -> Dict[str, Any]:
+        # Store request_id for logging
+        self.request_id = request_id or "unknown"
+        
+        logger.info(f"REQUEST_ID: {self.request_id} - WORKFLOW STARTED - QUESTION: {question}")
+        workflow_start_time = datetime.now()
+        
         state = WorkflowState(
                 history=[{"role":"user", "content": question}],
                 question=question,
@@ -383,19 +401,31 @@ class TextToSQLWorkflow:
                 required_unique_column_values=[],
                 visualization_data={}
             )
-        # DB_URI = "postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable"
-        DB_URI = f"postgres://{os.getenv('POSTGRES_USER')}:{os.getenv('POSTGRES_PASSWORD')}@{os.getenv('POSTGRES_HOST')}:{os.getenv('POSTGRES_PORT')}/{os.getenv('POSTGRES_DB')}"
-        with PostgresSaver.from_conn_string(DB_URI) as checkpointer:
-            # checkpointer.setup()
-
+        
+        try:
+            # Remove PostgreSQL checkpointing for better performance
             workflow = self._build_workflow()
-            graph = workflow.compile(checkpointer=checkpointer)
+            build_time = (datetime.now() - workflow_start_time).total_seconds()
+            logger.info(f"REQUEST_ID: {self.request_id} - WORKFLOW BUILT - TIME: {build_time:.3f}s")
+            
+            graph = workflow.compile()  # Remove checkpointer parameter
+            compile_time = (datetime.now() - workflow_start_time).total_seconds()
+            logger.info(f"REQUEST_ID: {self.request_id} - GRAPH COMPILED - TIME: {compile_time:.3f}s")
+            
             config = {"configurable": {"thread_id": "1"}}
             final_state = graph.invoke(state, config)
+            
+            workflow_time = (datetime.now() - workflow_start_time).total_seconds()
+            logger.info(f"REQUEST_ID: {self.request_id} - WORKFLOW COMPLETED SUCCESSFULLY - TOTAL TIME: {workflow_time:.3f}s")
+            
             return {
             "final_answer": final_state["final_answer"],
             "visualization_data": final_state["visualization_data"],
             }
+        except Exception as e:
+            workflow_time = (datetime.now() - workflow_start_time).total_seconds()
+            logger.error(f"REQUEST_ID: {self.request_id} - WORKFLOW FAILED: {str(e)} - TOTAL TIME: {workflow_time:.3f}s")
+            raise
 
 
 if __name__ == "__main__":

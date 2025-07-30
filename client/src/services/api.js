@@ -269,50 +269,68 @@ class ApiService {
   async sendChatMessage(message, sessionId = null, userId = 'anonymous') {
     // Use the new conversational BI endpoint
     try {
-      console.log('Sending message to ConvBI:', message);
-      
+      console.log('🔥 API: Sending message to ConvBI:', message);
+      console.log('🔥 API: Request URL:', `${API_BASE_URL}/api/v1/chat`);
+      console.log('🔥 API: Request payload:', { question: message });
+
       const response = await api.post('/api/v1/chat', {
         question: message
       });
 
-      console.log('ConvBI response:', response);
+      console.log('🔥 API: ConvBI response received:', response);
+      console.log('🔥 API: Response status:', response.status_code);
+      console.log('🔥 API: Response body:', response.body);
+
+      // Check if ConvBI engine is available
+      if (response.status_code === 503) {
+        throw new Error('Conversational BI engine not available. Please install dependencies: pip install -r convBI_engine/requirements.txt');
+      }
 
       // Transform the response to match the expected format
       let chartData = null;
       if (response.body?.visualization_data) {
         try {
           // Handle both object and string formats
-          const rawChartData = typeof response.body.visualization_data === 'string' 
+          const rawChartData = typeof response.body.visualization_data === 'string'
             ? JSON.parse(response.body.visualization_data)
             : response.body.visualization_data;
-          
+
           // Sanitize the chart data to prevent object rendering issues
           chartData = this.sanitizeChartData(rawChartData);
-          console.log('Processed chart data:', chartData);
+          console.log('🔥 API: Processed chart data:', chartData);
         } catch (parseError) {
-          console.error('Error parsing visualization data:', parseError);
+          console.error('🔥 API: Error parsing visualization data:', parseError);
           chartData = null;
         }
       }
 
-      return {
+      const finalResponse = {
         success: true,
-        message: this.extractTextFromResponse(response.body?.final_answer) || 
-                 this.extractTextFromResponse(response.body?.error_message) || 
+        message: this.extractTextFromResponse(response.body?.final_answer) ||
+                 this.extractTextFromResponse(response.body?.error_message) ||
                  'No response available',
         data_context: response.body?.query_result ? JSON.parse(response.body.query_result) : null,
         chart_data: chartData,
         sql_query: response.body?.sql_query || null,
         suggested_actions: [
-          "Show me recent incidents by severity",
-          "What are the top safety violations this month?",
-          "Compare safety metrics across regions",
-          "Show training compliance rates"
+          "How many days of work were lost due to an unsafe event?",
+          "Create a graph showing a trend of incidents reported in SR1, SR2, NR1 and NR2 for the last three months.",
+          "Which hazards are commonly occurring in all regions?",
+          "Are there any recurring patterns observed for the unsafe events reported this year?",
+          "Which region has reported the most number of unsafe events?"
         ]
       };
+
+      console.log('🔥 API: Final response being returned:', finalResponse);
+      return finalResponse;
     } catch (error) {
-      console.error('ConvBI error:', error);
-      
+      console.error('🔥 API: ConvBI error:', error);
+      console.error('🔥 API: Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+
       // Return error in expected format
       return {
         success: false,

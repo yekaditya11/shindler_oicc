@@ -28,9 +28,13 @@ class SRSKPIQueries:
         """Get database session"""
         return db_manager.get_session()
     
-    def execute_query(self, query: str, params: Dict = None) -> List[Dict]:
+    def execute_query(self, query: str, params: Dict = None, session: Session = None) -> List[Dict]:
         """Execute SQL query and return results"""
-        session = self.get_session()
+        # Use provided session or create a new one
+        use_existing_session = session is not None
+        if not session:
+            session = self.get_session()
+
         try:
             result = session.execute(text(query), params or {})
             columns = result.keys()
@@ -39,11 +43,13 @@ class SRSKPIQueries:
             logger.error(f"Error executing query: {e}")
             raise
         finally:
-            session.close()
+            # Only close session if we created it
+            if not use_existing_session:
+                session.close()
     
     # ==================== EVENT VOLUME & FREQUENCY ====================
     
-    def get_total_events_count(self) -> Dict[str, Any]:
+    def get_total_events_count(self, session: Session = None) -> Dict[str, Any]:
         """Total events count"""
         query = f"""
         SELECT 
@@ -52,9 +58,9 @@ class SRSKPIQueries:
         FROM {self.table_name}
         WHERE event_id IS NOT NULL
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
     
-    def get_events_by_unsafe_event_type(self) -> List[Dict]:
+    def get_events_by_unsafe_event_type(self, session: Session = None) -> List[Dict]:
         """Events by unsafe_event_type"""
         query = f"""
         SELECT 
@@ -66,9 +72,9 @@ class SRSKPIQueries:
         GROUP BY unsafe_event_type
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
     
-    def get_events_per_time_period(self, period: str = 'month') -> List[Dict]:
+    def get_events_per_time_period(self, period: str = 'month', session: Session = None) -> List[Dict]:
         """Events per time period (month/week/quarter)"""
         if period == 'month':
             date_part = "EXTRACT(YEAR FROM date_of_unsafe_event), EXTRACT(MONTH FROM date_of_unsafe_event)"
@@ -93,11 +99,11 @@ class SRSKPIQueries:
         GROUP BY {date_part}
         ORDER BY {date_part}
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
     
     # ==================== SAFETY SEVERITY METRICS ====================
     
-    def get_serious_near_miss_count(self) -> Dict[str, Any]:
+    def get_serious_near_miss_count(self, session: Session = None) -> Dict[str, Any]:
         """Serious near miss incidents count and percentage"""
         query = f"""
         SELECT 
@@ -107,9 +113,9 @@ class SRSKPIQueries:
                   NULLIF(COUNT(*), 0), 2) as serious_near_miss_percentage
         FROM {self.table_name}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
     
-    def get_work_stopped_incidents(self) -> Dict[str, Any]:
+    def get_work_stopped_incidents(self, session: Session = None) -> Dict[str, Any]:
         """Work stopped incidents analysis"""
         query = f"""
         SELECT 
@@ -119,9 +125,9 @@ class SRSKPIQueries:
                   NULLIF(COUNT(*), 0), 2) as work_stopped_percentage
         FROM {self.table_name}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
     
-    def get_events_requiring_sanctions(self) -> Dict[str, Any]:
+    def get_events_requiring_sanctions(self, session: Session = None) -> Dict[str, Any]:
         """Events requiring sanctions analysis"""
         query = f"""
         SELECT 
@@ -131,9 +137,9 @@ class SRSKPIQueries:
                   NULLIF(COUNT(*), 0), 2) as sanction_required_percentage
         FROM {self.table_name}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
     
-    def get_nogo_violations_count(self) -> Dict[str, Any]:
+    def get_nogo_violations_count(self, session: Session = None) -> Dict[str, Any]:
         """NOGO violations analysis"""
         query = f"""
         SELECT 
@@ -143,11 +149,11 @@ class SRSKPIQueries:
                   NULLIF(COUNT(*), 0), 2) as nogo_violation_percentage
         FROM {self.table_name}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
     
     # ==================== GEOGRAPHIC DISTRIBUTION ====================
     
-    def get_events_by_region_country_division(self) -> List[Dict]:
+    def get_events_by_region_country_division(self, session: Session = None) -> List[Dict]:
         """Events by region, country, and division"""
         query = f"""
         SELECT 
@@ -161,9 +167,9 @@ class SRSKPIQueries:
         GROUP BY region, country_name, division
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
     
-    def get_events_by_city_district_zone(self) -> List[Dict]:
+    def get_events_by_city_district_zone(self, session: Session = None) -> List[Dict]:
         """Events by city, district, and zone"""
         query = f"""
         SELECT 
@@ -179,9 +185,9 @@ class SRSKPIQueries:
         ORDER BY event_count DESC
         LIMIT 50
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
     
-    def get_events_by_branch(self) -> List[Dict]:
+    def get_events_by_branch(self, session: Session = None) -> List[Dict]:
         """Events by branch"""
         query = f"""
         SELECT 
@@ -196,14 +202,14 @@ class SRSKPIQueries:
         GROUP BY branch
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
     
     # ==================== PERSONNEL METRICS (REMOVED - NOT ESSENTIAL) ====================
     # Removed: get_events_by_reporter, get_employee_vs_subcontractor_incidents, get_events_by_subcontractor_company
     
     # ==================== OPERATIONAL METRICS ====================
 
-    def get_events_by_business_details(self) -> List[Dict]:
+    def get_events_by_business_details(self, session: Session = None) -> List[Dict]:
         """Events by business details (business type)"""
         query = f"""
         SELECT
@@ -216,9 +222,9 @@ class SRSKPIQueries:
         ORDER BY event_count DESC
         LIMIT 20
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_events_by_unsafe_event_location(self) -> List[Dict]:
+    def get_events_by_unsafe_event_location(self, session: Session = None) -> List[Dict]:
         """Frequent Unsafe Event Locations"""
         query = f"""
         SELECT
@@ -234,9 +240,9 @@ class SRSKPIQueries:
         ORDER BY event_count DESC
         LIMIT 25
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_work_hours_lost_analysis(self) -> Dict[str, Any]:
+    def get_work_hours_lost_analysis(self, session: Session = None) -> Dict[str, Any]:
         """Work Hours lost analysis"""
         query = f"""
         SELECT
@@ -246,9 +252,9 @@ class SRSKPIQueries:
                   NULLIF(COUNT(*), 0), 2) as work_disruption_percentage
         FROM {self.table_name}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
 
-    def get_action_creation_and_compliance(self) -> Dict[str, Any]:
+    def get_action_creation_and_compliance(self, session: Session = None) -> Dict[str, Any]:
         """Action creation and compliance analysis"""
         query = f"""
         SELECT
@@ -258,9 +264,9 @@ class SRSKPIQueries:
                   NULLIF(COUNT(*), 0), 2) as action_closure_rate
         FROM {self.table_name}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
 
-    def get_insights_from_comments_and_actions(self) -> Dict[str, Any]:
+    def get_insights_from_comments_and_actions(self, session: Session = None) -> Dict[str, Any]:
         """Insights from comments and actions"""
         query = f"""
         SELECT
@@ -273,11 +279,11 @@ class SRSKPIQueries:
                   NULLIF(COUNT(*), 0), 2) as actions_completion_rate
         FROM {self.table_name}
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
 
     # ==================== UNSAFE ACTS & CONDITIONS ANALYSIS ====================
 
-    def get_common_unsafe_behaviors(self) -> List[Dict]:
+    def get_common_unsafe_behaviors(self, session: Session = None) -> List[Dict]:
         """Common Unsafe Behaviors breakdown"""
         query = f"""
         SELECT
@@ -293,9 +299,9 @@ class SRSKPIQueries:
         ORDER BY event_count DESC
         LIMIT 20
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_common_unsafe_conditions(self) -> List[Dict]:
+    def get_common_unsafe_conditions(self, session: Session = None) -> List[Dict]:
         """Common Unsafe Conditions breakdown"""
         query = f"""
         SELECT
@@ -311,9 +317,9 @@ class SRSKPIQueries:
         ORDER BY event_count DESC
         LIMIT 20
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_monthly_weekly_trends_unsafe_behaviors(self) -> List[Dict]:
+    def get_monthly_weekly_trends_unsafe_behaviors(self, session: Session = None) -> List[Dict]:
         """Monthly/Weekly Trends of Unsafe Behaviours"""
         query = f"""
         SELECT
@@ -327,9 +333,9 @@ class SRSKPIQueries:
         GROUP BY EXTRACT(YEAR FROM date_of_unsafe_event), EXTRACT(MONTH FROM date_of_unsafe_event)
         ORDER BY EXTRACT(YEAR FROM date_of_unsafe_event), EXTRACT(MONTH FROM date_of_unsafe_event)
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_monthly_weekly_trends_unsafe_conditions(self) -> List[Dict]:
+    def get_monthly_weekly_trends_unsafe_conditions(self, session: Session = None) -> List[Dict]:
         """Monthly/Weekly Trends of Unsafe Conditions"""
         query = f"""
         SELECT
@@ -343,11 +349,11 @@ class SRSKPIQueries:
         GROUP BY EXTRACT(YEAR FROM date_of_unsafe_event), EXTRACT(MONTH FROM date_of_unsafe_event)
         ORDER BY EXTRACT(YEAR FROM date_of_unsafe_event), EXTRACT(MONTH FROM date_of_unsafe_event)
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== REPORTING & TIME ANALYSIS ====================
 
-    def get_time_taken_to_report_incidents(self) -> List[Dict]:
+    def get_time_taken_to_report_incidents(self, session: Session = None) -> List[Dict]:
         """Time taken to report incidents"""
         query = f"""
         SELECT
@@ -374,9 +380,9 @@ class SRSKPIQueries:
             END
         ORDER BY event_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_average_time_between_event_and_reporting(self) -> Dict[str, Any]:
+    def get_average_time_between_event_and_reporting(self, session: Session = None) -> Dict[str, Any]:
         """Average Time Between Event and Reporting"""
         query = f"""
         SELECT
@@ -387,9 +393,9 @@ class SRSKPIQueries:
         FROM {self.table_name}
         WHERE reported_date IS NOT NULL AND date_of_unsafe_event IS NOT NULL
         """
-        return self.execute_query(query)[0]
+        return self.execute_query(query, {}, session)[0]
 
-    def get_events_by_time_of_day(self) -> List[Dict]:
+    def get_events_by_time_of_day(self, session: Session = None) -> List[Dict]:
         """Unsafe Events by Time of Day"""
         query = f"""
         SELECT
@@ -424,9 +430,9 @@ class SRSKPIQueries:
             END
         ORDER BY incident_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_events_by_approval_status(self) -> List[Dict]:
+    def get_events_by_approval_status(self, session: Session = None) -> List[Dict]:
         """Events by approval status"""
         query = f"""
         SELECT
@@ -448,9 +454,9 @@ class SRSKPIQueries:
             END
         ORDER BY incident_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_nogo_violation_trends_by_regions_branches(self) -> List[Dict]:
+    def get_nogo_violation_trends_by_regions_branches(self, session: Session = None) -> List[Dict]:
         """No Go Violation trends by Regions/Branches"""
         query = f"""
         SELECT
@@ -466,9 +472,9 @@ class SRSKPIQueries:
         HAVING COUNT(CASE WHEN UPPER(stop_work_nogo_violation) = 'YES' THEN 1 END) > 0
         ORDER BY nogo_violation_count DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_serious_near_miss_by_location_region_branch(self) -> List[Dict]:
+    def get_serious_near_miss_by_location_region_branch(self, session: Session = None) -> List[Dict]:
         """Serious Near Miss - by location/region/branch"""
         query = f"""
         SELECT
@@ -486,9 +492,9 @@ class SRSKPIQueries:
         ORDER BY serious_near_miss_count DESC
         LIMIT 25
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_branch_risk_index(self) -> List[Dict]:
+    def get_branch_risk_index(self, session: Session = None) -> List[Dict]:
         """Branch Risk Index calculation"""
         query = f"""
         SELECT
@@ -510,9 +516,9 @@ class SRSKPIQueries:
         GROUP BY branch
         ORDER BY branch_risk_index DESC, total_incidents DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_at_risk_regions(self) -> List[Dict]:
+    def get_at_risk_regions(self, session: Session = None) -> List[Dict]:
         """At risk regions identification"""
         query = f"""
         SELECT
@@ -538,11 +544,11 @@ class SRSKPIQueries:
             COUNT(CASE WHEN UPPER(stop_work_nogo_violation) = 'YES' THEN 1 END) > 1
         ORDER BY risk_score DESC, serious_incident_rate DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== OPERATIONAL INTELLIGENCE & INSIGHTS ====================
 
-    def get_operational_alerts_with_reasons(self, days_back: int = 30) -> List[Dict]:
+    def get_operational_alerts_with_reasons(self, days_back: int = 30, session: Session = None) -> List[Dict]:
         """Generate operational alerts with detailed reasons from comments"""
         query = f"""
         WITH recent_performance AS (
@@ -601,9 +607,9 @@ class SRSKPIQueries:
         WHERE r.recent_incidents >= 2
         ORDER BY variance_percent DESC, serious_incidents DESC
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_violation_patterns_with_context(self, days_back: int = 30) -> List[Dict]:
+    def get_violation_patterns_with_context(self, days_back: int = 30, session: Session = None) -> List[Dict]:
         """Analyze violation patterns with detailed context and reasons"""
         query = f"""
         SELECT
@@ -636,9 +642,9 @@ class SRSKPIQueries:
         ORDER BY violation_count DESC, serious_violations DESC
         LIMIT 25
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_staff_impact_analysis(self) -> List[Dict]:
+    def get_staff_impact_analysis(self, session: Session = None) -> List[Dict]:
         """Analyze staff impact with performance metrics and context"""
         query = f"""
         SELECT
@@ -672,9 +678,9 @@ class SRSKPIQueries:
         ORDER BY work_continuation_rate DESC, proactive_action_rate DESC
         LIMIT 30
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
-    def get_resource_optimization_insights(self) -> List[Dict]:
+    def get_resource_optimization_insights(self, session: Session = None) -> List[Dict]:
         """Generate resource optimization insights based on incident patterns"""
         query = f"""
         SELECT
@@ -715,71 +721,81 @@ class SRSKPIQueries:
         ORDER BY incident_frequency DESC, disruption_rate DESC
         LIMIT 25
         """
-        return self.execute_query(query)
+        return self.execute_query(query, {}, session)
 
     # ==================== COMPREHENSIVE KPI COLLECTION ====================
 
-    def get_all_kpis(self) -> Dict[str, Any]:
+    def get_all_kpis(self, session: Session = None) -> Dict[str, Any]:
         """Execute essential KPI queries and return results (optimized for LLM processing)"""
         try:
             logger.info("Executing essential SRS KPI queries...")
 
-            results = {
-                # Core Event Metrics
-                "number_of_unsafe_events": self.get_total_events_count(),
-                "monthly_unsafe_events_trend": self.get_events_per_time_period('month'),
-                "monthly_weekly_trends_unsafe_behaviors": self.get_monthly_weekly_trends_unsafe_behaviors(),
-                "monthly_weekly_trends_unsafe_conditions": self.get_monthly_weekly_trends_unsafe_conditions(),
-                "near_misses": self.get_serious_near_miss_count(),
+            # Use provided session or create a new one for all KPI queries - PERFORMANCE OPTIMIZATION
+            use_existing_session = session is not None
+            if not session:
+                session = self.get_session()
 
-                # Geographic & Location Analysis
-                "unsafe_events_by_branch": self.get_events_by_branch(),
-                "unsafe_events_by_region": self.get_events_by_region_country_division(),
-                "at_risk_regions": self.get_at_risk_regions(),
-                "frequent_unsafe_event_locations": self.get_events_by_unsafe_event_location(),
+            try:
+                results = {
+                    # Core Event Metrics
+                    "number_of_unsafe_events": self.get_total_events_count(session),
+                    "monthly_unsafe_events_trend": self.get_events_per_time_period('month', session),
+                    "monthly_weekly_trends_unsafe_behaviors": self.get_monthly_weekly_trends_unsafe_behaviors(session),
+                    "monthly_weekly_trends_unsafe_conditions": self.get_monthly_weekly_trends_unsafe_conditions(session),
+                    "near_misses": self.get_serious_near_miss_count(session),
 
-                # Time & Reporting Analysis
-                "time_taken_to_report_incidents": self.get_time_taken_to_report_incidents(),
-                "average_time_between_event_and_reporting": self.get_average_time_between_event_and_reporting(),
-                "unsafe_events_by_time_of_day": self.get_events_by_time_of_day(),
+                    # Geographic & Location Analysis
+                    "unsafe_events_by_branch": self.get_events_by_branch(session),
+                    "unsafe_events_by_region": self.get_events_by_region_country_division(session),
+                    "at_risk_regions": self.get_at_risk_regions(session),
+                    "frequent_unsafe_event_locations": self.get_events_by_unsafe_event_location(session),
 
-                # Actions & Compliance
-                "corrective_actions_created": self.get_action_creation_and_compliance(),
-                "action_creation_and_compliance": self.get_action_creation_and_compliance(),
-                "action_closure_rate": self.get_action_creation_and_compliance(),
+                    # Time & Reporting Analysis
+                    "time_taken_to_report_incidents": self.get_time_taken_to_report_incidents(session),
+                    "average_time_between_event_and_reporting": self.get_average_time_between_event_and_reporting(session),
+                    "unsafe_events_by_time_of_day": self.get_events_by_time_of_day(session),
 
-                # Business & Operational
-                "unsafe_event_distribution_by_business_type": self.get_events_by_business_details(),
-                "events_by_approval_status": self.get_events_by_approval_status(),
+                    # Actions & Compliance
+                    "corrective_actions_created": self.get_action_creation_and_compliance(session),
+                    "action_creation_and_compliance": self.get_action_creation_and_compliance(session),
+                    "action_closure_rate": self.get_action_creation_and_compliance(session),
 
-                # No Go Violations & Work Disruptions
-                "number_of_nogo_violations": self.get_nogo_violations_count(),
-                "nogo_violation_trends_by_regions_branches": self.get_nogo_violation_trends_by_regions_branches(),
-                "work_hours_lost": self.get_work_hours_lost_analysis(),
+                    # Business & Operational
+                    "unsafe_event_distribution_by_business_type": self.get_events_by_business_details(session),
+                    "events_by_approval_status": self.get_events_by_approval_status(session),
 
-                # Safety Behaviors & Conditions
-                "common_unsafe_behaviors": self.get_common_unsafe_behaviors(),
-                "common_unsafe_conditions": self.get_common_unsafe_conditions(),
+                    # No Go Violations & Work Disruptions
+                    "number_of_nogo_violations": self.get_nogo_violations_count(session),
+                    "nogo_violation_trends_by_regions_branches": self.get_nogo_violation_trends_by_regions_branches(session),
+                    "work_hours_lost": self.get_work_hours_lost_analysis(session),
 
-                # Serious Incidents Analysis
-                "serious_near_misses_trend": self.get_events_per_time_period('month'),  # Reusing monthly trend
-                "serious_near_miss_by_location_region_branch": self.get_serious_near_miss_by_location_region_branch(),
+                    # Safety Behaviors & Conditions
+                    "common_unsafe_behaviors": self.get_common_unsafe_behaviors(session),
+                    "common_unsafe_conditions": self.get_common_unsafe_conditions(session),
 
-                # Risk Assessment
-                "branch_risk_index": self.get_branch_risk_index(),
+                    # Serious Incidents Analysis
+                    "serious_near_misses_trend": self.get_events_per_time_period('month', session),  # Reusing monthly trend
+                    "serious_near_miss_by_location_region_branch": self.get_serious_near_miss_by_location_region_branch(session),
 
-                # Insights & Comments
-                "insights_from_comments_and_actions": self.get_insights_from_comments_and_actions(),
+                    # Risk Assessment
+                    "branch_risk_index": self.get_branch_risk_index(session),
 
-                # ==================== ENHANCED OPERATIONAL INTELLIGENCE ====================
-                "operational_alerts_with_reasons": self.get_operational_alerts_with_reasons(),
-                "violation_patterns_with_context": self.get_violation_patterns_with_context(),
-                "staff_impact_analysis": self.get_staff_impact_analysis(),
-                "resource_optimization_insights": self.get_resource_optimization_insights(),
-            }
+                    # Insights & Comments
+                    "insights_from_comments_and_actions": self.get_insights_from_comments_and_actions(session),
 
-            logger.info("Successfully executed essential SRS KPI queries")
-            return results
+                    # ==================== ENHANCED OPERATIONAL INTELLIGENCE ====================
+                    "operational_alerts_with_reasons": self.get_operational_alerts_with_reasons(30, session),
+                    "violation_patterns_with_context": self.get_violation_patterns_with_context(30, session),
+                    "staff_impact_analysis": self.get_staff_impact_analysis(session),
+                    "resource_optimization_insights": self.get_resource_optimization_insights(session),
+                }
+
+                logger.info("Successfully executed essential SRS KPI queries")
+                return results
+            finally:
+                # Only close session if we created it
+                if not use_existing_session:
+                    session.close()
 
         except Exception as e:
             logger.error(f"Error in get_all_kpis: {e}")

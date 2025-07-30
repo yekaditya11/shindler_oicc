@@ -3,6 +3,7 @@ uvicorn
 pandas
 openpyxl
 psycopg2-binary
+psycopg
 sqlalchemy
 python-dotenv
 pydantic

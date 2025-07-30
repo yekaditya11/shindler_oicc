@@ -55,14 +55,11 @@ const ChatBot = ({ moduleContext = null }) => {
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const [persistentSuggestions] = useState([
-    "Show me the top 5 unsafe events by region",
-    "What are the most common safety violations this month?",
-    "How many incidents occurred in the last quarter?",
-    "Compare safety metrics across different regions",
-    "Show training compliance rates by department",
-    "What is the trend of near miss incidents over time?",
-    "Show equipment inspection failure rates",
-    "Display safety performance by location"
+    "How many days of work were lost due to an unsafe event?",
+    "Create a graph showing a trend of incidents reported in SR1, SR2, NR1 and NR2 for the last three months.",
+    "Which hazards are commonly occurring in all regions?",
+    "Are there any recurring patterns observed for the unsafe events reported this year?",
+    "Which region has reported the most number of unsafe events?"
   ]);
 
   // Add a simple test to ensure component is working
@@ -187,7 +184,15 @@ const ChatBot = ({ moduleContext = null }) => {
   };
 
   const handleSendMessage = async (messageText) => {
-    if (!messageText.trim() || isLoading) return;
+    console.log('🚀 handleSendMessage called with:', messageText);
+    console.log('🚀 Current isLoading state:', isLoading);
+
+    if (!messageText.trim() || isLoading) {
+      console.log('🚀 Message blocked - empty message or loading:', { messageText: messageText.trim(), isLoading });
+      return;
+    }
+
+    console.log('🚀 Processing message...');
 
     // Add user message immediately
     const userMessage = {
@@ -197,19 +202,21 @@ const ChatBot = ({ moduleContext = null }) => {
       timestamp: new Date()
     };
 
+    console.log('🚀 Adding user message to state:', userMessage);
     setMessages(prev => [...prev, userMessage]);
     setIsLoading(true);
     setIsTyping(true);
 
     try {
-      console.log('Sending chat message:', messageText, 'Session ID:', sessionId, 'Module Context:', moduleContext);
+      console.log('🚀 Sending chat message:', messageText, 'Session ID:', sessionId, 'Module Context:', moduleContext);
 
       // Always use general chat endpoint - the AI backend is smart enough to detect
       // module intent from question content and handle ALL module questions
       // This allows the chatbot to answer questions about any module regardless of current page
+      console.log('🚀 About to call ApiService.sendChatMessage...');
       const response = await ApiService.sendChatMessage(messageText, sessionId);
 
-      console.log('Chat response received:', response);
+      console.log('🚀 Chat response received:', response);
 
       // Note: axios interceptor returns response.data, so response is already the data object
       if (response && response.success) {
@@ -251,8 +258,13 @@ const ChatBot = ({ moduleContext = null }) => {
         setMessages(prev => [...prev, errorMessage]);
       }
     } catch (error) {
-      console.error('Error sending message:', error);
-      
+      console.error('🚀 Error sending message:', error);
+      console.error('🚀 Error details:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response
+      });
+
       // Add error message
       const errorMessage = {
         id: Date.now() + 1,
@@ -261,9 +273,11 @@ const ChatBot = ({ moduleContext = null }) => {
         timestamp: new Date(),
         isError: true
       };
-      
+
+      console.log('🚀 Adding error message to chat:', errorMessage);
       setMessages(prev => [...prev, errorMessage]);
     } finally {
+      console.log('🚀 Finally block - setting loading states to false');
       setIsLoading(false);
       setIsTyping(false);
     }

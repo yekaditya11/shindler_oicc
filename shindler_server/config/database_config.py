@@ -58,14 +58,14 @@ class DatabaseManager:
                     self.postgres_config.connection_string,
                     pool_pre_ping=True,
                     pool_recycle=300,
-                    pool_size=10,
-                    max_overflow=20,
+                    pool_size=20,        # Increased from 10 to 20 for better concurrency
+                    max_overflow=40,     # Increased from 20 to 40 for peak loads
                     pool_timeout=30,
                     echo=False,
                     isolation_level="AUTOCOMMIT",
                     connect_args={
                         "connect_timeout": 10,
-                        "application_name": "Shindler_EI_Tech_API",
+                        "application_name": "Shindler_Safety_Analytics_API",
                         "sslmode": "require"  # Required for Aiven cloud databases
                     }
                 )
