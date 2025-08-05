@@ -30,6 +30,10 @@ from routes.dashboard_management_routes import router as dashboard_management_ro
 # Import file upload route module
 from routes.file_upload_routes import router as file_upload_router
 
+
+from routes.aws_s3_routes import s3_router
+from routes.dataingest_routes import router as dataingest_router
+
 # Create FastAPI app
 app = FastAPI(
     title="Shindler Safety Analytics API Server",
@@ -198,6 +202,9 @@ async def api_info():
         "default_behavior": "Returns data for the last 1 year when no date parameters are provided"
     }
 
+
+app.include_router(s3_router, prefix="/s3", tags=["S3"])
+app.include_router(dataingest_router, prefix="/api/v1", tags=["Data Ingestion"])
 
 if __name__ == "__main__":
     # Start the server on port 8000
