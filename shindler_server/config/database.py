@@ -21,7 +21,7 @@ def get_engine():
     """Get or create database engine"""
     global _engine
     if _engine is None:
-        from src.config.settings import settings
+        from config.settings import settings
         logger.info(f"Creating database engine for: {settings.db_host}:{settings.db_port}/{settings.db_name}")
         _engine = create_engine(
             settings.database_url,
@@ -44,10 +44,6 @@ class LazyEngine:
     def __getattr__(self, name):
         engine = get_engine()
         return getattr(engine, name)
-
-    def __call__(self, *args, **kwargs):
-        engine = get_engine()
-        return engine(*args, **kwargs)
 
 class LazySessionLocal:
     def __getattr__(self, name):
@@ -74,7 +70,7 @@ async def init_db():
     """Initialize database tables"""
     try:
         # Import all models to register them
-        from src.models import unsafe_event_models, base_models, upload_data_versioning
+        from models import unsafe_event_models, base_models, upload_data_versioning
 
         # Use the models to ensure they're registered (suppress unused warnings)
         _ = unsafe_event_models, base_models, upload_data_versioning

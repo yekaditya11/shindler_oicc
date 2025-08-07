@@ -162,7 +162,7 @@ def _validate_filename_pattern(filename: str) -> None:
     - ValueError: If filename doesn't contain any allowed patterns
     """
     # Import here to avoid circular imports
-    from src.config.file_name_pattrens_configs import file_name_patterns
+    from config.file_name_pattrens_configs import file_name_patterns
 
     if not filename:
         raise ValueError("Filename cannot be empty")

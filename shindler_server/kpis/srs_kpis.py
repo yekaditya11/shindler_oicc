@@ -789,7 +789,6 @@ class SRSKPIQueries:
                     "staff_impact_analysis": self.get_staff_impact_analysis(session),
                     "resource_optimization_insights": self.get_resource_optimization_insights(session),
                 }
-
                 logger.info("Successfully executed essential SRS KPI queries")
                 return results
             finally:

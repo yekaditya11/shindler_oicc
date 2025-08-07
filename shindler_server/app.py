@@ -29,6 +29,8 @@ from routes.dashboard_ni_tct_routes import router as dashboard_ni_tct_router
 from routes.dashboard_management_routes import router as dashboard_management_router
 # Import file upload route module
 from routes.file_upload_routes import router as file_upload_router
+# Import file processing route module
+from routes.file_processing_routes import router as file_processing_router
 
 
 from routes.aws_s3_routes import s3_router
@@ -64,6 +66,8 @@ app.include_router(dashboard_ni_tct_router)
 app.include_router(dashboard_management_router)
 # Include file upload router
 app.include_router(file_upload_router)
+# Include file processing router
+app.include_router(file_processing_router)
 
 # Pydantic models for request/response
 class HealthResponse(BaseModel):

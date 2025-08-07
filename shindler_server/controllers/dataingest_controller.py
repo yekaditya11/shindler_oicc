@@ -29,7 +29,6 @@ class DataIngestController:
         """
         try:
             logger.info(f"Received S3 file ingestion request: s3_key={request.s3_key}, filename={request.filename}")
-
             # Check if filename matches any known patterns
             matched_pattern = None
             for pattern in file_name_patterns:
