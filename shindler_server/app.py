@@ -22,6 +22,8 @@ from routes.ei_tech_routes import router as ei_tech_router
 from routes.srs_routes import router as srs_router
 from routes.ni_tct_routes import router as ni_tct_router
 from routes.conversationBI_routers import conv_bi_router
+from routes.srs_agumented_routes import router as srs_agumented_router
+from routes.dashboard_srs_agumented_routes import router as dashboard_srs_agumented_router
 # Import dashboard route modules
 from routes.dashboard_ei_tech_routes import router as dashboard_ei_tech_router
 from routes.dashboard_srs_routes import router as dashboard_srs_router
@@ -29,7 +31,7 @@ from routes.dashboard_ni_tct_routes import router as dashboard_ni_tct_router
 from routes.dashboard_management_routes import router as dashboard_management_router
 # Import file upload route module
 from routes.file_upload_routes import router as file_upload_router
-
+from routes.file_health_routers import health_router
 # Create FastAPI app
 app = FastAPI(
     title="Shindler Safety Analytics API Server",
@@ -53,6 +55,8 @@ app.include_router(ei_tech_router)
 app.include_router(srs_router)
 app.include_router(ni_tct_router)
 app.include_router(conv_bi_router)
+app.include_router(srs_agumented_router)
+app.include_router(dashboard_srs_agumented_router)
 # Include dashboard routers
 app.include_router(dashboard_ei_tech_router)
 app.include_router(dashboard_srs_router)
@@ -60,6 +64,8 @@ app.include_router(dashboard_ni_tct_router)
 app.include_router(dashboard_management_router)
 # Include file upload router
 app.include_router(file_upload_router)
+
+app.include_router(health_router)
 
 # Pydantic models for request/response
 class HealthResponse(BaseModel):

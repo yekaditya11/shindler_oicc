@@ -1,0 +1,423 @@
+{
+    "overall_health": {
+      "score": 94,
+      "grade": "Excellent",
+      "timestamp": "2025-08-09T18:10:49.463003Z"
+    },
+    "dimensions": {
+      "completeness": {
+        "score": 94,
+        "columns_assessed": 56
+      },
+      "uniqueness": {
+        "score": 96,
+        "columns_assessed": 8
+      },
+      "consistency": {
+        "score": 89,
+        "columns_assessed": 15
+      },
+      "validity": {
+        "score": 93,
+        "columns_assessed": 18
+      },
+      "timeliness": {
+        "score": 91,
+        "columns_assessed": 8
+      }
+    },
+    "column_analysis": {
+      "event_id": {
+        "overall_column_score": 100,
+        "priority": "critical",
+        "dimensions_checked": ["completeness", "uniqueness", "validity"],
+        "dimensions_skipped": ["consistency", "timeliness"],
+        "issues": []
+      },
+      "reporter_name": {
+        "overall_column_score": 92,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "consistency"],
+        "dimensions_skipped": ["uniqueness", "timeliness"],
+        "issues": ["Minor formatting inconsistencies (no spaces in some cases like 'AashishChaudhari' vs 'Abhishek Ravindra Kharwar')"]
+      },
+      "reported_date": {
+        "overall_column_score": 97,
+        "priority": "critical",
+        "dimensions_checked": ["completeness", "validity", "timeliness"],
+        "dimensions_skipped": ["uniqueness", "consistency"],
+        "issues": ["Few reported dates are in the future"]
+      },
+      "reporter_id": {
+        "overall_column_score": 96,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "uniqueness", "validity"],
+        "dimensions_skipped": ["consistency", "timeliness"],
+        "issues": ["622 unique IDs vs 610 unique names indicates potential duplicates"]
+      },
+      "date_of_unsafe_event": {
+        "overall_column_score": 96,
+        "priority": "critical",
+        "dimensions_checked": ["completeness", "validity", "timeliness"],
+        "dimensions_skipped": ["uniqueness", "consistency"],
+        "issues": ["Few event dates are after reported dates"]
+      },
+      "time_of_unsafe_event": {
+        "overall_column_score": 93,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "consistency"],
+        "dimensions_skipped": ["uniqueness", "timeliness"],
+        "issues": ["Minor time format variations (HH:MM:SS vs HH:MM:00)"]
+      },
+      "unsafe_event_type": {
+        "overall_column_score": 88,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": ["Minor ordering variations in combined categories (e.g., 'Unsafe Condition,Unsafe Act' vs 'Unsafe Act,Unsafe Condition')"]
+      },
+      "business_details": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness"],
+        "dimensions_skipped": ["uniqueness", "consistency", "validity", "timeliness"],
+        "issues": []
+      },
+      "site_reference": {
+        "overall_column_score": 88,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "consistency"],
+        "dimensions_skipped": ["uniqueness", "timeliness"],
+        "issues": ["90 missing values", "Minor naming convention variations"]
+      },
+      "unsafe_event_location": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": []
+      },
+      "product_type": {
+        "overall_column_score": 91,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": ["Minor naming convention variations"]
+      },
+      "employee_id": {
+        "overall_column_score": 95,
+        "priority": "critical",
+        "dimensions_checked": ["completeness", "uniqueness", "validity"],
+        "dimensions_skipped": ["consistency", "timeliness"],
+        "issues": ["1723 unique employee IDs vs 1636 unique names suggests potential data mismatches"]
+      },
+      "employee_name": {
+        "overall_column_score": 94,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "consistency"],
+        "dimensions_skipped": ["uniqueness", "timeliness"],
+        "issues": ["Minor name formatting variations"]
+      },
+      "employee_age": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": []
+      },
+      "job_role": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": []
+      },
+      "subcontractor_company_name": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": []
+      },
+      "subcontractorid": {
+        "overall_column_score": 98,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "uniqueness"],
+        "dimensions_skipped": ["consistency", "validity", "timeliness"],
+        "issues": ["187 unique IDs vs 188 unique company names indicates potential mismatch"]
+      },
+      "subcontractor_city": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": []
+      },
+      "subcontractor_name": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": []
+      },
+      "kg_name": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": []
+      },
+      "country_name": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": []
+      },
+      "division": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": []
+      },
+      "department": {
+        "overall_column_score": 88,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": ["191 missing values", "Standardized formatting with codes"]
+      },
+      "city": {
+        "overall_column_score": 92,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "consistency"],
+        "dimensions_skipped": ["uniqueness", "timeliness"],
+        "issues": ["191 missing values", "Standardized formatting with location codes"]
+      },
+      "sub-area": {
+        "overall_column_score": 85,
+        "priority": "low",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": ["739 missing values - expected for optional field"]
+      },
+      "district": {
+        "overall_column_score": 0,
+        "priority": "low",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": ["4000 missing values - completely empty column"]
+      },
+      "zone": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": []
+      },
+      "serious_near_miss": {
+        "overall_column_score": 100,
+        "priority": "critical",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": []
+      },
+      "unsafe_act": {
+        "overall_column_score": 15,
+        "priority": "low",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": ["3279 missing values", "Trailing commas and spaces in values (e.g., 'Lack or improper use of PPE, ')"]
+      },
+      "unsafe_act_other": {
+        "overall_column_score": 5,
+        "priority": "low",
+        "dimensions_checked": ["completeness"],
+        "dimensions_skipped": ["uniqueness", "consistency", "validity", "timeliness"],
+        "issues": ["3786 missing values"]
+      },
+      "unsafe_condition": {
+        "overall_column_score": 75,
+        "priority": "low",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": ["728 missing values", "Trailing commas and spaces in values (e.g., 'Inadequate barricades (falling hazard), ')"]
+      },
+      "unsafe_condition_other": {
+        "overall_column_score": 14,
+        "priority": "low",
+        "dimensions_checked": ["completeness"],
+        "dimensions_skipped": ["uniqueness", "consistency", "validity", "timeliness"],
+        "issues": ["3440 missing values"]
+      },
+      "work_stopped": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": []
+      },
+      "stop_work_nogo_violation": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": []
+      },
+      "nogo_violation_detail": {
+        "overall_column_score": 2,
+        "priority": "low",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": ["3995 missing values", "Trailing commas in values (e.g., 'Safe Hoistway Access, ')"]
+      },
+      "stop_work_duration": {
+        "overall_column_score": 20,
+        "priority": "low",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": ["3198 missing values"]
+      },
+      "other_safety_issues": {
+        "overall_column_score": 6,
+        "priority": "low",
+        "dimensions_checked": ["completeness"],
+        "dimensions_skipped": ["uniqueness", "consistency", "validity", "timeliness"],
+        "issues": ["3776 missing values"]
+      },
+      "comments_remarks": {
+        "overall_column_score": 6,
+        "priority": "low",
+        "dimensions_checked": ["completeness"],
+        "dimensions_skipped": ["uniqueness", "consistency", "validity", "timeliness"],
+        "issues": ["3763 missing values"]
+      },
+      "event_requires_sanction": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": []
+      },
+      "action_description_1": {
+        "overall_column_score": 84,
+        "priority": "low",
+        "dimensions_checked": ["completeness"],
+        "dimensions_skipped": ["uniqueness", "consistency", "validity", "timeliness"],
+        "issues": ["657 missing values"]
+      },
+      "branch": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": []
+      },
+      "region": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "consistency"],
+        "dimensions_skipped": ["uniqueness", "validity", "timeliness"],
+        "issues": []
+      },
+      "gender": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "consistency"],
+        "dimensions_skipped": ["uniqueness", "timeliness"],
+        "issues": []
+      },
+      "joining_date": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "timeliness"],
+        "dimensions_skipped": ["uniqueness", "consistency"],
+        "issues": []
+      },
+      "last_training_attended": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "timeliness"],
+        "dimensions_skipped": ["uniqueness", "consistency"],
+        "issues": []
+      },
+      "training_expiry_date": {
+        "overall_column_score": 91,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "timeliness"],
+        "dimensions_skipped": ["uniqueness", "consistency"],
+        "issues": ["Few training certificates have expired (dates before 2025-08-09)"]
+      },
+      "training_scores": {
+        "overall_column_score": 97,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": ["Few scores below 65 (minimum passing score)"]
+      },
+      "shift_timings": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "consistency"],
+        "dimensions_skipped": ["uniqueness", "timeliness"],
+        "issues": []
+      },
+      "total_hours_worked_in_previous_week": {
+        "overall_column_score": 85,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": ["Few values exceed recommended work limits (maximum 92 hours flagged for review)"]
+      },
+      "overtime_hours": {
+        "overall_column_score": 95,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": ["Few instances of high overtime (>16 hours)"]
+      },
+      "years_of_experience": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity"],
+        "dimensions_skipped": ["uniqueness", "consistency", "timeliness"],
+        "issues": []
+      },
+      "last_maintenance_date": {
+        "overall_column_score": 86,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "timeliness", "consistency"],
+        "dimensions_skipped": ["uniqueness"],
+        "issues": ["Date format standardization needed (MM/dd/yyyy format)", "Few future maintenance dates to review"]
+      },
+      "investigation_closure_date": {
+        "overall_column_score": 97,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "timeliness"],
+        "dimensions_skipped": ["uniqueness", "consistency"],
+        "issues": ["Few closure dates scheduled for future"]
+      },
+      "audit_date": {
+        "overall_column_score": 93,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "timeliness"],
+        "dimensions_skipped": ["uniqueness", "consistency"],
+        "issues": ["Few audit dates need refresh (older than 6 months)"]
+      },
+      "audit_frequency": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "consistency"],
+        "dimensions_skipped": ["uniqueness", "timeliness"],
+        "issues": []
+      },
+      "weather_condition": {
+        "overall_column_score": 100,
+        "priority": "high",
+        "dimensions_checked": ["completeness", "validity", "consistency"],
+        "dimensions_skipped": ["uniqueness", "timeliness"],
+        "issues": []
+      }
+    }
+  }
