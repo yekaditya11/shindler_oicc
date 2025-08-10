@@ -41,7 +41,37 @@ def insert_file_data(uploaded_file_name, file_id):
     except Exception as e:
         logger.error(f"Error inserting data: {e}")
         return False
+
+def update_file_id(uploaded_file_name, new_file_id):
+    """Update file_id for an existing record based on uploaded_file_name"""
     
+    update_sql = """
+    UPDATE file_ids_table 
+    SET file_id = :new_file_id
+    WHERE uploaded_file_name = :uploaded_file_name;
+    """
+    
+    try:
+        engine = db_manager.postgres_engine
+        with engine.connect() as conn:
+            result = conn.execute(text(update_sql), {
+                'uploaded_file_name': uploaded_file_name,
+                'new_file_id': new_file_id
+            })
+            
+            conn.commit()
+            
+            # Check if any rows were affected
+            if result.rowcount > 0:
+                logger.info(f"Successfully updated record: {uploaded_file_name} -> {new_file_id}")
+                return True
+            else:
+                logger.warning(f"No record found with uploaded_file_name: {uploaded_file_name}")
+                return False
+                
+    except Exception as e:
+        logger.error(f"Error updating data: {e}")
+        return False  
 
 def get_all_files():
     """Retrieve all records from file_ids_table"""
@@ -59,3 +89,26 @@ def get_all_files():
     except Exception as e:
         logger.error(f"Error retrieving all files: {e}")
         return []
+
+
+def add_tab(tab_name:str):
+    """Add a new tab to the file_ids_table"""
+    
+    insert_sql = """
+    INSERT INTO file_ids_table (uploaded_file_name)
+    VALUES (:uploaded_file_name);
+    """
+    try:
+        engine = db_manager.postgres_engine
+        with engine.connect() as conn:
+            conn.execute(text(insert_sql), {
+                'uploaded_file_name': tab_name
+            })
+            conn.commit()
+            logger.info(f"Successfully added tab: {tab_name}")
+            return True
+    except Exception as e:
+        logger.error(f"Error adding tab: {e}")
+        return False
+
+

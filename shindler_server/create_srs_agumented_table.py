@@ -29,7 +29,7 @@ def create_table():
     """Create the unsafe_events_srs_agumented table"""
     
     create_table_sql = """
-    CREATE TABLE IF NOT EXISTS unsafe_events_srs_agumented (
+    CREATE TABLE IF NOT EXISTS unsafe_events_srs_enriched (
         event_id VARCHAR(50) PRIMARY KEY,
         reporter_name VARCHAR(255),
         reported_date DATE,
@@ -94,7 +94,7 @@ def create_table():
         with engine.connect() as conn:
             conn.execute(text(create_table_sql))
             conn.commit()
-            logger.info("Table unsafe_events_srs_agumented created successfully")
+            logger.info("Table unsafe_events_srs_enriched created successfully")
             return True
     except Exception as e:
         logger.error(f"Error creating table: {e}")
@@ -150,7 +150,7 @@ def upload_excel_data(excel_file_path):
         # Upload data to database
         logger.info("Uploading data to database...")
         df.to_sql(
-            'unsafe_events_srs_agumented', 
+            'unsafe_events_srs_enriched', 
             engine, 
             if_exists='replace',  # Replace existing data
             index=False,
@@ -158,7 +158,7 @@ def upload_excel_data(excel_file_path):
             chunksize=1000  # Process in chunks
         )
         
-        logger.info(f"Successfully uploaded {len(df)} rows to unsafe_events_srs_agumented table")
+        logger.info(f"Successfully uploaded {len(df)} rows to unsafe_events_srs_enriched table")
         return True
         
     except Exception as e:
@@ -172,12 +172,12 @@ def verify_data():
         engine = db_manager.postgres_engine
         with engine.connect() as conn:
             # Check row count
-            result = conn.execute(text("SELECT COUNT(*) FROM unsafe_events_srs_agumented"))
+            result = conn.execute(text("SELECT COUNT(*) FROM unsafe_events_srs_enriched"))
             row_count = result.fetchone()[0]
             logger.info(f"Total rows in table: {row_count}")
             
             # Check sample data
-            result = conn.execute(text("SELECT event_id, reporter_name, reported_date FROM unsafe_events_srs_agumented LIMIT 5"))
+            result = conn.execute(text("SELECT event_id, reporter_name, reported_date FROM unsafe_events_srs_enriched LIMIT 5"))
             sample_data = result.fetchall()
             logger.info("Sample data:")
             for row in sample_data:

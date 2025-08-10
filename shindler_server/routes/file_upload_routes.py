@@ -9,7 +9,7 @@ import pandas as pd
 import io
 import logging
 from datetime import datetime
-from controllers.file_upload_controller import insert_file_data,get_all_files
+from controllers.file_upload_controller import insert_file_data,get_all_files,add_tab,update_file_id
 
 logger = logging.getLogger(__name__)
 
@@ -62,7 +62,8 @@ async def upload_and_analyze_file(upload_file_name:str,file: UploadFile = File(.
         if file_type=="srs_agumented":
             file_id=3
 
-        insert_file_data(upload_file_name,file_id)
+        # insert_file_data(upload_file_name,file_id)
+        update_file_id(upload_file_name,file_id)
         # Reset file position
         await file.seek(0)
         
@@ -87,4 +88,10 @@ async def upload_and_analyze_file(upload_file_name:str,file: UploadFile = File(.
 @router.get("/get-all-files")
 def get_all_files_router():
     result=get_all_files()
+    return result
+
+
+@router.post("/add-tab") 
+def add_tab_router(tab_name:str):
+    result=add_tab(tab_name)
     return result
