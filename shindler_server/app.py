@@ -23,6 +23,7 @@ from routes.srs_routes import router as srs_router
 from routes.ni_tct_routes import router as ni_tct_router
 from routes.conversation_routers import  router as conv_bi_router
 from routes.srs_agumented_routes import router as srs_agumented_router
+from routes.srs_enriched_routes import router as srs_enriched_router
 from routes.dashboard_srs_agumented_routes import router as dashboard_srs_agumented_router
 # Import dashboard route modules
 from routes.dashboard_ei_tech_routes import router as dashboard_ei_tech_router
@@ -57,6 +58,7 @@ app.include_router(srs_router)
 app.include_router(ni_tct_router)
 app.include_router(conv_bi_router)
 app.include_router(srs_agumented_router)
+app.include_router(srs_enriched_router)
 app.include_router(dashboard_srs_agumented_router)
 # Include dashboard routers
 app.include_router(dashboard_ei_tech_router)
