@@ -42,20 +42,20 @@ def insert_file_data(uploaded_file_name, file_id):
         logger.error(f"Error inserting data: {e}")
         return False
 
-def update_file_id(uploaded_file_name, new_file_id, file_type):
+def update_file_id(tab_id, new_file_id, file_type):
     """Update file_id and file_type for an existing record based on uploaded_file_name"""
     
     update_sql = """
     UPDATE file_ids_table 
     SET file_id = :new_file_id, file_type = :file_type
-    WHERE uploaded_file_name = :uploaded_file_name;
+    WHERE id = :tab_id;
     """
     
     try:
         engine = db_manager.postgres_engine
         with engine.connect() as conn:
             result = conn.execute(text(update_sql), {
-                'uploaded_file_name': uploaded_file_name,
+                'tab_id': tab_id,
                 'new_file_id': new_file_id,
                 'file_type': file_type
             })
@@ -64,10 +64,10 @@ def update_file_id(uploaded_file_name, new_file_id, file_type):
             
             # Check if any rows were affected
             if result.rowcount > 0:
-                logger.info(f"Successfully updated record: {uploaded_file_name} -> file_id: {new_file_id}, file_type: {file_type}")
+                logger.info(f"Successfully updated record: {tab_id} -> file_id: {new_file_id}, file_type: {file_type}")
                 return True
             else:
-                logger.warning(f"No record found with uploaded_file_name: {uploaded_file_name}")
+                logger.warning(f"No record found with uploaded_file_name: {tab_id}")
                 return False
                 
     except Exception as e:

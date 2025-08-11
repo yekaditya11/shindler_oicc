@@ -23,7 +23,7 @@ def analyze_file_content(df: pd.DataFrame, filename: str = "") -> str:
         return "unknown"
         
 @router.post("/upload-analyze")
-async def upload_and_analyze_file(upload_file_name:str,file: UploadFile = File(...)) -> Dict[str, Any]:
+async def upload_and_analyze_file(tab_id:str,file: UploadFile = File(...)) -> Dict[str, Any]:
     """
     Upload Excel file and analyze its content to determine dashboard type
     
@@ -63,12 +63,13 @@ async def upload_and_analyze_file(upload_file_name:str,file: UploadFile = File(.
             file_id=3
 
         # insert_file_data(upload_file_name,file_id)
-        update_file_id(upload_file_name,file_id,file_type)
+        update_file_id(tab_id,file_id,file_type)
         # Reset file position
         await file.seek(0)
         
         return {
             'success': True,
+            "tab_id":tab_id,
             'file_id':file_id,
             'file_type': file_type,
             'filename': file.filename,
