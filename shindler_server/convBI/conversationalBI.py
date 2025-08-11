@@ -394,12 +394,13 @@ class TextToSQLWorkflow:
             final_answer = ""
             try:
                 final_answer = final_state.values.get("final_answer", "")
+                visulaization_data=final_state.values.get("visualization_data","")
             except Exception:
                 final_answer = ""
 
             completion_response = StreamResponse(
                 type="final_answer",
-                data={"final_answer": final_answer},
+                data={"final_answer": final_answer,"visualaization_data":visulaization_data},
                 timestamp=datetime.now().isoformat(),
             )
             yield f"data: {completion_response.model_dump_json()}\n\n"

@@ -71,6 +71,102 @@
     {
       "type": "ai",
       "content": "in the srs system, hyderabad 1 has the highest number of unsafe events with a total of 335."
+    },
+    {
+      "type": "human",
+      "content": "highest unsafe events in a area"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT branch AS area, COUNT(*) AS event_count\nFROM unsafe_events_srs\nGROUP BY branch\nORDER BY event_count DESC\nLIMIT 1;"
+    },
+    {
+      "type": "ai",
+      "content": "the highest number of unsafe events in srs is in bangalore 1, with 836 events."
+    },
+    {
+      "type": "human",
+      "content": "let me know the insights"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  region, \n  branch AS area,\n  COUNT(*) AS total_unsafe_events,\n  COUNT(DISTINCT unsafe_event_type) AS unique_unsafe_event_types,\n  SUM(CASE WHEN serious_near_miss = 'Yes' THEN 1 ELSE 0 END) AS serious_near_miss_count,\n  SUM(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END) AS work_stopped_count,\n  COUNT(DISTINCT reporter_id) AS distinct_reporters,\n  MIN(date_of_unsafe_event) AS first_reported_event_date,\n  MAX(date_of_unsafe_event) AS last_reported_event_date\nFROM unsafe_events_srs\nGROUP BY region, branch\nORDER BY total_unsafe_events DESC\nLIMIT 5;"
+    },
+    {
+      "type": "ai",
+      "content": "in srs, the top 5 areas with unsafe events show bangalore 1 leading with 836 total events and 5 unique unsafe event types, followed closely by north delhi with 816 events and a higher variety of 9 event types. bangalore 1 had 4 serious near misses and 181 instances where work was stopped, while north delhi had none for serious near misses but a higher work-stopped count at 244. infra/trd reported 621 events with fewer reporters and the least work stoppages (46). bangalore 2 and south delhi had fewer total events (457 and 449 respectively) but still notable work-stopped counts (165 and 79). distinct reporters ranged from 41 in south delhi up to 140 in north delhi. the earliest reported events date from early january 2025, with records extending to late june 2025."
+    },
+    {
+      "type": "human",
+      "content": "let me know the insights"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  region, \n  branch AS area,\n  COUNT(*) AS total_unsafe_events,\n  COUNT(DISTINCT unsafe_event_type) AS unique_unsafe_event_types,\n  SUM(CASE WHEN serious_near_miss = 'Yes' THEN 1 ELSE 0 END) AS serious_near_miss_count,\n  SUM(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END) AS work_stopped_count,\n  COUNT(DISTINCT reporter_id) AS distinct_reporters,\n  MIN(date_of_unsafe_event) AS first_reported_event_date,\n  MAX(date_of_unsafe_event) AS last_reported_event_date\nFROM unsafe_events_srs\nGROUP BY region, branch\nORDER BY total_unsafe_events DESC\nLIMIT 5;"
+    },
+    {
+      "type": "ai",
+      "content": "for srs, the top areas reporting unsafe events are bangalore 1 with 836 events and north delhi with 816 events. bangalore 1 has 5 unique unsafe event types, 4 serious near misses, and 181 instances where work was stopped, reported by 91 distinct reporters since january 1, 2025. north delhi shows a higher diversity of event types (9) but no serious near misses, with 244 work stoppages reported by 140 reporters starting january 4, 2025. other notable areas include infra/trd with 621 events, bangalore 2 with 457 events, and south delhi with 449 events, all showing varying counts of serious near misses and work stoppages. the data reflects active reporting and significant safety concerns across these regions in srs from january to june 2025."
+    },
+    {
+      "type": "human",
+      "content": "tell me the insights"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  region, \n  branch AS area,\n  COUNT(*) AS total_unsafe_events,\n  COUNT(DISTINCT unsafe_event_type) AS unique_unsafe_event_types,\n  SUM(CASE WHEN serious_near_miss = 'Yes' THEN 1 ELSE 0 END) AS serious_near_miss_count,\n  SUM(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END) AS work_stopped_count,\n  COUNT(DISTINCT reporter_id) AS distinct_reporters,\n  MIN(date_of_unsafe_event) AS first_reported_event_date,\n  MAX(date_of_unsafe_event) AS last_reported_event_date\nFROM unsafe_events_srs\nGROUP BY region, branch\nORDER BY total_unsafe_events DESC\nLIMIT 5;"
+    },
+    {
+      "type": "ai",
+      "content": "in srs, the top 5 areas with the most unsafe events are bangalore 1 (836 events), north delhi (816), infra / trd (621), bangalore 2 (457), and south delhi (449). bangalore 1 and north delhi lead with the highest total events and the greatest number of distinct reporters (91 and 140, respectively). north delhi has the widest variety of unsafe event types (9), while serious near misses are relatively low across areas, with bangalore 1 reporting 4 and most others 0 or 1. work stoppages are significant, especially in north delhi (244) and bangalore 1 (181). the events span from early january to late june 2025."
+    },
+    {
+      "type": "human",
+      "content": "What are today's highlights?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  region, \n  branch AS area,\n  COUNT(*) AS total_unsafe_events,\n  COUNT(DISTINCT unsafe_event_type) AS unique_unsafe_event_types,\n  SUM(CASE WHEN serious_near_miss = 'Yes' THEN 1 ELSE 0 END) AS serious_near_miss_count,\n  SUM(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END) AS work_stopped_count,\n  COUNT(DISTINCT reporter_id) AS distinct_reporters,\n  MIN(date_of_unsafe_event) AS first_reported_event_date,\n  MAX(date_of_unsafe_event) AS last_reported_event_date\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event = CURRENT_DATE\nGROUP BY region, branch\nORDER BY total_unsafe_events DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "there are no reported unsafe events in srs for today, so no highlights to share."
+    },
+    {
+      "type": "human",
+      "content": "what insights are there more"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  region, \n  branch AS area,\n  COUNT(*) AS total_unsafe_events,\n  COUNT(DISTINCT unsafe_event_type) AS unique_unsafe_event_types,\n  SUM(CASE WHEN serious_near_miss = 'Yes' THEN 1 ELSE 0 END) AS serious_near_miss_count,\n  SUM(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END) AS work_stopped_count,\n  COUNT(DISTINCT reporter_id) AS distinct_reporters,\n  MIN(date_of_unsafe_event) AS first_reported_event_date,\n  MAX(date_of_unsafe_event) AS last_reported_event_date\nFROM unsafe_events_srs\nGROUP BY region, branch\nORDER BY total_unsafe_events DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "in the srs data, bangalore 1 (sr 1) reports the highest number of unsafe events (836) with 5 unique event types and significant work stoppages (181). north delhi (nr 1) follows closely with 816 events, the highest diversity of unsafe event types (9), and the most work stopped instances (244). regions like infra/trd and bangalore 2 also report high event counts. serious near misses are relatively low overall but present across multiple regions. distinct reporter counts vary, indicating varying levels of reporting engagement across areas. the data spans from january to june 2025, highlighting ongoing safety concerns across multiple regions."
+    },
+    {
+      "type": "human",
+      "content": "highest unsafe events in a area"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  region, \n  branch AS area,\n  COUNT(*) AS total_unsafe_events,\n  COUNT(DISTINCT unsafe_event_type) AS unique_unsafe_event_types,\n  SUM(CASE WHEN serious_near_miss = 'Yes' THEN 1 ELSE 0 END) AS serious_near_miss_count,\n  SUM(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END) AS work_stopped_count,\n  COUNT(DISTINCT reporter_id) AS distinct_reporters,\n  MIN(date_of_unsafe_event) AS first_reported_event_date,\n  MAX(date_of_unsafe_event) AS last_reported_event_date\nFROM unsafe_events_srs\nGROUP BY region, branch\nORDER BY total_unsafe_events DESC\nLIMIT 1;"
+    },
+    {
+      "type": "ai",
+      "content": "in the srs system, bangalore 1 (region sr 1) has the highest number of unsafe events with a total of 836 events, including 5 unique unsafe event types. there were 4 serious near misses and 181 instances where work was stopped. these events were reported by 91 distinct reporters between january 1, 2025, and june 11, 2025."
+    },
+    {
+      "type": "human",
+      "content": "sample"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  region, \n  branch AS area,\n  COUNT(*) AS total_unsafe_events,\n  COUNT(DISTINCT unsafe_event_type) AS unique_unsafe_event_types,\n  SUM(CASE WHEN serious_near_miss = 'Yes' THEN 1 ELSE 0 END) AS serious_near_miss_count,\n  SUM(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END) AS work_stopped_count,\n  COUNT(DISTINCT reporter_id) AS distinct_reporters,\n  MIN(date_of_unsafe_event) AS first_reported_event_date,\n  MAX(date_of_unsafe_event) AS last_reported_event_date\nFROM unsafe_events_srs\nGROUP BY region, branch\nORDER BY total_unsafe_events DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "here is a summary of unsafe events reported in the srs system by region and area from january to june 2025:\n\n- bangalore 1 (sr 1) leads with 836 total unsafe events, 5 unique event types, 4 serious near misses, and 181 instances of work stoppage reported by 91 distinct reporters.\n- north delhi (nr 1) follows closely with 816 events across 9 event types, no serious near misses, but 244 work stoppages reported by 140 reporters.\n- other notable areas include infra / trd with 621 events, bangalore 2 (sr 1) with 457 events, and south delhi (nr 1) with 449 events.\n- regions vary in serious near miss counts and work stoppages, with some areas like north delhi having high work stoppages despite zero serious near misses.\n- reporters across regions range widely, for example, 140 in north delhi and 7 in andhra pradesh.\n- dates of reported events span mostly from early january 2025 to late june 2025.\n\noverall, sr 1 and nr 1 regions show the highest volumes of unsafe events and reporter engagement in the srs system during this period."
     }
   ],
   "question": "highest unsafe events in a area",
