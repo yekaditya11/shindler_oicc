@@ -98,7 +98,7 @@ def add_tab_router(tab_name:str):
     return result
 
 
-@router.post("/delete-tab")
+@router.delete("/delete-tab")
 def delete_tab_router(tab_id:int):
     result=delete_tab(tab_id)
     return result

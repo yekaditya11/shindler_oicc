@@ -248,7 +248,7 @@ class TextToSQLWorkflow:
             "query_result": state["query_result"],
             "tablename": state["tablename"]
         })
-        state["final_answer"] = result.content.strip().lower()
+        state["final_answer"] = result.content.strip()
         state["history"] = [
             AIMessage(content=state["final_answer"])
         ]
@@ -267,7 +267,7 @@ class TextToSQLWorkflow:
             "history": prez_conv,
             "error_message": state["error_message"]
         })
-        state["final_answer"] = result.content.strip().lower()
+        state["final_answer"] = result.content.strip()
         
         return state
     
