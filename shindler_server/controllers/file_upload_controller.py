@@ -77,7 +77,7 @@ def update_file_id(uploaded_file_name, new_file_id, file_type):
 def get_all_files():
     """Retrieve all records from file_ids_table"""
     
-    select_sql = "SELECT uploaded_file_name, file_id FROM file_ids_table ORDER BY uploaded_file_name;"
+    select_sql = "SELECT id,file_type,uploaded_file_name, file_id FROM file_ids_table ORDER BY uploaded_file_name;"
     
     try:
         engine = db_manager.postgres_engine
@@ -85,7 +85,7 @@ def get_all_files():
             result = conn.execute(text(select_sql))
             rows = result.fetchall()
             print(rows)
-            return [{'uploaded_file_name': row[0], 'file_id': row[1]} for row in rows]
+            return [{'id':row[0],'file_type':row[1],'uploaded_file_name': row[2], 'file_id': row[3]} for row in rows]
         
     except Exception as e:
         logger.error(f"Error retrieving all files: {e}")
