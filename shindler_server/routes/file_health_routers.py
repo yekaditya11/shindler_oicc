@@ -5,7 +5,7 @@ health_router = APIRouter(prefix="/api/v1", tags=["File health"])
 
 @health_router.get("/file-health")
 def file_health(id):
-    if int(id) in [1,2,3]:
+    if int(id) in [1,2,3,4]:
         return file_health_fetch(id)
     
     else: 

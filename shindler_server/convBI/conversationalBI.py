@@ -17,7 +17,7 @@ from datetime import datetime
 from pydantic import BaseModel
 import asyncio
 
-from convBI.prompts import intent_prompt,greeting_prompt,table_identification_prompt,prompt_ddl,text_to_sql_prompt,clarification_prompt,summarizer_prompt
+from convBI.prompts import intent_prompt,greeting_prompt,table_identification_prompt,prompt_ddl,text_to_sql_prompt,clarification_prompt,summarizer_prompt,summarizer_prompt_3
 import psycopg 
 import json
 
@@ -39,6 +39,7 @@ class WorkflowState(TypedDict):
     needs_clarification:bool 
     visualization_data:Dict[str,Any]
     final_answer:str
+    error_message:str
 
 
 class StreamResponse(BaseModel):
@@ -238,7 +239,7 @@ class TextToSQLWorkflow:
     def _summarizer_agent(self, state: WorkflowState) -> WorkflowState:
 
         
-        prompt = ChatPromptTemplate.from_messages(summarizer_prompt)
+        prompt = ChatPromptTemplate.from_messages(summarizer_prompt_3)
         # Optimize history to reduce state size
         prez_conv = state["history"][-1:] if state["history"] else []
         chain = prompt | self.llm
@@ -337,7 +338,8 @@ class TextToSQLWorkflow:
             query_error_message="",
             needs_clarification="", 
             visualization_data="",
-            final_answer=""
+            final_answer="",
+            error_message=""
         )
         # print(input_state)
 
@@ -365,7 +367,8 @@ class TextToSQLWorkflow:
             query_error_message="",
             needs_clarification="", 
             visualization_data="",
-            final_answer=""
+            final_answer="",
+            error_message=""
         )
         # print(input_state)
         # Use PostgresSaver checkpointer with synchronous streaming
@@ -375,7 +378,7 @@ class TextToSQLWorkflow:
             workflow = self._build_workflow()
             graph = workflow.compile(checkpointer=checkpointer)
 
-            config = {"configurable": {"thread_id": "555"}}
+            config = {"configurable": {"thread_id": "444"}}
             for chunk in graph.stream(
                 input=input_state,
                 config=config,
@@ -429,12 +432,15 @@ def ddl_extraction(id):
 
 def semantics_extraction(id):
     try:
+        
         with open(f"convBI/test.semantics{id}.json") as semantics_json:
             semantics=json.load(semantics_json)
             return semantics
     except FileNotFoundError:
-        print(f"Warning: test.semantics{id}.json file not found. Using default semantics.")
-        return {"default_table": {"columns": {"id": "INTEGER", "name": "TEXT"}}}
+        with open(f"convBI/test.semantics{1}.json") as semantics_json:
+            semantics=json.load(semantics_json)
+            return semantics
+
     except Exception as e:
         print(f"Error reading semantics file: {e}")
         return {"default_table": {"columns": {"id": "INTEGER", "name": "TEXT"}}}

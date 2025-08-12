@@ -875,7 +875,7 @@
         "is_nullable": true,
         "description": "Timestamp indicating when the audit related to the unsafe event was conducted. This helps track the timing of safety inspections or reviews within the event lifecycle."
       },
-      "audit_frequency_": {
+      "audit_frequency": {
         "data_type": "bigint",
         "unique_values": [
           "min: 1",
