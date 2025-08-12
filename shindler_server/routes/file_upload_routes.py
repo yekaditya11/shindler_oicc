@@ -100,7 +100,7 @@ async def upload_and_analyze_file(tab_id:str,file: UploadFile = File(...)) -> Di
         file_id=1
         if file_type=="srs_enriched":
             file_id=2
-        if file_type=="srs_agumented":
+        if file_type=="srs_augmented":
             file_id=3
         if file_type=="ei_tech":
             file_id=4
