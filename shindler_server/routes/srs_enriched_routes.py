@@ -278,3 +278,4 @@ async def get_srs_enriched_insights(
             status_code=500,
             detail=f"Internal server error while generating insights: {str(e)}"
         )
+

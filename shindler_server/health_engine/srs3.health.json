@@ -1,12 +1,12 @@
 {
     "overall_health": {
-      "score": 94,
+      "score": 95,
       "grade": "Excellent",
       "timestamp": "2025-08-09T18:10:49.463003Z"
     },
     "dimensions": {
       "completeness": {
-        "score": 94,
+        "score": 95,
         "columns_assessed": 56
       },
       "uniqueness": {
@@ -14,15 +14,15 @@
         "columns_assessed": 8
       },
       "consistency": {
-        "score": 89,
+        "score": 92,
         "columns_assessed": 15
       },
       "validity": {
-        "score": 93,
+        "score": 94,
         "columns_assessed": 18
       },
       "timeliness": {
-        "score": 91,
+        "score": 92,
         "columns_assessed": 8
       }
     },

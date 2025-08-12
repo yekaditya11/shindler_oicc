@@ -1,33 +1,33 @@
 {
   "overall_health": {
-    "score": 92,
-    "grade": "Good",
-    "timestamp": "2025-08-12T12:52:01.393093Z"
+    "score": 74,
+    "grade": "Fair",
+    "timestamp": "2025-08-12T12:48:50.159598Z"
   },
   "dimensions": {
     "completeness": {
-      "score": 90,
-      "columns_assessed": 44
+      "score": 84,
+      "columns_assessed": 43
     },
     "uniqueness": {
-      "score": 85,
-      "columns_assessed": 4
+      "score": 21,
+      "columns_assessed": 6
     },
     "consistency": {
-      "score": 92,
-      "columns_assessed": 6
+      "score": 83,
+      "columns_assessed": 3
     },
     "validity": {
       "score": 100,
-      "columns_assessed": 44
+      "columns_assessed": 43
     },
     "timeliness": {
-      "score": 88,
-      "columns_assessed": 3
+      "score": 80,
+      "columns_assessed": 1
     }
   },
   "column_analysis": {
-    "event_id": {
+    "reporting_id": {
       "overall_column_score": 100,
       "priority": "critical",
       "dimensions_checked": [
@@ -39,7 +39,151 @@
         "consistency",
         "timeliness"
       ],
+      "issues": [
+        "29 duplicate values"
+      ]
+    },
+    "status_key": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
       "issues": []
+    },
+    "status": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "location_key": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "location": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "branch_key": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "no": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "branch_name": {
+      "overall_column_score": 100,
+      "priority": "high",
+      "dimensions_checked": [
+        "completeness",
+        "validity",
+        "consistency"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "region_key": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "region": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "reporter_sap_id": {
+      "overall_column_score": 73,
+      "priority": "critical",
+      "dimensions_checked": [
+        "completeness",
+        "uniqueness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "consistency",
+        "timeliness"
+      ],
+      "issues": [
+        "3197 duplicate values"
+      ]
     },
     "reporter_name": {
       "overall_column_score": 95,
@@ -57,22 +201,36 @@
         "Case inconsistencies detected"
       ]
     },
-    "reported_date": {
+    "designation_key": {
       "overall_column_score": 100,
-      "priority": "high",
+      "priority": "medium",
       "dimensions_checked": [
         "completeness",
-        "validity",
-        "timeliness"
+        "validity"
       ],
       "dimensions_skipped": [
         "uniqueness",
-        "consistency"
+        "consistency",
+        "timeliness"
       ],
       "issues": []
     },
-    "reporter_id": {
-      "overall_column_score": 72,
+    "designation": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "gl_id_key": {
+      "overall_column_score": 67,
       "priority": "critical",
       "dimensions_checked": [
         "completeness",
@@ -84,25 +242,77 @@
         "timeliness"
       ],
       "issues": [
-        "3378 duplicate values"
+        "36 missing values",
+        "3890 duplicate values"
       ]
     },
-    "date_of_unsafe_event": {
-      "overall_column_score": 100,
-      "priority": "high",
+    "gl_id": {
+      "overall_column_score": 67,
+      "priority": "critical",
       "dimensions_checked": [
         "completeness",
-        "validity",
+        "uniqueness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "consistency",
         "timeliness"
+      ],
+      "issues": [
+        "82 missing values",
+        "3902 duplicate values"
+      ]
+    },
+    "pe_id_key": {
+      "overall_column_score": 45,
+      "priority": "critical",
+      "dimensions_checked": [
+        "completeness",
+        "uniqueness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "consistency",
+        "timeliness"
+      ],
+      "issues": [
+        "2658 missing values",
+        "3930 duplicate values"
+      ]
+    },
+    "pe_id": {
+      "overall_column_score": 44,
+      "priority": "critical",
+      "dimensions_checked": [
+        "completeness",
+        "uniqueness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "consistency",
+        "timeliness"
+      ],
+      "issues": [
+        "2823 missing values",
+        "3939 duplicate values"
+      ]
+    },
+    "created_on": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
       ],
       "dimensions_skipped": [
         "uniqueness",
-        "consistency"
+        "consistency",
+        "timeliness"
       ],
       "issues": []
     },
-    "time_of_unsafe_event": {
-      "overall_column_score": 62,
+    "date_and_time_of_unsafe_event": {
+      "overall_column_score": 93,
       "priority": "high",
       "dimensions_checked": [
         "completeness",
@@ -114,11 +324,102 @@
         "consistency"
       ],
       "issues": [
-        "4000 invalid date formats",
-        "No valid dates found"
+        "1 future dates detected"
       ]
     },
-    "unsafe_event_type": {
+    "type_of_unsafe_event_key": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "type_of_unsafe_event": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "unsafe_event_details_key": {
+      "overall_column_score": 97,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": [
+        "225 missing values"
+      ]
+    },
+    "unsafe_event_details": {
+      "overall_column_score": 97,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": [
+        "225 missing values"
+      ]
+    },
+    "action_related_to_high_risk_situation_key": {
+      "overall_column_score": 53,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": [
+        "3788 missing values"
+      ]
+    },
+    "action_related_to_high_risk_situation": {
+      "overall_column_score": 53,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": [
+        "3788 missing values"
+      ]
+    },
+    "business_details_key": {
       "overall_column_score": 100,
       "priority": "medium",
       "dimensions_checked": [
@@ -146,8 +447,26 @@
       ],
       "issues": []
     },
-    "site_reference": {
-      "overall_column_score": 99,
+    "site_name": {
+      "overall_column_score": 87,
+      "priority": "high",
+      "dimensions_checked": [
+        "completeness",
+        "validity",
+        "consistency"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "timeliness"
+      ],
+      "issues": [
+        "149 missing values",
+        "Mixed data types detected: {<class 'str'>: 3851, <class 'float'>: 149}",
+        "Case inconsistencies detected"
+      ]
+    },
+    "site_reference_key": {
+      "overall_column_score": 100,
       "priority": "medium",
       "dimensions_checked": [
         "completeness",
@@ -158,11 +477,23 @@
         "consistency",
         "timeliness"
       ],
-      "issues": [
-        "90 missing values"
-      ]
+      "issues": []
     },
-    "unsafe_event_location": {
+    "site_reference": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "product_type_key": {
       "overall_column_score": 100,
       "priority": "medium",
       "dimensions_checked": [
@@ -190,79 +521,8 @@
       ],
       "issues": []
     },
-    "employee_id": {
-      "overall_column_score": 78,
-      "priority": "critical",
-      "dimensions_checked": [
-        "completeness",
-        "uniqueness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "395 missing values",
-        "2297 duplicate values"
-      ]
-    },
-    "employee_name": {
-      "overall_column_score": 90,
-      "priority": "high",
-      "dimensions_checked": [
-        "completeness",
-        "validity",
-        "consistency"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "timeliness"
-      ],
-      "issues": [
-        "Case inconsistencies detected",
-        "Leading/trailing whitespace detected",
-        "395 whitespace-only strings found"
-      ]
-    },
-    "subcontractor_company_name": {
-      "overall_column_score": 55,
-      "priority": "high",
-      "dimensions_checked": [
-        "completeness",
-        "validity",
-        "consistency"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "timeliness"
-      ],
-      "issues": [
-        "3605 missing values",
-        "Mixed data types detected: {<class 'float'>: 3605, <class 'str'>: 395}",
-        "Case inconsistencies detected",
-        "Leading/trailing whitespace detected"
-      ]
-    },
-    "subcontractorid": {
-      "overall_column_score": 38,
-      "priority": "critical",
-      "dimensions_checked": [
-        "completeness",
-        "uniqueness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "3605 missing values",
-        "3854 duplicate values"
-      ]
-    },
-    "subcontractor_city": {
-      "overall_column_score": 55,
+    "persons_involved": {
+      "overall_column_score": 83,
       "priority": "medium",
       "dimensions_checked": [
         "completeness",
@@ -274,61 +534,39 @@
         "timeliness"
       ],
       "issues": [
-        "3605 missing values"
+        "1388 missing values"
       ]
     },
-    "subcontractor_name": {
-      "overall_column_score": 55,
-      "priority": "high",
-      "dimensions_checked": [
-        "completeness",
-        "validity",
-        "consistency"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "timeliness"
-      ],
-      "issues": [
-        "3605 missing values",
-        "Mixed data types detected: {<class 'float'>: 3605, <class 'str'>: 395}",
-        "Case inconsistencies detected",
-        "Leading/trailing whitespace detected"
-      ]
-    },
-    "kg_name": {
+    "work_was_stopped_key": {
       "overall_column_score": 100,
-      "priority": "high",
+      "priority": "medium",
       "dimensions_checked": [
         "completeness",
-        "validity",
-        "consistency"
+        "validity"
       ],
       "dimensions_skipped": [
         "uniqueness",
+        "consistency",
         "timeliness"
       ],
       "issues": []
     },
-    "country_name": {
-      "overall_column_score": 90,
-      "priority": "high",
+    "work_was_stopped": {
+      "overall_column_score": 100,
+      "priority": "medium",
       "dimensions_checked": [
         "completeness",
-        "validity",
-        "consistency"
+        "validity"
       ],
       "dimensions_skipped": [
         "uniqueness",
+        "consistency",
         "timeliness"
       ],
-      "issues": [
-        "395 missing values",
-        "Mixed data types detected: {<class 'str'>: 3605, <class 'float'>: 395}"
-      ]
+      "issues": []
     },
-    "division": {
-      "overall_column_score": 95,
+    "work_stopped_hours": {
+      "overall_column_score": 100,
       "priority": "medium",
       "dimensions_checked": [
         "completeness",
@@ -340,11 +578,11 @@
         "timeliness"
       ],
       "issues": [
-        "395 missing values"
+        "1 missing values"
       ]
     },
-    "department": {
-      "overall_column_score": 95,
+    "no_go_violation_key": {
+      "overall_column_score": 58,
       "priority": "medium",
       "dimensions_checked": [
         "completeness",
@@ -356,11 +594,11 @@
         "timeliness"
       ],
       "issues": [
-        "395 missing values"
+        "3337 missing values"
       ]
     },
-    "city": {
-      "overall_column_score": 95,
+    "no_go_violation": {
+      "overall_column_score": 58,
       "priority": "medium",
       "dimensions_checked": [
         "completeness",
@@ -372,11 +610,11 @@
         "timeliness"
       ],
       "issues": [
-        "395 missing values"
+        "3337 missing values"
       ]
     },
-    "sub_area": {
-      "overall_column_score": 88,
+    "job_no": {
+      "overall_column_score": 96,
       "priority": "medium",
       "dimensions_checked": [
         "completeness",
@@ -388,10 +626,40 @@
         "timeliness"
       ],
       "issues": [
-        "943 missing values"
+        "297 missing values"
       ]
     },
-    "district": {
+    "additional_comments": {
+      "overall_column_score": 87,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": [
+        "1002 missing values"
+      ]
+    },
+    "has_attachment": {
+      "overall_column_score": 100,
+      "priority": "medium",
+      "dimensions_checked": [
+        "completeness",
+        "validity"
+      ],
+      "dimensions_skipped": [
+        "uniqueness",
+        "consistency",
+        "timeliness"
+      ],
+      "issues": []
+    },
+    "attachment": {
       "overall_column_score": 50,
       "priority": "medium",
       "dimensions_checked": [
@@ -406,314 +674,6 @@
       "issues": [
         "4000 missing values"
       ]
-    },
-    "zone": {
-      "overall_column_score": 95,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "395 missing values"
-      ]
-    },
-    "serious_near_miss": {
-      "overall_column_score": 100,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": []
-    },
-    "unsafe_act": {
-      "overall_column_score": 59,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "3279 missing values"
-      ]
-    },
-    "unsafe_act_other": {
-      "overall_column_score": 53,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "3786 missing values"
-      ]
-    },
-    "unsafe_condition": {
-      "overall_column_score": 91,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "728 missing values"
-      ]
-    },
-    "unsafe_condition_other": {
-      "overall_column_score": 57,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "3440 missing values"
-      ]
-    },
-    "work_stopped": {
-      "overall_column_score": 100,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": []
-    },
-    "stop_work_nogo_violation": {
-      "overall_column_score": 100,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": []
-    },
-    "nogo_violation_detail": {
-      "overall_column_score": 50,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "3995 missing values"
-      ]
-    },
-    "stop_work_duration": {
-      "overall_column_score": 60,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "3198 missing values"
-      ]
-    },
-    "other_safety_issues": {
-      "overall_column_score": 53,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "3776 missing values"
-      ]
-    },
-    "comments_remarks": {
-      "overall_column_score": 53,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "3763 missing values"
-      ]
-    },
-    "event_requires_sanction": {
-      "overall_column_score": 100,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": []
-    },
-    "action_description_1": {
-      "overall_column_score": 92,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "657 missing values"
-      ]
-    },
-    "action_description_2": {
-      "overall_column_score": 50,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "3997 missing values"
-      ]
-    },
-    "action_description_3": {
-      "overall_column_score": 50,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "4000 missing values"
-      ]
-    },
-    "action_description_4": {
-      "overall_column_score": 50,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "4000 missing values"
-      ]
-    },
-    "action_description_5": {
-      "overall_column_score": 50,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": [
-        "4000 missing values"
-      ]
-    },
-    "branch": {
-      "overall_column_score": 100,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": []
-    },
-    "region": {
-      "overall_column_score": 100,
-      "priority": "medium",
-      "dimensions_checked": [
-        "completeness",
-        "validity"
-      ],
-      "dimensions_skipped": [
-        "uniqueness",
-        "consistency",
-        "timeliness"
-      ],
-      "issues": []
     }
   }
 }
