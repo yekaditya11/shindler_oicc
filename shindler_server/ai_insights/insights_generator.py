@@ -429,7 +429,7 @@ class AIInsightsGenerator:
         Data:
         {data}
         
-        Response format: Return EXACTLY 10 insights in this JSON format:
+        Response format: Return EXACTLY 5 insights in this JSON format:
         [
           {{"text": "analytical insight about events/patterns here", "sentiment": "positive|negative|neutral"}},
           {{"text": "analytical insight about events/patterns here", "sentiment": "positive|negative|neutral"}},
