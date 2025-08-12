@@ -77,7 +77,7 @@ def update_file_id(tab_id, new_file_id, file_type):
 def get_all_files():
     """Retrieve all records from file_ids_table"""
     
-    select_sql = "SELECT id,file_type,uploaded_file_name, file_id FROM file_ids_table ORDER BY uploaded_file_name;"
+    select_sql = "SELECT id,file_type,uploaded_file_name, file_id FROM file_ids_table ORDER BY id;"
     
     try:
         engine = db_manager.postgres_engine

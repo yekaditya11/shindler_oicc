@@ -214,12 +214,12 @@ class TextToSQLWorkflow:
             for row in results:
                 row_dict = dict(zip(columns, row))
                 formatted_results.append(row_dict)
-            
+            print(state["sql_query"])
             state["query_result"] = str(formatted_results)
             # Optimize state by storing only essential query info
             # state["history"] = [{"role":"system", "content":f"query_result_count: {len(results)}"}]
             state["needs_clarification"] = False
-            
+            print(state["query_result"])
             cursor.close()
             conn.close()
             
@@ -378,7 +378,7 @@ class TextToSQLWorkflow:
             workflow = self._build_workflow()
             graph = workflow.compile(checkpointer=checkpointer)
 
-            config = {"configurable": {"thread_id": "444"}}
+            config = {"configurable": {"thread_id": "8080"}}
             for chunk in graph.stream(
                 input=input_state,
                 config=config,
@@ -398,10 +398,12 @@ class TextToSQLWorkflow:
             try:
                 final_answer = final_state.values.get("final_answer", "")
                 visulaization_data=final_state.values.get("visualization_data","")
+
             except Exception:
                 final_answer = ""
 
             completion_response = StreamResponse(
+
                 type="final_answer",
                 data={"final_answer": final_answer,"visualaization_data":visulaization_data},
                 timestamp=datetime.now().isoformat(),
