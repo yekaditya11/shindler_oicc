@@ -200,7 +200,8 @@ class EITechDashboardService:
                     "total_events": data.get("total_events", 0),
                     "unique_events": data.get("unique_events", 0)
                 },
-                "description": f"Total unsafe events recorded in EI Tech system"
+                "description": f"Total unsafe events recorded in EI Tech system",
+                "chart_type": "card"
             }
 
         except Exception as e:
@@ -242,7 +243,8 @@ class EITechDashboardService:
                     "total_events": data.get("total_events", 0),
                     "serious_near_miss_percentage": str(safe_percentage)
                 },
-                "description": "Percentage of events classified as serious near misses"
+                "description": "Percentage of events classified as serious near misses",
+                "chart_type": "card"
             }
 
         except Exception as e:
@@ -283,7 +285,8 @@ class EITechDashboardService:
                     "total_events": data.get("total_events", 0),
                     "unique_events": data.get("total_events", 0)
                 },
-                "description": "Percentage of events that resulted in work stoppage"
+                "description": "Percentage of events that resulted in work stoppage",
+                "chart_type": "card"
             }
 
         except Exception as e:
@@ -312,11 +315,16 @@ class EITechDashboardService:
             if region:
                 params["region"] = region
 
-            return self.execute_query(query, params, session)
+            data = self.execute_query(query, params, session)
+            return {
+                "data": data,
+                "description": "Monthly trends of unsafe events",
+                "chart_type": "line"
+            }
 
         except Exception as e:
             logger.error(f"Error getting monthly trends: {e}")
-            return []
+            return {"data": [], "description": "Error retrieving data", "chart_type": "line"}
 
     def _get_branch_performance_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 5: Branch Performance Analysis"""
@@ -355,11 +363,16 @@ class EITechDashboardService:
             if region:
                 params["region"] = region
 
-            return self.execute_query(query, params, session)
+            data = self.execute_query(query, params, session)
+            return {
+                "data": data,
+                "description": "Branch performance analysis",
+                "chart_type": "bar"
+            }
 
         except Exception as e:
             logger.error(f"Error getting branch performance analysis: {e}")
-            return []
+            return {"data": [], "description": "Error retrieving data", "chart_type": "bar"}
 
     def _get_event_type_distribution(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 6: Event Type Distribution"""
@@ -384,11 +397,16 @@ class EITechDashboardService:
             if region:
                 params["region"] = region
 
-            return self.execute_query(query, params, session)
+            data = self.execute_query(query, params, session)
+            return {
+                "data": data,
+                "description": "Distribution of unsafe event types",
+                "chart_type": "pie"
+            }
 
         except Exception as e:
             logger.error(f"Error getting event type distribution: {e}")
-            return []
+            return {"data": [], "description": "Error retrieving data", "chart_type": "pie"}
 
     def _get_repeat_locations(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 7: Repeat Locations"""
@@ -419,11 +437,16 @@ class EITechDashboardService:
             if region:
                 params["region"] = region
 
-            return self.execute_query(query, params, session)
+            data = self.execute_query(query, params, session)
+            return {
+                "data": data,
+                "description": "Repeat incident locations",
+                "chart_type": "bar"
+            }
 
         except Exception as e:
             logger.error(f"Error getting repeat locations: {e}")
-            return []
+            return {"data": [], "description": "Error retrieving data", "chart_type": "bar"}
 
     def _get_response_time_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 8: Response Time Analysis"""
@@ -458,14 +481,16 @@ class EITechDashboardService:
                     "average_response_time": f"{float(avg_delay):.2f} days",
                     "median_response_time": "N/A",
                     "events_analyzed": data.get("events_with_timing_data", 0),
-                    "description": "Average time between incident occurrence and reporting"
+                    "description": "Average time between incident occurrence and reporting",
+                    "chart_type": "card"
                 }
             else:
                 return {
                     "average_response_time": "N/A",
                     "median_response_time": "N/A",
                     "events_analyzed": 0,
-                    "description": "Response time analysis not available - insufficient timing data"
+                    "description": "Response time analysis not available - insufficient timing data",
+                    "chart_type": "card"
                 }
 
         except Exception as e:
@@ -474,7 +499,8 @@ class EITechDashboardService:
                 "average_response_time": "N/A",
                 "median_response_time": "N/A",
                 "events_analyzed": 0,
-                "description": "Error retrieving response time data"
+                "description": "Error retrieving response time data",
+                "chart_type": "card"
             }
 
     def _get_safety_performance_trends(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
@@ -513,11 +539,16 @@ class EITechDashboardService:
             if region:
                 params["region"] = region
 
-            return self.execute_query(query, params, session)
+            data = self.execute_query(query, params, session)
+            return {
+                "data": data,
+                "description": "Safety performance trends by quarter",
+                "chart_type": "line"
+            }
 
         except Exception as e:
             logger.error(f"Error getting safety performance trends: {e}")
-            return []
+            return {"data": [], "description": "Error retrieving data", "chart_type": "line"}
 
     def _get_incident_severity_distribution(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 10: Incident Severity Distribution"""
@@ -579,20 +610,25 @@ class EITechDashboardService:
                 total_count = count_result[0].get('total_count', 0) if count_result else 0
 
                 if total_count > 0:
-                    return [{
+                    data = [{
                         'severity_level': 'Low',
                         'incident_count': total_count,
                         'percentage': 100.0,
                         'sort_order': 4
                     }]
                 else:
-                    return []
-
-            return result
+                    data = []
+            else:
+                data = result
+            return {
+                "data": data,
+                "description": "Distribution of incidents by severity level",
+                "chart_type": "pie"
+            }
 
         except Exception as e:
             logger.error(f"Error getting incident severity distribution: {e}")
-            return []
+            return {"data": [], "description": "Error retrieving data", "chart_type": "pie"}
 
     def _get_operational_impact_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 11: Operational Impact Analysis"""
@@ -653,7 +689,8 @@ class EITechDashboardService:
                     "work_stopped_incidents": data.get("work_stopped_incidents", 0),
                     "serious_incidents": data.get("serious_incidents", 0)
                 },
-                "description": "Comprehensive analysis of operational and business impact from safety incidents"
+                "description": "Comprehensive analysis of operational and business impact from safety incidents",
+                "chart_type": "card"
             }
 
         except Exception as e:
@@ -662,7 +699,8 @@ class EITechDashboardService:
                 "summary": {"total_incidents": 0, "branches_impacted": 0, "locations_impacted": 0, "incident_types": 0},
                 "impact_metrics": {"operational_disruption_rate": 0.0, "safety_risk_rate": 0.0, "overall_impact_score": 0.0},
                 "incident_breakdown": {"work_stopped_incidents": 0, "serious_incidents": 0},
-                "description": "Error retrieving operational impact data"
+                "description": "Error retrieving operational impact data",
+                "chart_type": "card"
             }
 
     def _get_time_based_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
@@ -720,7 +758,8 @@ class EITechDashboardService:
                     "total_days_analyzed": len(day_of_week_results),
                     "description": "Time-based incident pattern analysis (date-only data)",
                     "has_hourly_data": False
-                }
+                },
+                "chart_type": "bar"
             }
 
         except Exception as e:
@@ -737,7 +776,8 @@ class EITechDashboardService:
                     "total_days_analyzed": 0,
                     "description": "Error retrieving time-based analysis data",
                     "has_hourly_data": False
-                }
+                },
+                "chart_type": "bar"
             }
 
     def _get_empty_dashboard_data(self) -> Dict[str, Any]:
@@ -745,7 +785,8 @@ class EITechDashboardService:
         return {
             "total_events": {
                 "count": {"total_events": 0, "unique_events": 0},
-                "description": "No data available"
+                "description": "No data available",
+                "chart_type": "card"
             },
             "serious_near_miss_rate": {
                 "rate": 0.0,
@@ -755,31 +796,35 @@ class EITechDashboardService:
                     "total_events": 0,
                     "serious_near_miss_percentage": "0.0"
                 },
-                "description": "No data available"
+                "description": "No data available",
+                "chart_type": "card"
             },
             "work_stoppage_rate": {
                 "rate": 0.0,
                 "count": 0,
                 "total": {"total_events": 0, "unique_events": 0},
-                "description": "No data available"
+                "description": "No data available",
+                "chart_type": "card"
             },
-            "monthly_trends": [],
-            "branch_performance_analysis": [],
-            "event_type_distribution": [],
-            "repeat_locations": [],
+            "monthly_trends": {"data": [], "description": "No data available", "chart_type": "line"},
+            "branch_performance_analysis": {"data": [], "description": "No data available", "chart_type": "bar"},
+            "event_type_distribution": {"data": [], "description": "No data available", "chart_type": "pie"},
+            "repeat_locations": {"data": [], "description": "No data available", "chart_type": "bar"},
             "response_time_analysis": {
                 "average_response_time": "N/A",
                 "median_response_time": "N/A",
                 "events_analyzed": 0,
-                "description": "No data available"
+                "description": "No data available",
+                "chart_type": "card"
             },
-            "safety_performance_trends": [],
-            "incident_severity_distribution": [],
+            "safety_performance_trends": {"data": [], "description": "No data available", "chart_type": "line"},
+            "incident_severity_distribution": {"data": [], "description": "No data available", "chart_type": "pie"},
             "operational_impact_analysis": {
                 "summary": {"total_incidents": 0, "branches_impacted": 0, "locations_impacted": 0, "incident_types": 0},
                 "impact_metrics": {"operational_disruption_rate": 0.0, "safety_risk_rate": 0.0, "overall_impact_score": 0.0},
                 "incident_breakdown": {"work_stopped_incidents": 0, "serious_incidents": 0},
-                "description": "No data available"
+                "description": "No data available",
+                "chart_type": "card"
             },
             "time_based_analysis": {
                 "time_of_day_analysis": [],
@@ -793,6 +838,7 @@ class EITechDashboardService:
                     "total_days_analyzed": 0,
                     "description": "No data available",
                     "has_hourly_data": False
-                }
+                },
+                "chart_type": "bar"
             }
         } 

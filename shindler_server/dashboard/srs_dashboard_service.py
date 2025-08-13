@@ -197,16 +197,25 @@ class SRSDashboardService:
             data = result[0] if result else {"total_events": 0, "unique_events": 0}
 
             return {
-                "count": {
-                    "total_events": data.get("total_events", 0),
-                    "unique_events": data.get("unique_events", 0)
-                },
-                "description": f"Total unsafe events recorded in SRS system"
+                "chart_type": "card",
+                "description": f"Total unsafe events recorded in SRS system",
+                "data": {
+                    "count": {
+                        "total_events": data.get("total_events", 0),
+                        "unique_events": data.get("unique_events", 0)
+                    }
+                }
             }
 
         except Exception as e:
             logger.error(f"Error getting total events count: {e}")
-            return {"count": {"total_events": 0, "unique_events": 0}, "description": "Error retrieving data"}
+            return {
+                "chart_type": "card",
+                "description": "Error retrieving data",
+                "data": {
+                    "count": {"total_events": 0, "unique_events": 0}
+                }
+            }
 
     def _get_serious_near_miss_rate(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 2: Serious Near Miss Rate"""
@@ -236,19 +245,29 @@ class SRSDashboardService:
             safe_percentage = float(serious_percentage) if serious_percentage is not None else 0.0
 
             return {
-                "rate": safe_percentage,
-                "count": {
-                    "serious_near_miss_count": data.get("serious_count", 0),
-                    "non_serious_count": data.get("total_events", 0) - data.get("serious_count", 0),
-                    "total_events": data.get("total_events", 0),
-                    "serious_near_miss_percentage": str(safe_percentage)
-                },
-                "description": "Percentage of events classified as serious near misses"
+                "chart_type": "card",
+                "description": "Percentage of events classified as serious near misses",
+                "data": {
+                    "rate": safe_percentage,
+                    "count": {
+                        "serious_near_miss_count": data.get("serious_count", 0),
+                        "non_serious_count": data.get("total_events", 0) - data.get("serious_count", 0),
+                        "total_events": data.get("total_events", 0),
+                        "serious_near_miss_percentage": str(safe_percentage)
+                    }
+                }
             }
 
         except Exception as e:
             logger.error(f"Error getting serious near miss rate: {e}")
-            return {"rate": 0.0, "count": {"serious_near_miss_count": 0, "non_serious_count": 0, "total_events": 0, "serious_near_miss_percentage": "0.0"}, "description": "Error retrieving data"}
+            return {
+                "chart_type": "card",
+                "description": "Error retrieving data",
+                "data": {
+                    "rate": 0.0,
+                    "count": {"serious_near_miss_count": 0, "non_serious_count": 0, "total_events": 0, "serious_near_miss_percentage": "0.0"}
+                }
+            }
 
     def _get_work_stoppage_rate(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 3: Work Stoppage Rate"""
@@ -278,18 +297,29 @@ class SRSDashboardService:
             safe_percentage = float(work_stoppage_percentage) if work_stoppage_percentage is not None else 0.0
             
             return {
-                "rate": safe_percentage,
-                "count": data.get("work_stopped_count", 0),
-                "total": {
-                    "total_events": data.get("total_events", 0),
-                    "unique_events": data.get("total_events", 0)
-                },
-                "description": "Percentage of events that resulted in work stoppage"
+                "chart_type": "card",
+                "description": "Percentage of events that resulted in work stoppage",
+                "data": {
+                    "rate": safe_percentage,
+                    "count": data.get("work_stopped_count", 0),
+                    "total": {
+                        "total_events": data.get("total_events", 0),
+                        "unique_events": data.get("total_events", 0)
+                    }
+                }
             }
 
         except Exception as e:
             logger.error(f"Error getting work stoppage rate: {e}")
-            return {"rate": 0.0, "count": 0, "total": {"total_events": 0, "unique_events": 0}, "description": "Error retrieving data"}
+            return {
+                "chart_type": "card",
+                "description": "Error retrieving data",
+                "data": {
+                    "rate": 0.0,
+                    "count": 0,
+                    "total": {"total_events": 0, "unique_events": 0}
+                }
+            }
 
     def _get_monthly_trends(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 4: Monthly Trends"""
@@ -313,11 +343,16 @@ class SRSDashboardService:
             if region:
                 params["region"] = region
 
-            return self.execute_query(query, params, session)
+            data = self.execute_query(query, params, session)
+            return {
+                "data": data,
+                "description": "Monthly trends of unsafe events",
+                "chart_type": "line"
+            }
 
         except Exception as e:
             logger.error(f"Error getting monthly trends: {e}")
-            return []
+            return {"data": [], "description": "Error retrieving data", "chart_type": "line"}
 
     def _get_branch_performance_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 5: Branch Performance Analysis"""
@@ -356,11 +391,16 @@ class SRSDashboardService:
             if region:
                 params["region"] = region
 
-            return self.execute_query(query, params, session)
+            data = self.execute_query(query, params, session)
+            return {
+                "data": data,
+                "description": "Branch performance analysis",
+                "chart_type": "bar"
+            }
 
         except Exception as e:
             logger.error(f"Error getting branch performance analysis: {e}")
-            return []
+            return {"data": [], "description": "Error retrieving data", "chart_type": "bar"}
 
     # Add other KPI methods following similar pattern...
     # For brevity, I'll add simplified versions of the remaining methods
@@ -385,10 +425,15 @@ class SRSDashboardService:
             params = {"start_date": start_date, "end_date": end_date}
             if region:
                 params["region"] = region
-            return self.execute_query(query, params, session)
+            data = self.execute_query(query, params, session)
+            return {
+                "data": data,
+                "description": "Distribution of unsafe event types",
+                "chart_type": "pie"
+            }
         except Exception as e:
             logger.error(f"Error getting event type distribution: {e}")
-            return []
+            return {"data": [], "description": "Error retrieving data", "chart_type": "pie"}
 
     def _get_repeat_locations(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 7: Repeat Locations"""
@@ -416,10 +461,15 @@ class SRSDashboardService:
             params = {"start_date": start_date, "end_date": end_date}
             if region:
                 params["region"] = region
-            return self.execute_query(query, params, session)
+            data = self.execute_query(query, params, session)
+            return {
+                "data": data,
+                "description": "Repeat incident locations",
+                "chart_type": "bar"
+            }
         except Exception as e:
             logger.error(f"Error getting repeat locations: {e}")
-            return []
+            return {"data": [], "description": "Error retrieving data", "chart_type": "bar"}
 
     def _get_response_time_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 8: Response Time Analysis"""
@@ -448,25 +498,34 @@ class SRSDashboardService:
             avg_delay = data.get("avg_reporting_delay_days")
             if avg_delay is not None:
                 return {
-                    "average_response_time": f"{float(avg_delay):.2f} days",
-                    "median_response_time": "N/A",
-                    "events_analyzed": data.get("events_with_timing_data", 0),
-                    "description": "Average time between incident occurrence and reporting"
+                    "chart_type": "card",
+                    "description": "Average time between incident occurrence and reporting",
+                    "data": {
+                        "average_response_time": f"{float(avg_delay):.2f} days",
+                        "median_response_time": "N/A",
+                        "events_analyzed": data.get("events_with_timing_data", 0)
+                    }
                 }
             else:
                 return {
-                    "average_response_time": "N/A",
-                    "median_response_time": "N/A",
-                    "events_analyzed": 0,
-                    "description": "Response time analysis not available - insufficient timing data"
+                    "chart_type": "card",
+                    "description": "Response time analysis not available - insufficient timing data",
+                    "data": {
+                        "average_response_time": "N/A",
+                        "median_response_time": "N/A",
+                        "events_analyzed": 0
+                    }
                 }
         except Exception as e:
             logger.error(f"Error getting response time analysis: {e}")
             return {
-                "average_response_time": "N/A",
-                "median_response_time": "N/A",
-                "events_analyzed": 0,
-                "description": "Error retrieving response time data"
+                "chart_type": "card",
+                "description": "Error retrieving response time data",
+                "data": {
+                    "average_response_time": "N/A",
+                    "median_response_time": "N/A",
+                    "events_analyzed": 0
+                }
             }
 
     def _get_safety_performance_trends(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
@@ -497,10 +556,15 @@ class SRSDashboardService:
             params = {"start_date": start_date, "end_date": end_date}
             if region:
                 params["region"] = region
-            return self.execute_query(query, params, session)
+            data = self.execute_query(query, params, session)
+            return {
+                "data": data,
+                "description": "Safety performance trends by quarter",
+                "chart_type": "line"
+            }
         except Exception as e:
             logger.error(f"Error getting safety performance trends: {e}")
-            return []
+            return {"data": [], "description": "Error retrieving data", "chart_type": "line"}
 
     def _get_incident_severity_distribution(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 10: Incident Severity Distribution"""
@@ -557,13 +621,19 @@ class SRSDashboardService:
                 count_result = self.execute_query(count_query, params)
                 total_count = count_result[0].get('total_count', 0) if count_result else 0
                 if total_count > 0:
-                    return [{'severity_level': 'Low', 'incident_count': total_count, 'percentage': 100.0, 'sort_order': 4}]
+                    data = [{'severity_level': 'Low', 'incident_count': total_count, 'percentage': 100.0, 'sort_order': 4}]
                 else:
-                    return []
-            return result
+                    data = []
+            else:
+                data = result
+            return {
+                "data": data,
+                "description": "Distribution of incidents by severity level",
+                "chart_type": "pie"
+            }
         except Exception as e:
             logger.error(f"Error getting incident severity distribution: {e}")
-            return []
+            return {"data": [], "description": "Error retrieving data", "chart_type": "pie"}
 
     def _get_operational_impact_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 11: Operational Impact Analysis"""
@@ -596,30 +666,36 @@ class SRSDashboardService:
             result = self.execute_query(query, params, session)
             data = result[0] if result else {}
             return {
-                "summary": {
-                    "total_incidents": data.get("total_incidents", 0),
-                    "branches_impacted": data.get("branches_impacted", 0),
-                    "locations_impacted": data.get("locations_impacted", 0),
-                    "incident_types": data.get("incident_types", 0)
-                },
-                "impact_metrics": {
-                    "operational_disruption_rate": float(data.get("operational_disruption_rate")) if data.get("operational_disruption_rate") is not None else 0.0,
-                    "safety_risk_rate": float(data.get("safety_risk_rate")) if data.get("safety_risk_rate") is not None else 0.0,
-                    "overall_impact_score": float(data.get("overall_impact_score")) if data.get("overall_impact_score") is not None else 0.0
-                },
-                "incident_breakdown": {
-                    "work_stopped_incidents": data.get("work_stopped_incidents", 0),
-                    "serious_incidents": data.get("serious_incidents", 0)
-                },
-                "description": "Comprehensive analysis of operational and business impact from safety incidents"
+                "chart_type": "card",
+                "description": "Comprehensive analysis of operational and business impact from safety incidents",
+                "data": {
+                    "summary": {
+                        "total_incidents": data.get("total_incidents", 0),
+                        "branches_impacted": data.get("branches_impacted", 0),
+                        "locations_impacted": data.get("locations_impacted", 0),
+                        "incident_types": data.get("incident_types", 0)
+                    },
+                    "impact_metrics": {
+                        "operational_disruption_rate": float(data.get("operational_disruption_rate")) if data.get("operational_disruption_rate") is not None else 0.0,
+                        "safety_risk_rate": float(data.get("safety_risk_rate")) if data.get("safety_risk_rate") is not None else 0.0,
+                        "overall_impact_score": float(data.get("overall_impact_score")) if data.get("overall_impact_score") is not None else 0.0
+                    },
+                    "incident_breakdown": {
+                        "work_stopped_incidents": data.get("work_stopped_incidents", 0),
+                        "serious_incidents": data.get("serious_incidents", 0)
+                    }
+                }
             }
         except Exception as e:
             logger.error(f"Error getting operational impact analysis: {e}")
             return {
-                "summary": {"total_incidents": 0, "branches_impacted": 0, "locations_impacted": 0, "incident_types": 0},
-                "impact_metrics": {"operational_disruption_rate": 0.0, "safety_risk_rate": 0.0, "overall_impact_score": 0.0},
-                "incident_breakdown": {"work_stopped_incidents": 0, "serious_incidents": 0},
-                "description": "Error retrieving operational impact data"
+                "chart_type": "card",
+                "description": "Error retrieving operational impact data",
+                "data": {
+                    "summary": {"total_incidents": 0, "branches_impacted": 0, "locations_impacted": 0, "incident_types": 0},
+                    "impact_metrics": {"operational_disruption_rate": 0.0, "safety_risk_rate": 0.0, "overall_impact_score": 0.0},
+                    "incident_breakdown": {"work_stopped_incidents": 0, "serious_incidents": 0}
+                }
             }
 
     def _get_time_based_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
@@ -676,7 +752,8 @@ class SRSDashboardService:
                     "total_days_analyzed": len(day_of_week_results),
                     "description": "Time-based incident pattern analysis (date-only data)",
                     "has_hourly_data": False
-                }
+                },
+                "chart_type": "bar"
             }
         except Exception as e:
             logger.error(f"Error getting time-based analysis: {e}")
@@ -684,22 +761,93 @@ class SRSDashboardService:
                 "time_of_day_analysis": [],
                 "day_of_week_analysis": [],
                 "peak_patterns": {"peak_time_period": "N/A", "peak_day_of_week": "N/A"},
-                "summary": {"total_time_periods_analyzed": 0, "total_days_analyzed": 0, "description": "Error retrieving time-based analysis data", "has_hourly_data": False}
+                "summary": {"total_time_periods_analyzed": 0, "total_days_analyzed": 0, "description": "Error retrieving time-based analysis data", "has_hourly_data": False},
+                "chart_type": "bar"
             }
 
     def _get_empty_dashboard_data(self) -> Dict[str, Any]:
         """Return empty dashboard data structure for all 12 KPIs"""
         return {
-            "total_events": {"count": {"total_events": 0, "unique_events": 0}, "description": "No data available"},
-            "serious_near_miss_rate": {"rate": 0.0, "count": {"serious_near_miss_count": 0, "non_serious_count": 0, "total_events": 0, "serious_near_miss_percentage": "0.0"}, "description": "No data available"},
-            "work_stoppage_rate": {"rate": 0.0, "count": 0, "total": {"total_events": 0, "unique_events": 0}, "description": "No data available"},
-            "monthly_trends": [],
-            "branch_performance_analysis": [],
-            "event_type_distribution": [],
-            "repeat_locations": [],
-            "response_time_analysis": {"average_response_time": "N/A", "median_response_time": "N/A", "events_analyzed": 0, "description": "No data available"},
-            "safety_performance_trends": [],
-            "incident_severity_distribution": [],
-            "operational_impact_analysis": {"summary": {"total_incidents": 0, "branches_impacted": 0, "locations_impacted": 0, "incident_types": 0}, "impact_metrics": {"operational_disruption_rate": 0.0, "safety_risk_rate": 0.0, "overall_impact_score": 0.0}, "incident_breakdown": {"work_stopped_incidents": 0, "serious_incidents": 0}, "description": "No data available"},
-            "time_based_analysis": {"time_of_day_analysis": [], "day_of_week_analysis": [], "peak_patterns": {"peak_time_period": "N/A", "peak_day_of_week": "N/A"}, "summary": {"total_time_periods_analyzed": 0, "total_days_analyzed": 0, "description": "No data available", "has_hourly_data": False}}
+            "total_events": {
+                "chart_type": "card",
+                "description": "No data available",
+                "data": {
+                    "count": {"total_events": 0, "unique_events": 0}
+                }
+            },
+            "serious_near_miss_rate": {
+                "chart_type": "card",
+                "description": "No data available",
+                "data": {
+                    "rate": 0.0,
+                    "count": {"serious_near_miss_count": 0, "non_serious_count": 0, "total_events": 0, "serious_near_miss_percentage": "0.0"}
+                }
+            },
+            "work_stoppage_rate": {
+                "chart_type": "card",
+                "description": "No data available",
+                "data": {
+                    "rate": 0.0,
+                    "count": 0,
+                    "total": {"total_events": 0, "unique_events": 0}
+                }
+            },
+            "monthly_trends": {
+                "chart_type": "line",
+                "description": "No data available",
+                "data": []
+            },
+            "branch_performance_analysis": {
+                "chart_type": "bar",
+                "description": "No data available",
+                "data": []
+            },
+            "event_type_distribution": {
+                "chart_type": "pie",
+                "description": "No data available",
+                "data": []
+            },
+            "repeat_locations": {
+                "chart_type": "bar",
+                "description": "No data available",
+                "data": []
+            },
+            "response_time_analysis": {
+                "chart_type": "card",
+                "description": "No data available",
+                "data": {
+                    "average_response_time": "N/A",
+                    "median_response_time": "N/A",
+                    "events_analyzed": 0
+                }
+            },
+            "safety_performance_trends": {
+                "chart_type": "line",
+                "description": "No data available",
+                "data": []
+            },
+            "incident_severity_distribution": {
+                "chart_type": "pie",
+                "description": "No data available",
+                "data": []
+            },
+            "operational_impact_analysis": {
+                "chart_type": "card",
+                "description": "No data available",
+                "data": {
+                    "summary": {"total_incidents": 0, "branches_impacted": 0, "locations_impacted": 0, "incident_types": 0},
+                    "impact_metrics": {"operational_disruption_rate": 0.0, "safety_risk_rate": 0.0, "overall_impact_score": 0.0},
+                    "incident_breakdown": {"work_stopped_incidents": 0, "serious_incidents": 0}
+                }
+            },
+            "time_based_analysis": {
+                "chart_type": "bar",
+                "description": "No data available",
+                "data": {
+                    "time_of_day_analysis": [],
+                    "day_of_week_analysis": [],
+                    "peak_patterns": {"peak_time_period": "N/A", "peak_day_of_week": "N/A"},
+                    "summary": {"total_time_periods_analyzed": 0, "total_days_analyzed": 0, "has_hourly_data": False}
+                }
+            }
         } 

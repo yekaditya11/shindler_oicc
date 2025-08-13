@@ -271,9 +271,9 @@ class SRSEnrichedKPIQueries:
         query = f"""
         SELECT
             COUNT(*) as total_events,
-            COUNT(CASE WHEN "comments/remarks" IS NOT NULL AND "comments/remarks" != '' THEN 1 END) as events_with_comments,
+            COUNT(CASE WHEN comments_remarks IS NOT NULL AND comments_remarks != '' THEN 1 END) as events_with_comments,
             COUNT(CASE WHEN action_description_1 IS NOT NULL AND action_description_1 != '' THEN 1 END) as events_with_actions,
-            ROUND(COUNT(CASE WHEN "comments/remarks" IS NOT NULL AND "comments/remarks" != '' THEN 1 END) * 100.0 /
+            ROUND(COUNT(CASE WHEN comments_remarks IS NOT NULL AND comments_remarks != '' THEN 1 END) * 100.0 /
                   NULLIF(COUNT(*), 0), 2) as comments_completion_rate,
             ROUND(COUNT(CASE WHEN action_description_1 IS NOT NULL AND action_description_1 != '' THEN 1 END) * 100.0 /
                   NULLIF(COUNT(*), 0), 2) as actions_completion_rate
@@ -401,22 +401,10 @@ class SRSEnrichedKPIQueries:
         SELECT
             CASE
                 WHEN time_of_unsafe_event IS NULL THEN 'Unknown'
-                WHEN (
-                    (pg_typeof(time_of_unsafe_event)::text = 'text' AND time_of_unsafe_event::text ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$')
-                    OR pg_typeof(time_of_unsafe_event)::text = 'time without time zone'
-                ) AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 6 AND 11 THEN 'Morning (6AM-11AM)'
-                WHEN (
-                    (pg_typeof(time_of_unsafe_event)::text = 'text' AND time_of_unsafe_event::text ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$')
-                    OR pg_typeof(time_of_unsafe_event)::text = 'time without time zone'
-                ) AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 12 AND 17 THEN 'Afternoon (12PM-5PM)'
-                WHEN (
-                    (pg_typeof(time_of_unsafe_event)::text = 'text' AND time_of_unsafe_event::text ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$')
-                    OR pg_typeof(time_of_unsafe_event)::text = 'time without time zone'
-                ) AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 18 AND 23 THEN 'Evening (6PM-11PM)'
-                WHEN (
-                    (pg_typeof(time_of_unsafe_event)::text = 'text' AND time_of_unsafe_event::text ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$')
-                    OR pg_typeof(time_of_unsafe_event)::text = 'time without time zone'
-                ) AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 0 AND 5 THEN 'Night (12AM-5AM)'
+                WHEN (time_of_unsafe_event ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$') AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 6 AND 11 THEN 'Morning (6AM-11AM)'
+                WHEN (time_of_unsafe_event ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$') AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 12 AND 17 THEN 'Afternoon (12PM-5PM)'
+                WHEN (time_of_unsafe_event ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$') AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 18 AND 23 THEN 'Evening (6PM-11PM)'
+                WHEN (time_of_unsafe_event ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$') AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 0 AND 5 THEN 'Night (12AM-5AM)'
                 ELSE 'Unknown'
             END as time_period,
             COUNT(*) as incident_count,
@@ -428,22 +416,10 @@ class SRSEnrichedKPIQueries:
         GROUP BY
             CASE
                 WHEN time_of_unsafe_event IS NULL THEN 'Unknown'
-                WHEN (
-                    (pg_typeof(time_of_unsafe_event)::text = 'text' AND time_of_unsafe_event::text ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$')
-                    OR pg_typeof(time_of_unsafe_event)::text = 'time without time zone'
-                ) AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 6 AND 11 THEN 'Morning (6AM-11AM)'
-                WHEN (
-                    (pg_typeof(time_of_unsafe_event)::text = 'text' AND time_of_unsafe_event::text ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$')
-                    OR pg_typeof(time_of_unsafe_event)::text = 'time without time zone'
-                ) AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 12 AND 17 THEN 'Afternoon (12PM-5PM)'
-                WHEN (
-                    (pg_typeof(time_of_unsafe_event)::text = 'text' AND time_of_unsafe_event::text ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$')
-                    OR pg_typeof(time_of_unsafe_event)::text = 'time without time zone'
-                ) AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 18 AND 23 THEN 'Evening (6PM-11PM)'
-                WHEN (
-                    (pg_typeof(time_of_unsafe_event)::text = 'text' AND time_of_unsafe_event::text ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$')
-                    OR pg_typeof(time_of_unsafe_event)::text = 'time without time zone'
-                ) AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 0 AND 5 THEN 'Night (12AM-5AM)'
+                WHEN (time_of_unsafe_event ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$') AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 6 AND 11 THEN 'Morning (6AM-11AM)'
+                WHEN (time_of_unsafe_event ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$') AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 12 AND 17 THEN 'Afternoon (12PM-5PM)'
+                WHEN (time_of_unsafe_event ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$') AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 18 AND 23 THEN 'Evening (6PM-11PM)'
+                WHEN (time_of_unsafe_event ~ '^[0-9]{{1,2}}:[0-9]{{2}}(:[0-9]{{2}})?$') AND EXTRACT(HOUR FROM time_of_unsafe_event::time) BETWEEN 0 AND 5 THEN 'Night (12AM-5AM)'
                 ELSE 'Unknown'
             END
         ORDER BY incident_count DESC
@@ -578,8 +554,8 @@ class SRSEnrichedKPIQueries:
                 COUNT(CASE WHEN UPPER(serious_near_miss) = 'YES' THEN 1 END) as serious_incidents,
                 STRING_AGG(DISTINCT
                     CASE
-                WHEN "comments/remarks" IS NOT NULL AND LENGTH(TRIM("comments/remarks")) > 10
-                THEN SUBSTRING("comments/remarks", 1, 100)
+                WHEN comments_remarks IS NOT NULL AND LENGTH(TRIM(comments_remarks)) > 10
+                THEN SUBSTRING(comments_remarks, 1, 100)
                     END, ' | ') as incident_reasons
             FROM {self.table_name}
             WHERE date_of_unsafe_event >= CURRENT_DATE - INTERVAL '{days_back} days'
@@ -642,8 +618,8 @@ class SRSEnrichedKPIQueries:
             STRING_AGG(DISTINCT unsafe_condition, '; ') as common_unsafe_conditions,
             STRING_AGG(DISTINCT
                 CASE
-                    WHEN "comments/remarks" IS NOT NULL AND LENGTH(TRIM("comments/remarks")) > 10
-                    THEN SUBSTRING("comments/remarks", 1, 100)
+                    WHEN comments_remarks IS NOT NULL AND LENGTH(TRIM(comments_remarks)) > 10
+                    THEN SUBSTRING(comments_remarks, 1, 100)
                 END, ' | ') as violation_reasons,
             STRING_AGG(DISTINCT
                 CASE
@@ -685,8 +661,8 @@ class SRSEnrichedKPIQueries:
             END) as avg_reporting_delay_days,
             STRING_AGG(DISTINCT
                 CASE
-                    WHEN "comments/remarks" IS NOT NULL AND LENGTH(TRIM("comments/remarks")) > 10
-                    THEN SUBSTRING("comments/remarks", 1, 100)
+                    WHEN comments_remarks IS NOT NULL AND LENGTH(TRIM(comments_remarks)) > 10
+                    THEN SUBSTRING(comments_remarks, 1, 100)
                 END, ' | ') as performance_context
         FROM {self.table_name}
         WHERE (employee_name IS NOT NULL OR subcontractor_name IS NOT NULL)
@@ -711,8 +687,8 @@ class SRSEnrichedKPIQueries:
             STRING_AGG(DISTINCT unsafe_condition, '; ') as common_conditions,
             STRING_AGG(DISTINCT
                 CASE
-                    WHEN "comments/remarks" IS NOT NULL AND LENGTH(TRIM("comments/remarks")) > 10
-                    THEN SUBSTRING("comments/remarks", 1, 100)
+                    WHEN comments_remarks IS NOT NULL AND LENGTH(TRIM(comments_remarks)) > 10
+                    THEN SUBSTRING(comments_remarks, 1, 100)
                 END, ' | ') as root_causes,
             STRING_AGG(DISTINCT
                 CASE

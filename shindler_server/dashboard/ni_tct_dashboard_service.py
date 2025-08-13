@@ -200,7 +200,8 @@ class NITCTDashboardService:
                     "total_events": data.get("total_events", 0),
                     "unique_events": data.get("unique_events", 0)
                 },
-                "description": f"Total unsafe events recorded in NI TCT system"
+                "description": f"Total unsafe events recorded in NI TCT system",
+                "chart_type": "card"
             }
 
         except Exception as e:
@@ -242,7 +243,8 @@ class NITCTDashboardService:
                     "total_events": data.get("total_events", 0),
                     "serious_near_miss_percentage": str(safe_percentage)
                 },
-                "description": "Percentage of events classified as high-risk situations"
+                "description": "Percentage of events classified as high-risk situations",
+                "chart_type": "card"
             }
 
         except Exception as e:
@@ -283,7 +285,8 @@ class NITCTDashboardService:
                     "total_events": data.get("total_events", 0),
                     "unique_events": data.get("total_events", 0)
                 },
-                "description": "Percentage of events that resulted in work stoppage"
+                "description": "Percentage of events that resulted in work stoppage",
+                "chart_type": "card"
             }
 
         except Exception as e:
