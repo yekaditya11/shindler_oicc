@@ -461,19 +461,7 @@ class SRSAugmentedDashboardService:
         return {
             "chart_type": "bar",
             "description": "Time-based incident pattern analysis (date-only data)",
-            "data": [{
-                "time_of_day_analysis": time_of_day_results,
-                "day_of_week_analysis": day_of_week_results,
-                "peak_patterns": {
-                    "peak_time_period": peak_time_period,
-                    "peak_day_of_week": peak_day,
-                },
-                "summary": {
-                    "total_time_periods_analyzed": len(time_of_day_results),
-                    "total_days_analyzed": len(day_of_week_results),
-                    "has_hourly_data": False,
-                }
-            }]
+            "data": day_of_week_results
         }
 
     def _get_srs_standard_kpis(self, start_date: str, end_date: str, region: Optional[str], session: Session) -> Dict[str, Any]:
