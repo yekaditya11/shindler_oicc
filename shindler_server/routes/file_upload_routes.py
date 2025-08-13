@@ -61,6 +61,8 @@ def analyze_file_content(df: pd.DataFrame, filename: str = "") -> str:
             if re.search(pattern, clean_filename):
                 return key_name
     
+    if "srs" in clean_filename:
+        return "srs_raw"
     return "unknown"
         
 @router.post("/upload-analyze")
