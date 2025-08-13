@@ -394,7 +394,7 @@ class AIInsightsGenerator:
         """Generate comprehensive insights combining all aspects"""
         
         prompt = f"""
-        Analyze the following safety KPI data and provide exactly 10 concise, analytical insights with sentiment analysis.
+        Analyze the following safety KPI data and provide exactly 5 concise, analytical insights with sentiment analysis.
         Focus on EVENT ANALYSIS and IN-DEPTH UNDERSTANDING rather than recommendations.
         
         CRITICAL REQUIREMENTS:
@@ -419,7 +419,7 @@ class AIInsightsGenerator:
         7. Compliance gap analysis showing systematic non-adherence patterns
         8. Risk manifestation patterns and incident prediction indicators
         9. Organizational safety culture indicators based on reporting patterns
-        10. Resource impact analysis showing cost and efficiency correlations
+        5. Resource impact analysis showing cost and efficiency correlations
         
         EXAMPLE ANALYTICAL INSIGHTS (NOT RECOMMENDATIONS):
         - "Branch X shows 300% higher incident rate during morning shifts indicating systematic operational stress"
@@ -429,7 +429,7 @@ class AIInsightsGenerator:
         Data:
         {data}
         
-        Response format: Return EXACTLY 10 insights in this JSON format:
+        Response format: Return EXACTLY 5 insights in this JSON format:
         [
           {{"text": "analytical insight about events/patterns here", "sentiment": "positive|negative|neutral"}},
           {{"text": "analytical insight about events/patterns here", "sentiment": "positive|negative|neutral"}},
@@ -492,12 +492,12 @@ class AIInsightsGenerator:
                                 'sentiment': 'neutral'
                             })
                     
-                    # Ensure we have exactly 10 insights
-                    if len(validated_insights) > 10:
-                        validated_insights = validated_insights[:10]
-                    elif len(validated_insights) < 10:
-                        # Pad with neutral insights if we got fewer than 10
-                        while len(validated_insights) < 10:
+                    # Ensure we have exactly 5 insights
+                    if len(validated_insights) > 5:
+                        validated_insights = validated_insights[:5]
+                    elif len(validated_insights) < 5:
+                        # Pad with neutral insights if we got fewer than 5
+                        while len(validated_insights) < 5:
                             validated_insights.append({
                                 'text': "Additional analysis requires more comprehensive data for deeper insights.",
                                 'sentiment': 'neutral'
@@ -525,12 +525,7 @@ class AIInsightsGenerator:
             {"text": "System is working to provide comprehensive safety insights.", "sentiment": "neutral"},
             {"text": "Regular monitoring of safety metrics is recommended.", "sentiment": "neutral"},
             {"text": "Safety performance tracking requires consistent data collection.", "sentiment": "neutral"},
-            {"text": "Incident reporting systems should be regularly reviewed.", "sentiment": "neutral"},
-            {"text": "Training compliance monitoring is essential for safety management.", "sentiment": "neutral"},
-            {"text": "Risk assessment procedures should be regularly updated.", "sentiment": "neutral"},
-            {"text": "Equipment safety checks require consistent scheduling.", "sentiment": "neutral"},
-            {"text": "Safety culture development is an ongoing organizational priority.", "sentiment": "neutral"},
-            {"text": "Data quality improvements will enhance future insights.", "sentiment": "neutral"}
+            {"text": "Incident reporting systems should be regularly reviewed.", "sentiment": "neutral"}
         ]
     
     def _parse_fallback_insights(self, content: str) -> List[Dict[str, str]]:
@@ -547,11 +542,11 @@ class AIInsightsGenerator:
                         'sentiment': 'neutral'  # Default to neutral when sentiment can't be determined
                     })
         
-        # Ensure we have exactly 10 insights
-        if len(insights) > 10:
-            insights = insights[:10]
-        elif len(insights) < 10:
-            insights.extend(self._create_fallback_insights()[:10-len(insights)])
+        # Ensure we have exactly 5 insights
+        if len(insights) > 5:
+            insights = insights[:5]
+        elif len(insights) < 5:
+            insights.extend(self._create_fallback_insights()[:5-len(insights)])
         
         return insights
     
