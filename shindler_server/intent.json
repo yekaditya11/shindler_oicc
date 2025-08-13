@@ -1,6 +1,1523 @@
 {
-  "history": [],
-  "question": "highest unsafe events in a area",
+  "history": [
+    {
+      "type": "human",
+      "content": "highest unsafe events in a area"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT city, COUNT(*) AS unsafe_event_count\nFROM unsafe_events_srs\nGROUP BY city\nORDER BY unsafe_event_count DESC\nLIMIT 1;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, North Delhi (5021) has the highest number of unsafe events, totaling 447."
+    },
+    {
+      "type": "human",
+      "content": "Give me summary of current work stoppages"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    COUNT(*) AS total_work_stoppages,\n    SUM(CASE WHEN stop_work_duration = 'One Day or Less' THEN 1 ELSE 0 END) AS stoppages_one_day_or_less,\n    SUM(CASE WHEN stop_work_duration = 'More than one day' THEN 1 ELSE 0 END) AS stoppages_more_than_one_day,\n    COUNT(DISTINCT city) AS affected_cities,\n    COUNT(DISTINCT branch) AS affected_branches,\n    MIN(date_of_unsafe_event) AS earliest_stoppage_date,\n    MAX(date_of_unsafe_event) AS latest_stoppage_date\nFROM unsafe_events_srs\nWHERE work_stopped = 'Yes';"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there have been a total of 802 work stoppages, with 767 lasting one day or less and 35 exceeding one day. These stoppages affected 46 cities and 28 branches, spanning from January 1, 2025, to April 16, 2025."
+    },
+    {
+      "type": "human",
+      "content": "Give me summary of current work stoppages"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    COUNT(*) AS total_work_stoppages,\n    SUM(CASE WHEN stop_work_duration = 'One Day or Less' THEN 1 ELSE 0 END) AS stoppages_one_day_or_less,\n    SUM(CASE WHEN stop_work_duration = 'More than one day' THEN 1 ELSE 0 END) AS stoppages_more_than_one_day,\n    COUNT(DISTINCT city) AS affected_cities,\n    COUNT(DISTINCT branch) AS affected_branches,\n    MIN(date_of_unsafe_event) AS earliest_stoppage_date,\n    MAX(date_of_unsafe_event) AS latest_stoppage_date\nFROM unsafe_events_srs\nWHERE work_stopped = 'Yes';"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there have been a total of 802 work stoppages, with 767 lasting one day or less and 35 extending beyond one day. These stoppages have impacted 46 cities and 28 branches, occurring between January 1, 2025, and April 16, 2025."
+    },
+    {
+      "type": "human",
+      "content": "Give me a graphical summary of work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    stop_work_duration,\n    COUNT(*) AS stoppage_count\nFROM unsafe_events_srs\nWHERE work_stopped = 'Yes'\nGROUP BY stop_work_duration\nORDER BY stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In srs, work stoppages lasting one day or less accounted for 767 incidents, while stoppages extending beyond one day were much fewer, with 35 incidents."
+    },
+    {
+      "type": "human",
+      "content": "give me a work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT * FROM unsafe_events_srs WHERE work_stopped = 'Yes' LIMIT 1;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there was a work stoppage reported at the Sayba Elegant site on January 7, 2025, due to unsafe conditions including pit access and falling objects hazards in the hoistway during a new installation of the S3 Series product. The work was stopped for one day or less. The issue involved a customer placing a water-filled drum outside the shaft, blocking barricade access\u2014a recurring problem at Sayba sites."
+    },
+    {
+      "type": "human",
+      "content": "give me a bar chart for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    stop_work_duration, \n    COUNT(*) AS stoppage_count \nFROM unsafe_events_srs \nWHERE work_stopped = 'Yes' \nGROUP BY stop_work_duration \nORDER BY stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In srs, work stoppages mostly last one day or less, with 767 occurrences, while stoppages lasting more than one day are much fewer, totaling 35."
+    },
+    {
+      "type": "human",
+      "content": "Who are the top 5 reporters of unsafe events?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    reporter_name, \n    COUNT(*) AS unsafe_event_count \nFROM unsafe_events_srs \nGROUP BY reporter_name \nORDER BY unsafe_event_count DESC \nLIMIT 5;"
+    },
+    {
+      "type": "ai",
+      "content": "The top 5 reporters of unsafe events in the srs system are Johndevanand with 63 reports, JoyalFrank with 54, AnkitKumar with 42, KamleshPrasad with 41, and PradeepKumar with 31 reports."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS unsafe_events_with_no_actions\nFROM unsafe_events_srs\nWHERE \n  (action_description_1 IS NULL OR TRIM(action_description_1) = '')\n  AND (action_description_2 IS NULL OR TRIM(action_description_2) = '')\n  AND (action_description_3 IS NULL OR TRIM(action_description_3) = '')\n  AND (action_description_4 IS NULL OR TRIM(action_description_4) = '')\n  AND (action_description_5 IS NULL OR TRIM(action_description_5) = '');"
+    },
+    {
+      "type": "ai",
+      "content": "There are no unsafe events without actions created in the srs system."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS unsafe_events_with_no_actions\nFROM unsafe_events_srs\nWHERE \n  (action_description_1 IS NULL OR TRIM(action_description_1) = '')\n  AND (action_description_2 IS NULL OR TRIM(action_description_2) = '')\n  AND (action_description_3 IS NULL OR TRIM(action_description_3) = '')\n  AND (action_description_4 IS NULL OR TRIM(action_description_4) = '')\n  AND (action_description_5 IS NULL OR TRIM(action_description_5) = '');"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there are currently no unsafe events without actions created."
+    },
+    {
+      "type": "human",
+      "content": "Which branches have the most number of PPE non compliances?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT branch, COUNT(*) AS ppe_non_compliance_count\nFROM unsafe_events_srs\nWHERE unsafe_act ILIKE '%PPE%'\nGROUP BY branch\nORDER BY ppe_non_compliance_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the branches with the highest number of PPE non-compliances are North Delhi (29), South Delhi (26), and Bangalore 1 (19), followed by Mumbai 1 with 11 non-compliances."
+    },
+    {
+      "type": "human",
+      "content": "Which branches have the most number of PPE non compliances?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT branch, COUNT(*) AS ppe_non_compliance_count\nFROM unsafe_events_srs\nWHERE unsafe_act ILIKE '%PPE%'\nGROUP BY branch\nORDER BY ppe_non_compliance_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In srs, the branches with the highest number of PPE non-compliances are North Delhi (29), South Delhi (26), and Bangalore 1 (19), followed by Mumbai 1 with 11 non-compliances."
+    },
+    {
+      "type": "human",
+      "content": "Which branches have the most number of PPE non compliances?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT branch, COUNT(*) AS ppe_non_compliance_count\nFROM unsafe_events_srs\nWHERE unsafe_act ILIKE '%PPE%'\nGROUP BY branch\nORDER BY ppe_non_compliance_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the branches with the highest number of PPE non-compliances are North Delhi (29), South Delhi (26), and Bangalore 1 (19), followed by Mumbai 1 with 11 non-compliances. These locations should be prioritized for corrective actions to improve PPE adherence."
+    },
+    {
+      "type": "human",
+      "content": "Which employee is associated with the most number of unsafe events?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT employee_name, COUNT(*) AS unsafe_event_count\nFROM unsafe_events_srs\nGROUP BY employee_name\nORDER BY unsafe_event_count DESC\nLIMIT 1;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, one employee is associated with the highest number of unsafe events, totaling 395 events."
+    },
+    {
+      "type": "human",
+      "content": "Which hazards are commonly occurring across all regions?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT unsafe_condition, COUNT(*) AS occurrence_count\nFROM unsafe_events_srs\nGROUP BY unsafe_condition\nHAVING COUNT(DISTINCT region) = (SELECT COUNT(DISTINCT region) FROM unsafe_events_srs)\nORDER BY occurrence_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "Across all regions in the srs system, the most common hazards include general unspecified issues (\"NaN\" and \"Other\"), poor lighting, housekeeping problems, tripping hazards, electrical hazards, and falling objects. Additional notable recurring hazards are pit access risks, defective tools or equipment, inadequate barricades related to fall hazards, missing guards on machinery or electrical components, and fire and chemical hazards. These unsafe conditions consistently appear across every region, indicating key focus areas for safety improvements."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS unsafe_events_with_no_actions\nFROM unsafe_events_srs\nWHERE COALESCE(action_description_1, '') = ''\n  AND COALESCE(action_description_2, '') = ''\n  AND COALESCE(action_description_3, '') = ''\n  AND COALESCE(action_description_4, '') = ''\n  AND COALESCE(action_description_5, '') = '';"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there are currently no unsafe events without any actions created."
+    },
+    {
+      "type": "human",
+      "content": "Which hazards are commonly occurring across all regions?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT unsafe_condition, COUNT(*) AS occurrence_count\nFROM unsafe_events_srs\nGROUP BY unsafe_condition\nHAVING COUNT(DISTINCT region) = (SELECT COUNT(DISTINCT region) FROM unsafe_events_srs)\nORDER BY occurrence_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "Across all regions in the srs system, the most commonly occurring hazards include poor lighting (428 occurrences), housekeeping issues (394), tripping hazards (353), electrical hazards (316), falling objects (217), pit access hazards (196), and defective tools or equipment (146). Additionally, inadequate barricades and missing guards are notable, with 141 and 48 occurrences respectively."
+    },
+    {
+      "type": "human",
+      "content": "In each branch which is the most common unsafe behaviour observed?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT branch, unsafe_act, COUNT(*) AS occurrence_count\nFROM unsafe_events_srs\nWHERE unsafe_act IS NOT NULL AND unsafe_act <> ''\nGROUP BY branch, unsafe_act\nQUALIFY ROW_NUMBER() OVER (PARTITION BY branch ORDER BY COUNT(*) DESC) = 1;"
+    },
+    {
+      "type": "human",
+      "content": "Which branches are most likely to have accidents?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT branch, COUNT(*) AS accident_count\nFROM unsafe_events_srs\nWHERE unsafe_event_type LIKE '%Unsafe Act%'\nGROUP BY branch\nORDER BY accident_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The branches most likely to have accidents based on unsafe acts in the srs system are North Delhi (120 accidents), South Delhi (103 accidents), and RoN (91 accidents), followed by Bangalore 1 (65) and Mumbai 1 (35). These locations should be prioritized for focused safety interventions."
+    },
+    {
+      "type": "human",
+      "content": "In each branch which is the most common unsafe behaviour observed?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT branch, unsafe_act, COUNT(*) AS occurrence_count\nFROM unsafe_events_srs\nWHERE unsafe_act IS NOT NULL AND unsafe_act <> ''\nGROUP BY branch, unsafe_act\nQUALIFY ROW_NUMBER() OVER (PARTITION BY branch ORDER BY COUNT(*) DESC) = 1;"
+    },
+    {
+      "type": "human",
+      "content": "Show me the latest safety insights and trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  branch,\n  unsafe_event_type,\n  COUNT(*) AS total_events,\n  COUNT(DISTINCT unsafe_act) AS distinct_unsafe_acts,\n  COUNT(DISTINCT unsafe_condition) AS distinct_unsafe_conditions,\n  MAX(date_of_unsafe_event) AS latest_event_date\nFROM \n  unsafe_events_srs\nWHERE \n  date_of_unsafe_event IS NOT NULL\nGROUP BY \n  branch,\n  unsafe_event_type\nORDER BY \n  latest_event_date DESC,\n  total_events DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "The latest safety insights from the srs system show that unsafe conditions are more frequently reported than unsafe acts across branches. The INFRA / TRD branch recorded 261 unsafe condition events as of June 14, 2025, the most recent among all branches. North Delhi reported the highest total unsafe events with 368 unsafe conditions and 109 unsafe acts, indicating significant risk areas. Other branches like South Delhi, Pune 2, and Mumbai 2 also show notable unsafe conditions and acts, with distinct unsafe conditions ranging from 13 to 29. Overall, unsafe conditions remain a prevalent issue, with several branches having multiple distinct unsafe conditions identified, highlighting areas for targeted safety improvements."
+    },
+    {
+      "type": "human",
+      "content": "Show me the latest safety insights and trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  branch,\n  unsafe_event_type,\n  COUNT(*) AS total_events,\n  COUNT(DISTINCT unsafe_act) AS distinct_unsafe_acts,\n  COUNT(DISTINCT unsafe_condition) AS distinct_unsafe_conditions,\n  MAX(date_of_unsafe_event) AS latest_event_date\nFROM \n  unsafe_events_srs\nWHERE \n  date_of_unsafe_event IS NOT NULL\nGROUP BY \n  branch,\n  unsafe_event_type\nORDER BY \n  latest_event_date DESC,\n  total_events DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "The latest safety insights from the srs system show that the INFRA / TRD branch reported 261 unsafe condition events most recently on June 14, 2025. North Delhi leads in total unsafe events with 368 unsafe conditions and 109 unsafe acts, both last recorded on April 16, 2025. South Delhi, Pune 2, and Mumbai 2 also show significant unsafe events, balancing between unsafe conditions and acts, with the latest records mostly from early April 2025. Overall, unsafe conditions dominate the event types across branches, with North Delhi showing the highest diversity in distinct unsafe acts."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  COUNT(*) AS unsafe_events_without_actions\nFROM\n  unsafe_events_srs\nWHERE\n  (action_description_1 IS NULL OR TRIM(action_description_1) = '')\n  AND (action_description_2 IS NULL OR TRIM(action_description_2) = '')\n  AND (action_description_3 IS NULL OR TRIM(action_description_3) = '')\n  AND (action_description_4 IS NULL OR TRIM(action_description_4) = '')\n  AND (action_description_5 IS NULL OR TRIM(action_description_5) = '')\n  AND unsafe_event_type ILIKE '%Unsafe Act%' OR unsafe_event_type ILIKE '%Unsafe Condition%' OR unsafe_event_type ILIKE '%Near Miss%'\n  AND (\n    unsafe_event_type ILIKE '%Unsafe Act%'\n    OR unsafe_event_type ILIKE '%Unsafe Condition%'\n  )"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there are 3,274 unsafe events currently without any actions created."
+    },
+    {
+      "type": "human",
+      "content": "unsafe events chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) AS total_unsafe_events\nFROM\n  unsafe_events_srs\nWHERE\n  date_of_unsafe_event IS NOT NULL\nGROUP BY\n  unsafe_event_type,\n  DATE_TRUNC('month', date_of_unsafe_event)\nORDER BY\n  event_month ASC,\n  total_unsafe_events DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system, in the first four months of 2025, the majority of unsafe events were Unsafe Conditions, with counts of 1,222 in January, 1,215 in February, 729 in March, and only 15 in April. Unsafe Acts were the next most common, with 218 in January, 249 in February, 162 in March, and 4 in April. Near Misses were less frequent, ranging from 31 to 53 through the first three months and dropping to single digits in April. Combined event types like Unsafe Act with Unsafe Condition also appeared but in much smaller numbers. Overall, January and February showed the highest volumes of unsafe events in srs."
+    },
+    {
+      "type": "human",
+      "content": "distinct unsafe events count"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(DISTINCT event_id) AS distinct_unsafe_events_count\nFROM unsafe_events_srs;"
+    },
+    {
+      "type": "ai",
+      "content": "There are 4,001 distinct unsafe events recorded in srs."
+    },
+    {
+      "type": "human",
+      "content": "distinct unsafe events count"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(DISTINCT event_id) AS distinct_unsafe_events_count\nFROM unsafe_events_srs;"
+    },
+    {
+      "type": "ai",
+      "content": "There are 4,001 distinct unsafe events recorded in srs."
+    },
+    {
+      "type": "human",
+      "content": "Show me the latest safety insights and trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_event_type,\n  COUNT(*) AS event_count,\n  AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END) AS avg_work_stopped_ratio,\n  MAX(date_of_unsafe_event) AS latest_event_date\nFROM unsafe_events_srs\nGROUP BY unsafe_event_type\nORDER BY latest_event_date DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the latest safety insights show that Unsafe Conditions are the most frequent with 3,182 events, averaging about 16.5% of cases where work was stopped, with the most recent event on June 14, 2025. Unsafe Acts, though fewer at 633 events, have a higher average work-stopped ratio of 33.3%, last reported on April 16, 2025. Near Misses are less common (94 events) but still significant, with a 29.8% average work-stopped ratio and recent occurrences up to March 29, 2025. Combined event types, like Unsafe Act with Unsafe Condition, show even higher work stoppage ratios, indicating critical risk areas. Overall, srs data highlights Unsafe Conditions as the prevalent issue but marks Unsafe Acts and combined unsafe events as triggers for more immediate work stoppage interventions."
+    },
+    {
+      "type": "human",
+      "content": "give me the monthly Trends for Spikes revealing seasonal or process driven patterns"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) AS spike_event_count\nFROM unsafe_events_srs\nGROUP BY event_month\nORDER BY event_month;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system, monthly spike event counts show a clear seasonal or process-driven pattern: high spikes in January (1,502 events) and February (1,553 events), a noticeable drop in March (926 events), followed by a sharp decline in April (19 events) and June (1 event). This suggests significant activity early in the year with a rapid decrease thereafter."
+    },
+    {
+      "type": "human",
+      "content": "can you show it to me in a graphical format"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  unsafe_event_type,\n  COUNT(*) AS event_count,\n  AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END) AS avg_work_stopped_ratio\nFROM unsafe_events_srs\nGROUP BY event_month, unsafe_event_type\nORDER BY event_month, unsafe_event_type;"
+    },
+    {
+      "type": "ai",
+      "content": "Here is a graphical summary of unsafe events in the srs system for early 2025, broken down by event type and month:\n\n- **January 2025:**  \n  - Unsafe Condition: 1,222 events (avg. work stopped ratio ~16.5%)  \n  - Unsafe Act: 218 events (~31.7%)  \n  - Near Miss: 31 events (~35.5%)  \n  - Other combined types have smaller counts and varying work stopped ratios.\n\n- **February 2025:**  \n  - Unsafe Condition: 1,215 events (~17.2%)  \n  - Unsafe Act: 249 events (~36.5%)  \n  - Near Miss: 53 events (~28.3%)  \n\n- **March 2025:**  \n  - Unsafe Condition: 729 events (~14.8%)  \n  - Unsafe Act: 162 events (~30.9%)  \n  - Near Miss: 10 events (20%)  \n\n- **April & June 2025:**  \n  - Fewer events, e.g. April has 15 Unsafe Condition events (~40%) and 4 Unsafe Act events (25%).  \n\nThe avg. work stopped ratio indicates the proportion of events where work was halted. Unsafe Acts generally show higher work stopped averages than Unsafe Conditions. This trend and event counts can be illustrated by a multi-line or stacked bar chart showing monthly counts per unsafe event type alongside work stopped ratios to highlight risk impact and response."
+    },
+    {
+      "type": "human",
+      "content": "Give me a bar chart for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes') AS work_stoppage_count\nFROM unsafe_events_srs\nGROUP BY event_month\nORDER BY event_month;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system, the work stoppage counts by month are as follows: January 2025 had 298 stoppages, February increased to 329, March dropped to 168, April sharply decreased to 7, and June recorded no work stoppages."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS unsafe_events_without_actions\nFROM unsafe_events_srs\nWHERE action_description_1 IS NULL\n  AND action_description_2 IS NULL\n  AND action_description_3 IS NULL\n  AND action_description_4 IS NULL\n  AND action_description_5 IS NULL;"
+    },
+    {
+      "type": "ai",
+      "content": "In srs, there are no unsafe events without any actions created."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS unsafe_events_with_no_actions_created\nFROM unsafe_events_srs\nWHERE action_description_1 IS NULL\n  AND action_description_2 IS NULL\n  AND action_description_3 IS NULL\n  AND action_description_4 IS NULL\n  AND action_description_5 IS NULL;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there are currently no unsafe events without actions created\u2014zero events have no associated action descriptions."
+    },
+    {
+      "type": "human",
+      "content": "ok give me any other chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT unsafe_event_type, COUNT(*) AS event_count\nFROM unsafe_events_srs\nGROUP BY unsafe_event_type\nORDER BY event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system, the majority of unsafe events are classified as Unsafe Conditions with 3,182 occurrences, followed by Unsafe Acts at 633 events. Near Misses are much fewer, totaling 94. There are also mixed event types recorded, such as combined Unsafe Act and Unsafe Condition events, but these are significantly less frequent."
+    },
+    {
+      "type": "human",
+      "content": "so safe event bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT unsafe_event_type, COUNT(*) AS event_count\nFROM unsafe_events_srs\nWHERE unsafe_event_type NOT ILIKE '%Unsafe%'\nGROUP BY unsafe_event_type\nORDER BY event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system, the bar chart would show that \"Near Miss\" is the only reported unsafe event type, with a total of 94 occurrences."
+    },
+    {
+      "type": "human",
+      "content": "ok give me any other charts"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT product_type, COUNT(*) AS event_count\nFROM unsafe_events_srs\nGROUP BY product_type\nORDER BY event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "Here is the breakdown of unsafe events by product type in the srs system: The S3 Series leads with 3,283 events, followed by the S5 Series at 193. Other notable categories include Other product (114), S97 Series (ESC) with 110, and S7 Series at 85 events. Older models like Old Sch products Traction and MRL have 80 and 26 events respectively, while other series and categories have fewer events ranging down to just 1 for Non Sch Elev."
+    },
+    {
+      "type": "human",
+      "content": "Give me bar chart for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT work_stopped, COUNT(*) AS event_count\nFROM unsafe_events_srs\nGROUP BY work_stopped\nORDER BY event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, work was stopped in 802 events, while in 3,199 events work continued without stoppage. Here is the breakdown for work stoppage events."
+    },
+    {
+      "type": "human",
+      "content": "give me bar chart for work stoppage rate"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  work_stopped,\n  COUNT(*) * 100.0 / (SELECT COUNT(*) FROM unsafe_events_srs) AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nGROUP BY work_stopped\nORDER BY work_stopped DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the work stoppage rate is about 20.0%, meaning work was stopped in 20% of unsafe events, while in 80% of cases work continued without stoppage."
+    },
+    {
+      "type": "human",
+      "content": "give me bar chart for work stoppage rate"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  work_stopped,\n  COUNT(*) * 100.0 / (SELECT COUNT(*) FROM unsafe_events_srs) AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nGROUP BY work_stopped\nORDER BY work_stopped DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the work stoppage rate shows that work was stopped in approximately 20% of unsafe events, while work continued without stoppage in about 80% of cases."
+    },
+    {
+      "type": "human",
+      "content": "What are the current incident trends and patterns?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) AS incident_count,\n  ROUND(AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END)::numeric * 100, 2) AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nGROUP BY unsafe_event_type, event_month\nORDER BY event_month DESC, incident_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, incident trends show that Unsafe Conditions are the most frequent type of unsafe events each month, with counts ranging from 1 to over 1,200 incidents. Unsafe Acts also occur regularly, with incident counts in the low hundreds monthly. March to June 2025 shows a significant decrease in incidents compared to previous months. Work stoppage rates vary by event type but are generally higher for Unsafe Acts (up to around 37%) and combined event types, while Unsafe Conditions tend to have lower stoppage rates (around 15-20%). Near Misses are less frequent but sometimes have high stoppage rates, especially when combined with Unsafe Acts. Overall, there's a downward trend in total incidents in recent months, signaling potential improvement in safety conditions."
+    },
+    {
+      "type": "human",
+      "content": "give me bar chart for work stoppage rate"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  work_stopped,\n  COUNT(*) * 100.0 / (SELECT COUNT(*) FROM unsafe_events_srs) AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nGROUP BY work_stopped\nORDER BY work_stopped DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system, the work stoppage rate is about 20.0% when work was stopped due to unsafe events, while 80.0% of events did not result in work stoppage."
+    },
+    {
+      "type": "human",
+      "content": "give me a bar chart for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  ROUND(AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END)::numeric * 100, 2) AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nGROUP BY unsafe_event_type\nORDER BY work_stoppage_rate_percentage DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rates in the srs system vary by unsafe event type, with the highest at 100% for combined events involving Unsafe Act, Unsafe Condition, and Near Miss. Other notable rates include 66.67% for Near Miss and Unsafe Act, 53.85% for Unsafe Condition and Unsafe Act, and several categories around 33%. Single event types like Near Miss and Unsafe Condition have lower stoppage rates of 29.79% and 16.50%, respectively. This indicates that work stoppages are more likely when multiple unsafe event types occur together."
+    },
+    {
+      "type": "human",
+      "content": "give me the highest unsafe events chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  COUNT(*) AS event_count\nFROM unsafe_events_srs\nGROUP BY unsafe_event_type\nORDER BY event_count DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the highest number of unsafe events are Unsafe Conditions with 3,182 occurrences, followed by Unsafe Acts with 633 events, and Near Misses at 94. Events involving combinations of Unsafe Acts, Unsafe Conditions, and Near Misses are significantly fewer."
+    },
+    {
+      "type": "human",
+      "content": "What are the current incident trends and patterns?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) AS event_count,\n  ROUND(AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END)::numeric * 100, 2) AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY unsafe_event_type, event_month\nORDER BY event_month ASC, event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In srs, over the past six months, unsafe conditions are the most frequent incident type, with counts decreasing from 868 in February to 729 in March, and then much lower in April and June. Unsafe acts follow, with 194 events in February and 162 in March, showing a similar downward trend. Near misses are fewer, ranging from 41 in February to 10 in March. Work stoppage rates are highest for combined event types and near misses with unsafe acts, peaking at 66.67%, while unsafe conditions alone have lower stoppage rates around 14.81%-17.40%. Overall, incident frequency is decreasing, but combined unsafe acts and conditions continue to have significant impact on work stoppages."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  COUNT(*) AS unsafe_events_with_no_actions\nFROM unsafe_events_srs ue\nWHERE COALESCE(action_description_1, '') = '';"
+    },
+    {
+      "type": "ai",
+      "content": "There are no unsafe events without actions created in the srs system."
+    },
+    {
+      "type": "human",
+      "content": "give me a bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) AS event_count,\n  ROUND(AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END)::numeric * 100, 2) AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY unsafe_event_type, event_month\nORDER BY event_month ASC, event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The bar chart data for the srs system shows unsafe events from February to June 2025, categorized by event type. Unsafe Conditions are the most frequent, with 868 events (17.4% work stoppage rate) in February and 729 events (14.81% stoppage) in March. Unsafe Acts follow, with 194 events (35.57% stoppage) in February and 162 events (30.86% stoppage) in March. Near Misses are fewer but have higher stoppage rates, e.g., 41 events in February with a 34.15% stoppage rate. Combined event types show varying counts and stoppage rates, with some near misses linked to unsafe acts having up to a 66.67% stoppage rate. Event counts drop significantly by April and June."
+    },
+    {
+      "type": "human",
+      "content": "give me a bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) AS event_count,\n  ROUND(AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END)::numeric * 100, 2) AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY unsafe_event_type, event_month\nORDER BY event_month ASC, event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "Here is a summary of unsafe events reported in the srs system over recent months, broken down by event type for February, March, April, and June 2025:\n\n- **Unsafe Condition** is the most frequent event type, with 868 events in Feb, 729 in Mar, but drastically lower in Apr (15) and June (1). Its work stoppage rates range from 0% to 40%.\n- **Unsafe Act** events are fewer but have higher stoppage rates\u2014194 in Feb (35.57%), 162 in Mar (30.86%), and 4 in Apr (25%).\n- **Near Miss** events occur less frequently (41 in Feb, 10 in Mar, with some combined categories) but tend to have notably high stoppage rates up to 66.67%.\n- Mixed event types like \u201cUnsafe Act, Unsafe Condition\u201d show moderate counts and higher stoppage percentages, indicating greater risk when combined.\n\nThis data highlights that unsafe conditions are the most prevalent, while unsafe acts and near misses, though fewer, often lead to higher work stoppage rates, pointing to critical areas for targeted interventions."
+    },
+    {
+      "type": "human",
+      "content": "unsafe events chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) AS event_count,\n  ROUND(AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END)::numeric * 100, 2) AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY unsafe_event_type, event_month\nORDER BY event_month ASC, event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system in February 2025, Unsafe Conditions were the most frequent with 868 events and a 17.4% work stoppage rate, followed by Unsafe Acts (194 events, 35.6%) and Near Misses (41 events, 34.2%). March shows a similar pattern with 729 Unsafe Conditions (14.8% stoppage), 162 Unsafe Acts (30.9%), and 10 Near Misses (20%). In April and June, the event counts are much lower but work stoppage rates vary widely, peaking at 40% for Unsafe Conditions in April. Combined event types tend to have higher stoppage rates, notably Near Miss with Unsafe Act at 66.7% in February. Overall, Unsafe Conditions are the most common unsafe events, but Unsafe Acts and Near Misses have higher average work stoppage rates."
+    },
+    {
+      "type": "human",
+      "content": "unsafe events charts"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) AS event_count,\n  ROUND(AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END)::numeric * 100, 2) AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY unsafe_event_type, event_month\nORDER BY event_month ASC, event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "For the unsafe events in the srs system over recent months, February 2025 recorded the highest counts with 868 Unsafe Conditions (17.4% work stoppage rate), 194 Unsafe Acts (35.6%), and 41 Near Misses (34.2%). March saw slightly fewer events, with 729 Unsafe Conditions (14.8%) and 162 Unsafe Acts (30.9%). Combined event types generally show higher work stoppage rates, notably Near Miss with Unsafe Act at 66.7% in February. April and June had minimal events but some high work stoppage percentages, such as 40% for Unsafe Conditions in April. Overall, Unsafe Conditions are the most frequent, while Unsafe Acts and Near Misses tend to lead to higher proportions of work stoppage."
+    },
+    {
+      "type": "human",
+      "content": "ok show me a insight chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) AS event_count,\n  ROUND(AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END)::numeric * 100, 2) AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY unsafe_event_type, event_month\nORDER BY event_month ASC, event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system in the last six months, February showed the highest number of unsafe events with 868 Unsafe Condition events (17.4% work stoppage rate), 194 Unsafe Acts (35.57%), and 41 Near Misses (34.15%). March had slightly fewer events but a similar pattern, with Unsafe Conditions at 729 events (14.81% stoppage) and Unsafe Acts at 162 (30.86%). April and June showed much lower counts but April\u2019s Unsafe Conditions had a high stoppage rate of 40%. Combined unsafe event types like Unsafe Act and Unsafe Condition also have notable stoppage rates, especially in February and March. Overall, Unsafe Acts tend to have higher work stoppage rates compared to Unsafe Conditions."
+    },
+    {
+      "type": "human",
+      "content": "show me total avg resoinse time chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  ROUND(AVG(response_time)::numeric, 2) AS avg_response_time\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_month\nORDER BY event_month ASC;"
+    },
+    {
+      "type": "human",
+      "content": "i want a chart that it"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) AS event_count,\n  ROUND(AVG(response_time)::numeric, 2) AS avg_response_time\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY unsafe_event_type, event_month\nORDER BY event_month ASC, event_count DESC;"
+    },
+    {
+      "type": "human",
+      "content": "total events"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  COUNT(*) AS total_events\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE;"
+    },
+    {
+      "type": "ai",
+      "content": "There are 2,075 unsafe events recorded in the srs system over the past six months."
+    },
+    {
+      "type": "human",
+      "content": "show me a chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) AS event_count,\n  ROUND(AVG(response_time)::numeric, 2) AS avg_response_time\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY unsafe_event_type, event_month\nORDER BY event_month ASC, event_count DESC;"
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::decimal / NULLIF(COUNT(*),0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_month\nORDER BY event_month ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "For unsafe events recorded in srs, the work stoppage rate over recent months shows variability: February 2025 had a rate of 21.4%, March 18.1%, April spiked to 36.8%, and by June 2025, there were no recorded work stoppages. This indicates fluctuating impacts on operations related to safety incidents in srs."
+    },
+    {
+      "type": "human",
+      "content": "Show me the latest safety insights and trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) AS event_count,\n  ROUND(AVG(response_time)::numeric, 2) AS avg_response_time,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::decimal / NULLIF(COUNT(*),0) * 100 AS work_stoppage_rate_percentage,\n  STRING_AGG(DISTINCT unsafe_condition, '; ') AS safety_conditions,\n  STRING_AGG(DISTINCT unsafe_act, '; ') AS safety_acts,\n  STRING_AGG(DISTINCT other_safety_issues, '; ') AS additional_safety_issues,\n  MAX(investigation_closure_date) AS latest_investigation_closure\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY unsafe_event_type, event_month\nORDER BY event_month DESC, event_count DESC;"
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::decimal / NULLIF(COUNT(*),0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_month\nORDER BY event_month ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in srs over the last several months shows some fluctuation: 21.43% in February 2025, decreasing to 18.14% in March, then jumping significantly to 36.84% in April, and dropping to effectively 0% in June 2025."
+    },
+    {
+      "type": "human",
+      "content": "i want a pie chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  COUNT(*) AS event_count\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY unsafe_event_type\nORDER BY event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The pie chart for unsafe events in the srs system over the past 6 months would show the largest portion as Unsafe Condition with 1,613 events, followed by Unsafe Act with 360 events. Other categories like Near Miss and combinations of Unsafe Act, Unsafe Condition, and Near Miss make up smaller segments, with counts ranging from 2 to 51 events."
+    },
+    {
+      "type": "human",
+      "content": "show me work stoppage events chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  work_stopped AS stoppage_status,\n  COUNT(*) AS event_count\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY work_stopped\nORDER BY event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there were 2,075 unsafe events in the last 6 months; 417 of these involved work stoppages, while 1,658 did not."
+    },
+    {
+      "type": "human",
+      "content": "Serious Near Miss Rate graph chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_trunc('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) FILTER (WHERE serious_near_miss = 'Yes')::float / NULLIF(COUNT(*),0) * 100 AS serious_near_miss_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_month\nORDER BY event_month;"
+    },
+    {
+      "type": "ai",
+      "content": "The Serious Near Miss Rate in srs shows some fluctuation over the past months. It was about 0.09% in February 2025, increased to approximately 0.22% in March, then dropped to 0% in April and June 2025. This indicates a recent improvement with no serious near misses recorded in the latest months."
+    },
+    {
+      "type": "human",
+      "content": "show a bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_trunc('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) FILTER (WHERE serious_near_miss = 'Yes')::float / NULLIF(COUNT(*),0) * 100 AS serious_near_miss_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_month\nORDER BY event_month;"
+    },
+    {
+      "type": "ai",
+      "content": "The bar chart would show the serious near miss rate percentage in the srs system over recent months: February 2025 at 8.86%, March 2025 rising to 21.60%, and then both April and June 2025 showing 0%. This indicates a peak in March with a notable drop afterward."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_trunc('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / NULLIF(COUNT(*),0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_month\nORDER BY event_month;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in srs fluctuated over recent months: 21.4% in February 2025, decreased to 18.1% in March, spiked to 36.8% in April, and dropped to 0% in June 2025."
+    },
+    {
+      "type": "human",
+      "content": "send me  Work Stoppage Rate chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_trunc('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / NULLIF(COUNT(*),0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_month\nORDER BY event_month;"
+    },
+    {
+      "type": "ai",
+      "content": "The Work Stoppage Rate in srs over recent months shows fluctuations: February 2025 had a rate of 21.4%, March dropped to 18.1%, April spiked to 36.8%, and June recorded 0%."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_trunc('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / NULLIF(COUNT(*),0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_month\nORDER BY event_month;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in srs over recent months shows some fluctuation: February 2025 had a rate of 21.4%, March decreased to 18.1%, April spiked significantly to 36.8%, and by June it dropped to 0%. This trend highlights a recent peak in April that may warrant further investigation."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_trunc('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / NULLIF(COUNT(*), 0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_month\nORDER BY event_month;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in the srs system shows fluctuations over recent months: 21.4% in February 2025, decreasing to 18.1% in March, then sharply rising to 36.8% in April, and dropping to 0% in June 2025."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_trunc('month', date_of_unsafe_event) AS event_month,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / NULLIF(COUNT(*), 0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_month\nORDER BY event_month;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in srs over recent months shows variability: February 2025 had a 21.4% stoppage rate, March dropped to 18.1%, April spiked significantly to 36.8%, and by June 2025, the rate fell to 0%. This trend highlights a notable peak in April that may warrant further investigation."
+    },
+    {
+      "type": "human",
+      "content": "show me pie chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  work_stopped AS status,\n  COUNT(*) AS event_count\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY status\nORDER BY event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system over the past 6 months, there were 2,075 unsafe events recorded, with 417 (about 20%) involving work stoppages and 1,658 (about 80%) where work was not stopped."
+    },
+    {
+      "type": "human",
+      "content": "Give me bar chart for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_of_unsafe_event AS event_date,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes') AS work_stoppage_count\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_date\nORDER BY event_date;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage counts from the srs system over the past months show fluctuations with notable peaks of up to 26 stoppages on February 26, 2025, and consistently higher counts between mid-February to late March 2025. There were several days with no work stoppages, especially in early March and late March to early April. The data indicates variable operational disruptions that the Safety Head and VP should monitor for patterns to target risk reduction efforts."
+    },
+    {
+      "type": "human",
+      "content": "give me bar chart for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  work_stopped AS status,\n  COUNT(*) AS event_count\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY status\nORDER BY event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there were 2,075 unsafe events reported in the last 6 months, with 1,658 events where work was not stopped and 417 events where work was stopped."
+    },
+    {
+      "type": "human",
+      "content": "show me Work Stoppage Rate charts"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_of_unsafe_event AS event_date,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::FLOAT / COUNT(*) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_date\nORDER BY event_date;"
+    },
+    {
+      "type": "ai",
+      "content": "The Work Stoppage Rate in srs shows notable fluctuations between February and April 2025. Rates vary daily from 0% up to a peak of 50% on February 23, with frequent days above 20-30%. There are multiple zero-rate days interspersed, indicating periods with no work stoppage events. Notably, the highest stoppage rates appear in late February and early April, with a significant spike of 46.15% on April 1. This variability suggests intermittent but impactful work stoppage incidents requiring attention to underlying causes for targeted improvements."
+    },
+    {
+      "type": "human",
+      "content": "show me Work Stoppage Rate charts"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_of_unsafe_event AS event_date,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::FLOAT / NULLIF(COUNT(*),0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_date\nORDER BY event_date;"
+    },
+    {
+      "type": "ai",
+      "content": "The Work Stoppage Rate in the srs system from February 12 to June 14, 2025, shows considerable fluctuations. Rates ranged from 0% on several dates to peaks such as 50% on February 23 and 46.15% on April 1. Several dates recorded no stoppages, indicating variability in work interruptions due to unsafe events during this period."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate charts"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_of_unsafe_event AS event_date,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::FLOAT / NULLIF(COUNT(*),0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_date\nORDER BY event_date;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in srs fluctuated significantly between February and April 2025, with daily rates ranging from 0% up to 50%. Notably, there were spikes around late February (up to 50%) and early April (46%). Several days recorded no stoppages at all, indicating variability in work interruptions related to unsafe events during this period."
+    },
+    {
+      "type": "human",
+      "content": "give me a pie chart depicting percentage of serious near miss rate"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  serious_near_miss AS category,\n  COUNT(*)::FLOAT / NULLIF((SELECT COUNT(*) FROM unsafe_events_srs WHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE),0) * 100 AS percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY serious_near_miss;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, serious near misses account for approximately 0.14% of unsafe events in the last 6 months, while 99.86% are categorized as non-serious near misses."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_of_unsafe_event AS event_date,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::FLOAT / NULLIF(COUNT(*),0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_date\nORDER BY event_date;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in the srs system fluctuated between 0% and 50% from February to April 2025. Notably, the highest rates appeared on February 23 (50%), April 1 (46.15%), and several days in late February and March consistently exceeding 20%. There were also multiple days with a 0% stoppage rate, indicating variability in work interruptions due to safety events during this period."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate charts"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_of_unsafe_event AS event_date,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::FLOAT / NULLIF(COUNT(*),0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_date\nORDER BY event_date;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in the srs system shows significant daily variation from February to April 2025. Rates range from 0% on some days up to a peak of 50% on February 23, and another high at 46.15% on April 1. Several dates in late February and March also display elevated stoppage rates above 20%, indicating intermittent periods of high work interruption due to safety events."
+    },
+    {
+      "type": "human",
+      "content": "unsafe events chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_of_unsafe_event AS event_date,\n  COUNT(*) AS total_unsafe_events\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_date\nORDER BY event_date;"
+    },
+    {
+      "type": "ai",
+      "content": "From the unsafe events data in srs, daily total events ranged from a low of 1 to a high of 122 between February 12, 2025, and June 14, 2025. Notably, there was a peak around late February (up to 122 events), followed by a general decline into March and April, with sporadic low counts thereafter. This trend indicates a period of heightened unsafe activity late February that requires priority review and targeted interventions."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate charts"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_of_unsafe_event AS event_date,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::FLOAT / NULLIF(COUNT(*),0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_date\nORDER BY event_date;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in the srs system varies significantly from mid-February to mid-April 2025, with rates ranging from 0% on several days up to 50% on February 23. Notable peaks include late February and early April, where stoppage rates reached as high as 50% and 46%, respectively. Periods of zero stoppage indicate times of uninterrupted work, while spikes suggest days with higher safety incidents causing work halts. Overall, the data shows fluctuating stoppage rates, highlighting the need for focused safety interventions during peak periods."
+    },
+    {
+      "type": "human",
+      "content": "non crtical events chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_of_unsafe_event AS event_date,\n  COUNT(*) AS total_non_critical_events\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\n  AND (unsafe_event_type NOT LIKE '%Unsafe Act%' AND unsafe_event_type NOT LIKE '%Unsafe Condition%' AND unsafe_event_type NOT LIKE '%Near Miss%')\nGROUP BY event_date\nORDER BY event_date;"
+    },
+    {
+      "type": "ai",
+      "content": "There are no recorded non-critical events in the srs system for the past six months based on the current query."
+    },
+    {
+      "type": "human",
+      "content": "show me any chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_of_unsafe_event AS event_date,\n  COUNT(*) AS total_events\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY event_date\nORDER BY event_date;"
+    },
+    {
+      "type": "ai",
+      "content": "The chart data from the srs system shows the daily count of unsafe events from February 12, 2025, to June 14, 2025. Event counts fluctuate over this period, with peaks around late February (up to 122 events) and a gradual decline in March and April, with sporadic low counts in mid-April and June."
+    },
+    {
+      "type": "human",
+      "content": "Create a line chart for weeks analysis"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('week', date_of_unsafe_event) AS week_start_date,\n  COUNT(*) AS total_events\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY week_start_date\nORDER BY week_start_date;"
+    },
+    {
+      "type": "ai",
+      "content": "The weekly analysis for unsafe events in srs shows fluctuations over the reported period, with peak activity at 506 events during the week starting February 24, 2025, and a significant drop to as low as 1 event by the week of June 9, 2025. Overall, there is a downward trend in total unsafe events from February through June 2025."
+    },
+    {
+      "type": "human",
+      "content": "unsafe events ratio chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('week', date_of_unsafe_event) AS week_start_date,\n  SUM(CASE WHEN unsafe_event_type LIKE '%Unsafe%' THEN 1 ELSE 0 END)::FLOAT / NULLIF(COUNT(*), 0) AS unsafe_events_ratio\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY week_start_date\nORDER BY week_start_date;"
+    },
+    {
+      "type": "ai",
+      "content": "The unsafe events ratio in srs has shown a steady increase over the recent weeks, starting around 0.96 in early February 2025 and reaching a ratio of 1.0 from the end of March through June 2025, indicating a rising trend in the proportion of unsafe events within that period."
+    },
+    {
+      "type": "human",
+      "content": "make a bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('week', date_of_unsafe_event) AS week_start_date,\n  COUNT(*) AS total_events\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY week_start_date\nORDER BY week_start_date;"
+    },
+    {
+      "type": "ai",
+      "content": "Here is a bar chart summary of weekly unsafe events in the srs system over the past six months, showing fluctuations from a high of 506 events during the week starting February 24, 2025, to a low of 1 event in the week starting June 9, 2025. Notably, there is a decreasing trend after late February, with very few events in April and June."
+    },
+    {
+      "type": "human",
+      "content": "simple one"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_location,\n  COUNT(*) AS total_unsafe_events\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY unsafe_event_location\nORDER BY total_unsafe_events DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In srs, the highest number of unsafe events occurred in the Hoistway with 1,166 incidents, followed by the Landing area with 257 events. Other notable locations include the Pit (153 events), Car top (96), and Machine Room (80). Areas like the Office had the fewest events, totaling 8."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate charts"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::FLOAT / NULLIF(COUNT(*), 0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in the srs system varied over the past months: 21.4% in February 2025, decreased to 18.1% in March, then spiked to 36.8% in April, and finally dropped to 0% in June."
+    },
+    {
+      "type": "human",
+      "content": "Give me pie chart for monthly trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS total_unsafe_events\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system, monthly unsafe events show a significant drop over recent months: February had 1,129 events, March dropped to 926, April sharply decreased to 19, and June recorded just 1 event, indicating a strong downward trend in unsafe occurrences."
+    },
+    {
+      "type": "human",
+      "content": "Give me chart for average response time"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  AVG(EXTRACT(EPOCH FROM (db_uploaded_date::timestamp - date_of_unsafe_event::timestamp))) AS average_response_time_seconds\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "The average response time for unsafe events in srs has improved over recent months. It was about 14.8 million seconds in February 2025, decreased to approximately 12.8 million in March, then to 11.2 million in April, and significantly dropped to around 5 million seconds by June 2025."
+    },
+    {
+      "type": "human",
+      "content": "create a bar chart for average response time"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  AVG(EXTRACT(EPOCH FROM (db_uploaded_date::timestamp - date_of_unsafe_event::timestamp))) AS average_response_time_seconds\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "The average response time for unsafe events in srs has been decreasing over recent months, from about 14.8 million seconds in February 2025 to approximately 5 million seconds in June 2025. I can create a bar chart showing this month-to-month trend if you'd like."
+    },
+    {
+      "type": "human",
+      "content": "give me bar chart for weekly trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('week', date_of_unsafe_event) AS week,\n  AVG(EXTRACT(EPOCH FROM (db_uploaded_date::timestamp - date_of_unsafe_event::timestamp))) AS average_response_time_seconds\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY week\nORDER BY week;"
+    },
+    {
+      "type": "ai",
+      "content": "The weekly trends for average response time to unsafe events in the srs system show a consistent decrease from about 15,486,098 seconds in the week of Feb 10, 2025, down to 5,054,415 seconds by the week of June 9, 2025. This indicates improving responsiveness over the monitored period."
+    },
+    {
+      "type": "human",
+      "content": "give me bar chart for weekly trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('week', date_of_unsafe_event) AS week,\n  AVG(EXTRACT(EPOCH FROM (db_uploaded_date::timestamp - date_of_unsafe_event::timestamp))) AS average_response_time_seconds\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY week\nORDER BY week;"
+    },
+    {
+      "type": "ai",
+      "content": "The weekly trend in average response time for unsafe events in srs shows a steady decrease from about 15,486,098 seconds in the week of Feb 10, 2025, down to approximately 5,054,415 seconds by the week of June 9, 2025. This indicates improved response times over the monitored period."
+    },
+    {
+      "type": "human",
+      "content": "give me bar chart for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('week', date_of_unsafe_event) AS week,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes') AS work_stoppage_count\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY week\nORDER BY week;"
+    },
+    {
+      "type": "ai",
+      "content": "The weekly work stoppage counts from srs over the past months show a peak during mid-February 2025, with the highest count of 103 in the week of February 17, followed closely by 98 the week of February 24. Counts then generally declined through March and April, reaching near zero by early June."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('week', date_of_unsafe_event) AS week,\n  COUNT(*) AS incident_count\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY week\nORDER BY week;"
+    },
+    {
+      "type": "ai",
+      "content": "The incident trends in the srs system over recent weeks show a peak around late February 2025, with incidents rising from 232 to 506 between February 10 and February 24. After that, the numbers generally decline, dropping to 37 incidents by the end of March, and further down to just 3 incidents by mid-April, reaching a low of 1 incident by early June. This indicates a significant reduction in unsafe events over the observed period."
+    },
+    {
+      "type": "human",
+      "content": "List overdue safety actions"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  id,\n  event_id,\n  reported_date,\n  date_of_unsafe_event,\n  unsafe_event_type,\n  action_description_1,\n  action_description_2,\n  action_description_3,\n  action_description_4,\n  action_description_5\nFROM unsafe_events_srs\nWHERE \n  (action_description_1 IS NOT NULL AND action_description_1 <> '') \n  AND reported_date < CURRENT_DATE\nORDER BY reported_date ASC;"
+    },
+    {
+      "type": "human",
+      "content": "Give me bar chart for daily work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_of_unsafe_event AS day,\n  COUNT(*) AS work_stoppage_count\nFROM unsafe_events_srs\nWHERE work_stopped = 'Yes'\n  AND date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY day\nORDER BY day;"
+    },
+    {
+      "type": "ai",
+      "content": "The daily work stoppage counts from the srs system over the recent period show variability, with notable peaks on February 26 (26 stoppages), February 21 (23 stoppages), and alongside several other days in late February and March where counts ranged from 15 to 22. Lower stoppage days typically have counts below 5, such as March 1, 6, and 8. This data highlights specific days with heightened work interruptions that may warrant further investigation to address underlying safety issues."
+    },
+    {
+      "type": "human",
+      "content": "give me bar chart for weekly work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('week', date_of_unsafe_event) AS week_start,\n  COUNT(*) AS work_stoppage_count\nFROM unsafe_events_srs\nWHERE work_stopped = 'Yes'\n  AND date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY week_start\nORDER BY week_start;"
+    },
+    {
+      "type": "ai",
+      "content": "The weekly work stoppage counts in the srs system show notable fluctuations over the past weeks: starting at 43 stoppages the week of Feb 10, peaking at 103 and 98 stoppages in the weeks of Feb 17 and Feb 24 respectively, then generally declining to as low as 1 stoppage in the week of Apr 14. This indicates a recent significant reduction in work stoppages after earlier spikes."
+    },
+    {
+      "type": "human",
+      "content": "Give me bar chart for monthly work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS work_stoppage_count\nFROM unsafe_events_srs\nWHERE work_stopped = 'Yes'\n  AND date_of_unsafe_event BETWEEN CURRENT_DATE - INTERVAL '6 months' AND CURRENT_DATE\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "The monthly work stoppage counts in srs are: February 2025 had 242 stoppages, March 2025 had 168, and April 2025 significantly dropped to 7 stoppages."
+    },
+    {
+      "type": "human",
+      "content": "asds"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('day', date_of_unsafe_event) AS event_day,\n  COUNT(*) AS event_count\nFROM unsafe_events_srs\nGROUP BY event_day\nORDER BY event_day;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system, the daily count of unsafe events from January to April 2025 shows fluctuating numbers with notable spikes: the highest daily counts occurred around late January and February, reaching up to 122 events on February 25. Event counts vary widely, from as low as 1 event on some days to peaks exceeding 100 on others. Overall, there is a trend of increasing event counts in late January through February, followed by a moderate decline into March and April."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS incident_count\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "For srs, incident counts show a significant decrease over recent months: 1,502 in January 2025, rising slightly to 1,553 in February, then dropping to 926 in March, followed by a sharp decline to 19 in April, and just 1 incident in June. This indicates a strong downward trend in incident frequency over this period."
+    },
+    {
+      "type": "human",
+      "content": "show unsafe chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('day', date_of_unsafe_event) AS event_day,\n  COUNT(*) AS event_count\nFROM unsafe_events_srs\nGROUP BY event_day\nORDER BY event_day;"
+    },
+    {
+      "type": "ai",
+      "content": "The unsafe events in srs show a varying daily count from January to April 2025, with low counts (1-7 events) on some days but significant spikes reaching over 100 events on several days in late January and February. Overall, the trend indicates fluctuations with notable peaks, such as 107 events on January 23, 122 on February 25, and 109 on February 26. This pattern suggests periods of increased unsafe incidents that require focused attention to identify root causes and mitigate risks."
+    },
+    {
+      "type": "human",
+      "content": "Show me the latest safety insights and trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  MAX(date_of_unsafe_event) AS latest_event_date,\n  COUNT(*) AS total_unsafe_events,\n  unsafe_event_type,\n  business_details,\n  unsafe_event_location,\n  region,\n  branch,\n  AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END) AS work_stopped_rate,\n  SUM(CASE WHEN serious_near_miss = 'Yes' THEN 1 ELSE 0 END) AS serious_near_miss_count\nFROM unsafe_events_srs\nGROUP BY unsafe_event_type, business_details, unsafe_event_location, region, branch\nORDER BY latest_event_date DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "The latest safety insights from srs show recent unsafe events primarily involve Unsafe Conditions and Unsafe Acts across various locations like Hoistway, Pit, Landing, and Car Top. The highest number of events (177) occurred during service maintenance in the Hoistway at North Delhi branch, with a work-stopped rate of about 14%. New installation activities also recorded multiple unsafe conditions, especially in Hoistway and Pit areas, with some branches experiencing work-stopped rates as high as 36% (Noida) and 41% (RoN). No serious near-miss incidents were reported in these recent events."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('day', date_of_unsafe_event) AS event_day,\n  AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END) AS work_stoppage_rate\nFROM unsafe_events_srs\nGROUP BY event_day\nORDER BY event_day;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in the srs system varies daily from January through April 2025. Rates range from 0 (no stoppages) on multiple days to peaks such as 100% on January 26 and notably high rates around 50% on several dates (e.g., January 1, February 23, April 1). There are intermittent days with zero stoppage, showing fluctuation rather than a steady trend."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_location,\n  AVG(CASE WHEN work_stopped = 'Yes' THEN 1 ELSE 0 END) AS work_stoppage_rate\nFROM unsafe_events_srs\nGROUP BY unsafe_event_location\nORDER BY work_stoppage_rate DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the highest work stoppage rates due to unsafe events are at the Landing (26.7%) and Pit (25.1%) locations, followed by Hoistway (20.4%) and Others (19.5%). The lowest rates are observed in the Machine Room (5.9%) and Office Area (7.1%). This highlights critical areas like Landing, Pit, and Hoistway where focused safety interventions may reduce work stoppages."
+    },
+    {
+      "type": "human",
+      "content": "unsafe event bar charts"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_event_type,\n  COUNT(*) AS event_count\nFROM unsafe_events_srs\nGROUP BY unsafe_event_type\nORDER BY event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In srs, the majority of unsafe events are classified as Unsafe Conditions with 3,182 occurrences, followed by Unsafe Acts at 633 events. Near Misses are less frequent, totaling 94. There are also combined event types such as Unsafe Act and Unsafe Condition occurring together in smaller numbers."
+    },
+    {
+      "type": "human",
+      "content": "bar chart for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_event_location,\n  COUNT(*) AS work_stoppage_count\nFROM unsafe_events_srs\nWHERE work_stopped = 'Yes'\nGROUP BY unsafe_event_location\nORDER BY work_stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, work stoppages due to unsafe events are highest in the Hoistway with 470 incidents, followed by the Landing area at 132. Other notable locations include the Pit (66), Others (64), and Car top (27). Locations like Warehouse/Logistic area, Escalator, Machine Room, Inside car, and Office Area have significantly fewer stoppages, ranging from 1 to 15 occurrences."
+    },
+    {
+      "type": "human",
+      "content": "Give me bar chart for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_event_location,\n  COUNT(*) AS work_stoppage_count\nFROM unsafe_events_srs\nWHERE work_stopped = 'Yes'\nGROUP BY unsafe_event_location\nORDER BY work_stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, work stoppages due to unsafe events are highest in the Hoistway with 470 incidents, followed by the Landing (132) and Pit (66). Other locations like Car top, Warehouse/Logistic area, Escalator, Machine Room, Inside car, and Office Area record significantly fewer stoppages. This highlights Hoistway as a critical area for focused safety interventions."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_event_location,\n  COUNT(*) AS work_stoppage_count\nFROM unsafe_events_srs\nWHERE work_stopped = 'Yes'\nGROUP BY unsafe_event_location\nORDER BY work_stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the Work Stoppage Rate is highest at the Hoistway with 470 stoppages, followed by the Landing area at 132, and the Pit at 66. Other locations like Car top, Warehouse/Logistic area, and Machine Room report significantly fewer stoppages, with the Office Area having the least at just 1. This highlights Hoistway and Landing as key focus areas for safety improvements to reduce work stoppages."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_event_location,\n  COUNT(*)::FLOAT / NULLIF((SELECT COUNT(*) FROM unsafe_events_srs), 0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nWHERE work_stopped = 'Yes'\nGROUP BY unsafe_event_location\nORDER BY work_stoppage_rate_percentage DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the highest work stoppage rate due to unsafe events is at the Hoistway with 11.75%, followed by the Landing at 3.30%, and the Pit at 1.65%. Other locations like Car top, Warehouse/Logistic area, and Machine Room have significantly lower rates, all below 1%. This highlights the Hoistway as the primary area of concern for work stoppages related to safety issues."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS incident_count\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "For srs, incident counts by month show a high volume in January (1,502) and February (1,553) 2025, then a significant drop in March (926), followed by a sharp decline in April (19) and June (1). This indicates a strong downward trend in incident occurrences over these months."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS incident_count\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system, incident counts showed a high level in January (1502) and February (1553) 2025, then dropped significantly to 926 in March, followed by a steep decline to 19 in April and only 1 incident in June. This indicates a major reduction in incidents after February."
+    },
+    {
+      "type": "human",
+      "content": "show me a Work Stoppage Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_event_type,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / COUNT(*) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nGROUP BY unsafe_event_type\nORDER BY work_stoppage_rate_percentage DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The Work Stoppage Rate in the srs system varies by unsafe event type, with the highest rate of 100% for combined events of Unsafe Act, Unsafe Condition, and Near Miss. Other notable rates include 66.7% for Near Miss and Unsafe Act, 53.8% for Unsafe Condition and Unsafe Act, and 33.3% for either Unsafe Act alone or combined Unsafe Act and Unsafe Condition. The lowest rate observed is 16.5% for Unsafe Condition alone."
+    },
+    {
+      "type": "human",
+      "content": "Total Events bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS total_events\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "For srs, the total unsafe events by month are: January 2025 with 1,502 events, February 2025 with 1,553, March 2025 with 926, April 2025 drops sharply to 19 events, and June 2025 has just 1 event."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_event_type,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / COUNT(*) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nGROUP BY unsafe_event_type\nORDER BY work_stoppage_rate_percentage DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, work stoppage rates vary by unsafe event type. The highest rate (100%) occurs when Unsafe Act, Unsafe Condition, and Near Miss events coincide. Combinations like Near Miss and Unsafe Act show a 66.7% stoppage rate, while single event types such as Unsafe Act or Unsafe Condition alone have lower rates, around 16.5% to 33.3%. This indicates that more complex or multiple concurrent unsafe events tend to trigger higher work stoppage rates."
+    },
+    {
+      "type": "human",
+      "content": "asdSerious Near Miss Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) FILTER (WHERE serious_near_miss = 'Yes')::float / NULLIF(COUNT(*),0) * 100 AS serious_near_miss_rate_percentage\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "The serious near miss rate in the srs system showed an increase from 0.07% in January 2025 to a peak of 0.22% in March 2025, followed by a drop to 0% in April and June 2025."
+    },
+    {
+      "type": "human",
+      "content": "Serious Near Miss Rate"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) FILTER (WHERE serious_near_miss = 'Yes')::float / NULLIF(COUNT(*),0) * 100 AS serious_near_miss_rate_percentage\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "The serious near miss rate in srs shows variation over the months in early 2025, starting at approximately 0.07% in January, increasing to about 0.13% in February, peaking near 0.22% in March, and then dropping to 0% in both April and June."
+    },
+    {
+      "type": "human",
+      "content": "Total Events bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS total_events\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "For srs, the total unsafe events by month show high activity early in the year: January had 1,502 events, February 1,553, and March 926. There is a sharp decline afterward, with only 19 events in April and just 1 event recorded in June."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate  bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / NULLIF(COUNT(*),0) * 100 AS work_stoppage_rate_percentage\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in srs varied month to month in early 2025, with January at about 19.8%, February slightly higher at 21.2%, March dropping to 18.1%, a spike in April reaching 36.8%, and June showing no work stoppages (0%)."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS total_incidents\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, incident trends show a high number of incidents in January (1,502) and February (1,553) 2025, followed by a significant drop in March (926). April and June show a drastic decrease to 19 and 1 incident(s) respectively, indicating a strong downward trend after March."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS total_incidents\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "Reviewing incident trends in the srs system shows a high volume of incidents in January (1,502) and February (1,553) 2025, followed by a significant drop in March (926), and a steep decline to very low counts in April (19) and June (1). This indicates a substantial reduction in reported incidents starting April."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS total_incidents\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "For srs, incident trends show a high of 1,553 incidents in February 2025, followed by a significant drop to 926 in March, then a sharp decline to 19 in April and just 1 in June. This indicates a notable reduction in reported incidents after February."
+    },
+    {
+      "type": "human",
+      "content": "Show latest safety insights"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  event_id,\n  reported_date,\n  date_of_unsafe_event,\n  unsafe_event_type,\n  unsafe_condition,\n  unsafe_act,\n  other_safety_issues,\n  comments_remarks,\n  action_description_1,\n  action_description_2,\n  work_stopped,\n  serious_near_miss,\n  event_requires_sanction,\n  db_uploaded_date\nFROM unsafe_events_srs\nORDER BY db_uploaded_date DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "The latest safety insights from the srs system highlight multiple unsafe conditions reported mainly in February 2025. Common hazards include pit access issues, falling objects, tripping hazards, electrical hazards, poor lighting, and defective equipment. Several events led to work being stopped, particularly when barricades were removed or hazards were severe. Most issues were promptly addressed, such as water removal from pits, barricade reinstatement, and defective equipment replacement. No serious near misses or sanctions were reported. Recurring concerns, like repeated pit access hazards at certain sites, suggest areas for focused corrective action."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS total_incidents\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, incident trends show a high number of unsafe events with 1,502 incidents in January 2025 and 1,553 in February 2025. There is a noticeable drop to 926 incidents in March, followed by a sharp decline to 19 incidents in April and just 1 incident recorded in June."
+    },
+    {
+      "type": "human",
+      "content": "Show latest safety insights"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  event_id,\n  reported_date,\n  date_of_unsafe_event,\n  unsafe_event_type,\n  unsafe_condition,\n  unsafe_act,\n  other_safety_issues,\n  comments_remarks,\n  action_description_1,\n  action_description_2,\n  work_stopped,\n  serious_near_miss,\n  event_requires_sanction,\n  db_uploaded_date\nFROM unsafe_events_srs\nORDER BY db_uploaded_date DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "The latest safety insights from the srs system show multiple unsafe condition events primarily involving pit access hazards, falling objects hazards, electrical hazards, poor lighting, defective tools, and tripping hazards. Notably, several events led to work stoppage due to serious access and barricading issues, with corrective actions taken promptly such as removing hazards, fixing barricades, and educating involved parties. No serious near misses or sanctions were required in these recent cases."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS total_incidents\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month DESC\nLIMIT 6;"
+    },
+    {
+      "type": "ai",
+      "content": "In srs, incident trends show a significant decline over the past six months: 1502 incidents in January 2025, peaking slightly at 1553 in February, then dropping sharply to 926 in March, 19 in April, and just 1 incident in June 2025. This indicates a strong improvement in safety performance recently."
+    },
+    {
+      "type": "human",
+      "content": "What are the current incident trends and patterns?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  unsafe_condition,\n  unsafe_act,\n  COUNT(*) AS incident_count,\n  DATE_TRUNC('month', date_of_unsafe_event) AS month\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months'\nGROUP BY month, unsafe_event_type, unsafe_condition, unsafe_act\nORDER BY month DESC, incident_count DESC\nLIMIT 50;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system over the past few months, incident trends show a high volume of unsafe conditions, particularly \"Other\" (127 incidents in March), \"Housekeeping issues\" (90), \"Poor lighting\" (82), \"Electrical hazards\" (82), and \"Tripping hazards\" (80) in March 2025. Pit access hazards and falling object hazards also feature notably. Unsafe acts are fewer but include \"Other\" (45 incidents) and common behaviors like lack of PPE use (33) and operating without following procedures (28). Incident counts have generally decreased after March, with fewer but similar types of unsafe conditions reported in April and June."
+    },
+    {
+      "type": "human",
+      "content": "give a pie chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_condition,\n  COUNT(*) AS incident_count\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months'\nGROUP BY unsafe_condition\nORDER BY incident_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The pie chart for unsafe conditions in srs shows the top contributors as: NaN (176 incidents), Other (130), Housekeeping issues (94), Electrical hazards (85), Tripping hazards (84), and Poor lighting (84). These six categories represent the majority of incidents, with remaining unsafe conditions contributing fewer counts. This highlights key areas for targeted safety improvements."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  unsafe_event_type,\n  unsafe_condition,\n  unsafe_act,\n  COUNT(*) AS incident_count\nFROM unsafe_events_srs\nWHERE date_of_unsafe_event >= DATE_TRUNC('month', CURRENT_DATE) - INTERVAL '5 months'\nGROUP BY month, unsafe_event_type, unsafe_condition, unsafe_act\nORDER BY month DESC, incident_count DESC\nLIMIT 50;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, incident trends over the past few months show a significant decrease in unsafe events from March to June 2025. March had the highest incident counts, with major unsafe conditions including \"Other\" (127 incidents), \"Housekeeping issue\" (90), \"Poor lighting\" (82), \"Electrical hazards\" (82), and \"Tripping hazard\" (80). Unsafe acts such as \"Other\" (45 incidents) and \"Lack or improper use of PPE\" (33) were also notable. By April, incidents dropped considerably across categories, with common issues remaining \"Pit access hazard,\" \"Tripping hazard,\" and \"Electrical hazards,\" but at much lower counts (mostly 1-3 incidents). June recorded only one incident related to a \"Pit access hazard.\" This reflects a positive downward trend in incident frequency and highlights persistent focus areas like pit access, housekeeping, lighting, and electrical safety for continued improvement."
+    },
+    {
+      "type": "human",
+      "content": "Who are the top 5 reporters of unsafe events?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  reporter_name,\n  COUNT(*) AS unsafe_event_count\nFROM unsafe_events_srs\nGROUP BY reporter_name\nORDER BY unsafe_event_count DESC\nLIMIT 5;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the top 5 reporters of unsafe events are Johndevanand with 63 reports, JoyalFrank with 54, AnkitKumar with 42, KamleshPrasad with 41, and PradeepKumar with 31."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS unsafe_events_without_actions\nFROM unsafe_events_srs\nWHERE \n  (action_description_1 IS NULL OR TRIM(action_description_1) = '')\n  AND (action_description_2 IS NULL OR TRIM(action_description_2) = '')\n  AND (action_description_3 IS NULL OR TRIM(action_description_3) = '')\n  AND (action_description_4 IS NULL OR TRIM(action_description_4) = '')\n  AND (action_description_5 IS NULL OR TRIM(action_description_5) = '');"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there are currently no unsafe events without actions created."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events are related to PPE non compliance?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS ppe_non_compliance_unsafe_events\nFROM unsafe_events_srs\nWHERE unsafe_act ILIKE '%PPE non compliance%' OR unsafe_act ILIKE '%Lack or improper use of PPE%' OR unsafe_act ILIKE '%Lack or improper use of PPE,%' OR unsafe_act ILIKE '%Lack or improper use of PPE,%';"
+    },
+    {
+      "type": "ai",
+      "content": "There are 138 unsafe events related to PPE non-compliance recorded in the srs system."
+    },
+    {
+      "type": "human",
+      "content": "Which employee is associated with the most number of unsafe events?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT employee_id, employee_name, COUNT(*) AS unsafe_event_count\nFROM unsafe_events_srs\nWHERE employee_id IS NOT NULL\nGROUP BY employee_id, employee_name\nORDER BY unsafe_event_count DESC\nLIMIT 1;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the employee associated with the most unsafe events has no recorded employee ID or name, with a total of 395 unsafe events."
+    },
+    {
+      "type": "human",
+      "content": "Which hazards are commonly occurring across all regions?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT unsafe_condition\nFROM unsafe_events_srs\nWHERE unsafe_condition IS NOT NULL\nGROUP BY unsafe_condition\nHAVING COUNT(DISTINCT region) = (SELECT COUNT(DISTINCT region) FROM unsafe_events_srs WHERE region IS NOT NULL)\nORDER BY COUNT(*) DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "Across all regions in the srs system, the commonly occurring hazards include poor lighting, housekeeping issues, tripping hazards, electrical hazards, falling objects, pit access hazards, defective tools or equipment, inadequate barricades (falling hazards), missing guards on machinery or electrical parts, and fire and chemical hazards. These conditions consistently appear as significant risks across all locations."
+    },
+    {
+      "type": "human",
+      "content": "In each branch which is the most common unsafe behaviour observed?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT branch, unsafe_act, COUNT(*) AS occurrence_count\nFROM unsafe_events_srs\nWHERE unsafe_act IS NOT NULL\nGROUP BY branch, unsafe_act\nQUALIFY ROW_NUMBER() OVER (PARTITION BY branch ORDER BY COUNT(*) DESC) = 1\nORDER BY branch;"
+    }
+  ],
+  "question": "Which branches are most likely to have accidents?",
   "intent": "system_query",
   "database_ddl": "unsafe_events_srs(event_id VARCHAR(100), reporter_name VARCHAR(255), reported_date DATE, reporter_id VARCHAR(100), date_of_unsafe_event DATE, time_of_unsafe_event VARCHAR(50), unsafe_event_type VARCHAR(255), business_details VARCHAR(255), site_reference TEXT, unsafe_event_location VARCHAR(255), product_type VARCHAR(255), employee_id VARCHAR(100), employee_name VARCHAR(255), subcontractor_company_name VARCHAR(255), subcontractor_id VARCHAR(100), subcontractor_city VARCHAR(255), subcontractor_name VARCHAR(255), kg_name VARCHAR(100), country_name VARCHAR(100), division VARCHAR(255), department VARCHAR(255), city VARCHAR(255), sub_area VARCHAR(100), district VARCHAR(255), zone VARCHAR(255), serious_near_miss VARCHAR(10), unsafe_act TEXT, unsafe_act_other TEXT, unsafe_condition TEXT, unsafe_condition_other TEXT, work_stopped VARCHAR(10), stop_work_nogo_violation VARCHAR(10), nogo_violation_detail TEXT, stop_work_duration VARCHAR(255), other_safety_issues TEXT, comments_remarks TEXT, event_requires_sanction VARCHAR(10), action_description_1 TEXT, action_description_2 TEXT, action_description_3 TEXT, action_description_4 TEXT, action_description_5 TEXT, branch VARCHAR(255), region VARCHAR(100), db_uploaded_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP);unsafe_events_ei_tech (event_id INTEGER, reporter_name VARCHAR(255), manager_name VARCHAR(255), branch VARCHAR(255), reported_date DATE, reporter_id VARCHAR(100), date_of_unsafe_event DATE, time VARCHAR(50), time_of_unsafe_event VARCHAR(50), unsafe_event_type VARCHAR(255), business_details VARCHAR(255), site_reference TEXT, unsafe_event_location VARCHAR(255), product_type VARCHAR(255), employee_id VARCHAR(100), employee_name VARCHAR(255), subcontractor_company_name VARCHAR(255), subcontractor_id VARCHAR(100), subcontractor_city VARCHAR(255), subcontractor_name VARCHAR(255), kg_name VARCHAR(100), country_name VARCHAR(100), division VARCHAR(255), department VARCHAR(255), city VARCHAR(255), sub_area VARCHAR(100), district VARCHAR(255), zone VARCHAR(255), serious_near_miss VARCHAR(10), unsafe_act VARCHAR(255), unsafe_act_other TEXT, unsafe_condition TEXT, unsafe_condition_other TEXT, work_stopped VARCHAR(10), stop_work_nogo_violation VARCHAR(255), nogo_violation_detail TEXT, stop_work_duration VARCHAR(255), other_safety_issues TEXT, comments_remarks TEXT, event_requires_sanction VARCHAR(10), action_description_1 TEXT, action_description_2 TEXT, action_description_3 TEXT, action_description_4 TEXT, action_description_5 TEXT, image VARCHAR(500), status VARCHAR(50), region VARCHAR(100), db_uploaded_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP); unsafe_events_ni_tct (reporting_id INTEGER, status_key VARCHAR(50), status VARCHAR(50), location_key INTEGER, location VARCHAR(255), branch_key INTEGER, no INTEGER, branch_name VARCHAR(255), region_key VARCHAR(100), region VARCHAR(100), reporter_sap_id VARCHAR(100), reporter_name VARCHAR(255), designation_key VARCHAR(50), designation VARCHAR(255), gl_id_key VARCHAR(100), gl_id VARCHAR(255), pe_id_key VARCHAR(100), pe_id VARCHAR(255), created_on TIMESTAMP, date_and_time_of_unsafe_event TIMESTAMP, type_of_unsafe_event_key VARCHAR(50), type_of_unsafe_event VARCHAR(255), unsafe_event_details_key VARCHAR(50), unsafe_event_details TEXT, action_related_to_high_risk_situation_key VARCHAR(10), action_related_to_high_risk_situation VARCHAR(10), business_details_key VARCHAR(50), business_details VARCHAR(255), site_name TEXT, site_reference_key VARCHAR(50), site_reference VARCHAR(255), product_type_key VARCHAR(50), product_type VARCHAR(255), persons_involved TEXT, work_was_stopped_key VARCHAR(10), work_was_stopped VARCHAR(10), work_stopped_hours VARCHAR(50), no_go_violation_key VARCHAR(50), no_go_violation VARCHAR(255), job_no VARCHAR(100), additional_comments TEXT, has_attachment BOOLEAN, attachment VARCHAR(500), db_uploaded_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP);",
   "total_database_semantics": {

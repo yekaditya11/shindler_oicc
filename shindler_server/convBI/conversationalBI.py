@@ -21,7 +21,7 @@ from convBI.prompts import intent_prompt,greeting_prompt,table_identification_pr
 import psycopg 
 import json
 
- 
+
 
 
 class WorkflowState(TypedDict):

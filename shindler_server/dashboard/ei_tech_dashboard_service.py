@@ -196,9 +196,11 @@ class EITechDashboardService:
             data = result[0] if result else {"total_events": 0, "unique_events": 0}
 
             return {
-                "count": {
-                    "total_events": data.get("total_events", 0),
-                    "unique_events": data.get("unique_events", 0)
+                "data": {
+                    "count": {
+                        "total_events": data.get("total_events", 0),
+                        "unique_events": data.get("unique_events", 0)
+                    }
                 },
                 "description": f"Total unsafe events recorded in EI Tech system",
                 "chart_type": "card"
@@ -206,7 +208,7 @@ class EITechDashboardService:
 
         except Exception as e:
             logger.error(f"Error getting total events count: {e}")
-            return {"count": {"total_events": 0, "unique_events": 0}, "description": "Error retrieving data"}
+            return {"data": {"count": {"total_events": 0, "unique_events": 0}}, "description": "Error retrieving data", "chart_type": "card"}
 
     def _get_serious_near_miss_rate(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 2: Serious Near Miss Rate"""
@@ -236,12 +238,14 @@ class EITechDashboardService:
             safe_percentage = float(serious_percentage) if serious_percentage is not None else 0.0
             
             return {
-                "rate": safe_percentage,
-                "count": {
-                    "serious_near_miss_count": data.get("serious_count", 0),
-                    "non_serious_count": data.get("total_events", 0) - data.get("serious_count", 0),
-                    "total_events": data.get("total_events", 0),
-                    "serious_near_miss_percentage": str(safe_percentage)
+                "data": {
+                    "rate": safe_percentage,
+                    "count": {
+                        "serious_near_miss_count": data.get("serious_count", 0),
+                        "non_serious_count": data.get("total_events", 0) - data.get("serious_count", 0),
+                        "total_events": data.get("total_events", 0),
+                        "serious_near_miss_percentage": str(safe_percentage)
+                    }
                 },
                 "description": "Percentage of events classified as serious near misses",
                 "chart_type": "card"
@@ -249,7 +253,7 @@ class EITechDashboardService:
 
         except Exception as e:
             logger.error(f"Error getting serious near miss rate: {e}")
-            return {"rate": 0.0, "count": {"serious_near_miss_count": 0, "non_serious_count": 0, "total_events": 0, "serious_near_miss_percentage": "0.0"}, "description": "Error retrieving data"}
+            return {"data": {"rate": 0.0, "count": {"serious_near_miss_count": 0, "non_serious_count": 0, "total_events": 0, "serious_near_miss_percentage": "0.0"}}, "description": "Error retrieving data", "chart_type": "card"}
 
     def _get_work_stoppage_rate(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI 3: Work Stoppage Rate"""
@@ -279,11 +283,13 @@ class EITechDashboardService:
             safe_percentage = float(work_stoppage_percentage) if work_stoppage_percentage is not None else 0.0
             
             return {
-                "rate": safe_percentage,
-                "count": data.get("work_stopped_count", 0),
-                "total": {
-                    "total_events": data.get("total_events", 0),
-                    "unique_events": data.get("total_events", 0)
+                "data": {
+                    "rate": safe_percentage,
+                    "count": data.get("work_stopped_count", 0),
+                    "total": {
+                        "total_events": data.get("total_events", 0),
+                        "unique_events": data.get("total_events", 0)
+                    }
                 },
                 "description": "Percentage of events that resulted in work stoppage",
                 "chart_type": "card"
@@ -291,7 +297,7 @@ class EITechDashboardService:
 
         except Exception as e:
             logger.error(f"Error getting work stoppage rate: {e}")
-            return {"rate": 0.0, "count": 0, "total": {"total_events": 0, "unique_events": 0}, "description": "Error retrieving data"}
+            return {"data": {"rate": 0.0, "count": 0, "total": {"total_events": 0, "unique_events": 0}}, "description": "Error retrieving data", "chart_type": "card"}
 
     def _get_monthly_trends(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> List[Dict]:
         """KPI 4: Monthly Trends"""
@@ -478,17 +484,21 @@ class EITechDashboardService:
             avg_delay = data.get("avg_reporting_delay_days")
             if avg_delay is not None:
                 return {
-                    "average_response_time": f"{float(avg_delay):.2f} days",
-                    "median_response_time": "N/A",
-                    "events_analyzed": data.get("events_with_timing_data", 0),
+                    "data": {
+                        "average_response_time": f"{float(avg_delay):.2f} days",
+                        "median_response_time": "N/A",
+                        "events_analyzed": data.get("events_with_timing_data", 0)
+                    },
                     "description": "Average time between incident occurrence and reporting",
                     "chart_type": "card"
                 }
             else:
                 return {
-                    "average_response_time": "N/A",
-                    "median_response_time": "N/A",
-                    "events_analyzed": 0,
+                    "data": {
+                        "average_response_time": "N/A",
+                        "median_response_time": "N/A",
+                        "events_analyzed": 0
+                    },
                     "description": "Response time analysis not available - insufficient timing data",
                     "chart_type": "card"
                 }
@@ -496,9 +506,11 @@ class EITechDashboardService:
         except Exception as e:
             logger.error(f"Error getting response time analysis: {e}")
             return {
-                "average_response_time": "N/A",
-                "median_response_time": "N/A",
-                "events_analyzed": 0,
+                "data": {
+                    "average_response_time": "N/A",
+                    "median_response_time": "N/A",
+                    "events_analyzed": 0
+                },
                 "description": "Error retrieving response time data",
                 "chart_type": "card"
             }
@@ -674,20 +686,22 @@ class EITechDashboardService:
             safe_impact_score = float(overall_impact_score) if overall_impact_score is not None else 0.0
             
             return {
-                "summary": {
-                    "total_incidents": data.get("total_incidents", 0),
-                    "branches_impacted": data.get("branches_impacted", 0),
-                    "locations_impacted": data.get("locations_impacted", 0),
-                    "incident_types": data.get("incident_types", 0)
-                },
-                "impact_metrics": {
-                    "operational_disruption_rate": safe_operational_rate,
-                    "safety_risk_rate": safe_safety_rate,
-                    "overall_impact_score": safe_impact_score
-                },
-                "incident_breakdown": {
-                    "work_stopped_incidents": data.get("work_stopped_incidents", 0),
-                    "serious_incidents": data.get("serious_incidents", 0)
+                "data": {
+                    "summary": {
+                        "total_incidents": data.get("total_incidents", 0),
+                        "branches_impacted": data.get("branches_impacted", 0),
+                        "locations_impacted": data.get("locations_impacted", 0),
+                        "incident_types": data.get("incident_types", 0)
+                    },
+                    "impact_metrics": {
+                        "operational_disruption_rate": safe_operational_rate,
+                        "safety_risk_rate": safe_safety_rate,
+                        "overall_impact_score": safe_impact_score
+                    },
+                    "incident_breakdown": {
+                        "work_stopped_incidents": data.get("work_stopped_incidents", 0),
+                        "serious_incidents": data.get("serious_incidents", 0)
+                    }
                 },
                 "description": "Comprehensive analysis of operational and business impact from safety incidents",
                 "chart_type": "card"
@@ -696,9 +710,11 @@ class EITechDashboardService:
         except Exception as e:
             logger.error(f"Error getting operational impact analysis: {e}")
             return {
-                "summary": {"total_incidents": 0, "branches_impacted": 0, "locations_impacted": 0, "incident_types": 0},
-                "impact_metrics": {"operational_disruption_rate": 0.0, "safety_risk_rate": 0.0, "overall_impact_score": 0.0},
-                "incident_breakdown": {"work_stopped_incidents": 0, "serious_incidents": 0},
+                "data": {
+                    "summary": {"total_incidents": 0, "branches_impacted": 0, "locations_impacted": 0, "incident_types": 0},
+                    "impact_metrics": {"operational_disruption_rate": 0.0, "safety_risk_rate": 0.0, "overall_impact_score": 0.0},
+                    "incident_breakdown": {"work_stopped_incidents": 0, "serious_incidents": 0}
+                },
                 "description": "Error retrieving operational impact data",
                 "chart_type": "card"
             }
@@ -747,62 +763,58 @@ class EITechDashboardService:
             peak_day = max(day_of_week_results, key=lambda x: x['incident_count'])['day_of_week'].strip() if day_of_week_results else "N/A"
 
             return {
-                "time_of_day_analysis": time_of_day_results,
-                "day_of_week_analysis": day_of_week_results,
-                "peak_patterns": {
-                    "peak_time_period": peak_time_period,
-                    "peak_day_of_week": peak_day
-                },
-                "summary": {
-                    "total_time_periods_analyzed": len(time_of_day_results),
-                    "total_days_analyzed": len(day_of_week_results),
-                    "description": "Time-based incident pattern analysis (date-only data)",
-                    "has_hourly_data": False
-                },
-                "chart_type": "bar"
+                "chart_type": "bar",
+                "description": "Time-based incident pattern analysis (date-only data)",
+                "data": [{
+                    "time_of_day_analysis": time_of_day_results,
+                    "day_of_week_analysis": day_of_week_results,
+                    "peak_patterns": {
+                        "peak_time_period": peak_time_period,
+                        "peak_day_of_week": peak_day
+                    },
+                    "summary": {
+                        "total_time_periods_analyzed": len(time_of_day_results),
+                        "total_days_analyzed": len(day_of_week_results),
+                        "has_hourly_data": False
+                    }
+                }]
             }
 
         except Exception as e:
             logger.error(f"Error getting time-based analysis: {e}")
             return {
-                "time_of_day_analysis": [],
-                "day_of_week_analysis": [],
-                "peak_patterns": {
-                    "peak_time_period": "N/A",
-                    "peak_day_of_week": "N/A"
-                },
-                "summary": {
-                    "total_time_periods_analyzed": 0,
-                    "total_days_analyzed": 0,
-                    "description": "Error retrieving time-based analysis data",
-                    "has_hourly_data": False
-                },
-                "chart_type": "bar"
+                "chart_type": "bar",
+                "description": "Error retrieving time-based analysis data",
+                "data": []
             }
 
     def _get_empty_dashboard_data(self) -> Dict[str, Any]:
         """Return empty dashboard data structure for all 12 KPIs"""
         return {
             "total_events": {
-                "count": {"total_events": 0, "unique_events": 0},
+                "data": {"count": {"total_events": 0, "unique_events": 0}},
                 "description": "No data available",
                 "chart_type": "card"
             },
             "serious_near_miss_rate": {
-                "rate": 0.0,
-                "count": {
-                    "serious_near_miss_count": 0,
-                    "non_serious_count": 0,
-                    "total_events": 0,
-                    "serious_near_miss_percentage": "0.0"
+                "data": {
+                    "rate": 0.0,
+                    "count": {
+                        "serious_near_miss_count": 0,
+                        "non_serious_count": 0,
+                        "total_events": 0,
+                        "serious_near_miss_percentage": "0.0"
+                    }
                 },
                 "description": "No data available",
                 "chart_type": "card"
             },
             "work_stoppage_rate": {
-                "rate": 0.0,
-                "count": 0,
-                "total": {"total_events": 0, "unique_events": 0},
+                "data": {
+                    "rate": 0.0,
+                    "count": 0,
+                    "total": {"total_events": 0, "unique_events": 0}
+                },
                 "description": "No data available",
                 "chart_type": "card"
             },
@@ -811,34 +823,28 @@ class EITechDashboardService:
             "event_type_distribution": {"data": [], "description": "No data available", "chart_type": "pie"},
             "repeat_locations": {"data": [], "description": "No data available", "chart_type": "bar"},
             "response_time_analysis": {
-                "average_response_time": "N/A",
-                "median_response_time": "N/A",
-                "events_analyzed": 0,
+                "data": {
+                    "average_response_time": "N/A",
+                    "median_response_time": "N/A",
+                    "events_analyzed": 0
+                },
                 "description": "No data available",
                 "chart_type": "card"
             },
             "safety_performance_trends": {"data": [], "description": "No data available", "chart_type": "line"},
             "incident_severity_distribution": {"data": [], "description": "No data available", "chart_type": "pie"},
             "operational_impact_analysis": {
-                "summary": {"total_incidents": 0, "branches_impacted": 0, "locations_impacted": 0, "incident_types": 0},
-                "impact_metrics": {"operational_disruption_rate": 0.0, "safety_risk_rate": 0.0, "overall_impact_score": 0.0},
-                "incident_breakdown": {"work_stopped_incidents": 0, "serious_incidents": 0},
+                "data": {
+                    "summary": {"total_incidents": 0, "branches_impacted": 0, "locations_impacted": 0, "incident_types": 0},
+                    "impact_metrics": {"operational_disruption_rate": 0.0, "safety_risk_rate": 0.0, "overall_impact_score": 0.0},
+                    "incident_breakdown": {"work_stopped_incidents": 0, "serious_incidents": 0}
+                },
                 "description": "No data available",
                 "chart_type": "card"
             },
             "time_based_analysis": {
-                "time_of_day_analysis": [],
-                "day_of_week_analysis": [],
-                "peak_patterns": {
-                    "peak_time_period": "N/A",
-                    "peak_day_of_week": "N/A"
-                },
-                "summary": {
-                    "total_time_periods_analyzed": 0,
-                    "total_days_analyzed": 0,
-                    "description": "No data available",
-                    "has_hourly_data": False
-                },
-                "chart_type": "bar"
+                "chart_type": "bar",
+                "description": "No data available",
+                "data": []
             }
         } 

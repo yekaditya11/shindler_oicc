@@ -63,9 +63,11 @@ class SRSAugmentedDashboardService:
         result = self._execute_query(query, params, session)
         data = result[0] if result else {"total_events": 0, "unique_events": 0}
         return {
-            "count": {
-                "total_events": data.get("total_events", 0),
-                "unique_events": data.get("unique_events", 0),
+            "data": {
+                "count": {
+                    "total_events": data.get("total_events", 0),
+                    "unique_events": data.get("unique_events", 0),
+                }
             },
             "description": "Total unsafe events recorded",
             "chart_type": "card"
@@ -88,12 +90,14 @@ class SRSAugmentedDashboardService:
         data = result[0] if result else {"serious_count": 0, "total_events": 0, "serious_percentage": 0.0}
         perc = float(data.get("serious_percentage") or 0.0)
         return {
-            "rate": perc,
-            "count": {
-                "serious_near_miss_count": data.get("serious_count", 0),
-                "non_serious_count": data.get("total_events", 0) - data.get("serious_count", 0),
-                "total_events": data.get("total_events", 0),
-                "serious_near_miss_percentage": f"{perc}",
+            "data": {
+                "rate": perc,
+                "count": {
+                    "serious_near_miss_count": data.get("serious_count", 0),
+                    "non_serious_count": data.get("total_events", 0) - data.get("serious_count", 0),
+                    "total_events": data.get("total_events", 0),
+                    "serious_near_miss_percentage": f"{perc}",
+                }
             },
             "description": "Percentage of events classified as serious near misses",
             "chart_type": "card"
@@ -116,9 +120,11 @@ class SRSAugmentedDashboardService:
         data = result[0] if result else {"work_stopped_count": 0, "total_events": 0, "work_stoppage_percentage": 0.0}
         perc = float(data.get("work_stoppage_percentage") or 0.0)
         return {
-            "rate": perc,
-            "count": data.get("work_stopped_count", 0),
-            "total": {"total_events": data.get("total_events", 0), "unique_events": data.get("total_events", 0)},
+            "data": {
+                "rate": perc,
+                "count": data.get("work_stopped_count", 0),
+                "total": {"total_events": data.get("total_events", 0), "unique_events": data.get("total_events", 0)}
+            },
             "description": "Percentage of events that resulted in work stoppage",
             "chart_type": "card"
         }
@@ -256,16 +262,20 @@ class SRSAugmentedDashboardService:
         avg_delay = data.get("avg_reporting_delay_days")
         if avg_delay is not None:
             return {
-                "average_response_time": f"{float(avg_delay):.2f} days",
-                "median_response_time": "N/A",
-                "events_analyzed": data.get("events_with_timing_data", 0),
+                "data": {
+                    "average_response_time": f"{float(avg_delay):.2f} days",
+                    "median_response_time": "N/A",
+                    "events_analyzed": data.get("events_with_timing_data", 0)
+                },
                 "description": "Average time between incident occurrence and reporting",
                 "chart_type": "card"
             }
         return {
-            "average_response_time": "N/A",
-            "median_response_time": "N/A",
-            "events_analyzed": 0,
+            "data": {
+                "average_response_time": "N/A",
+                "median_response_time": "N/A",
+                "events_analyzed": 0
+            },
             "description": "Response time analysis not available - insufficient timing data",
             "chart_type": "card"
         }
@@ -395,20 +405,22 @@ class SRSAugmentedDashboardService:
         result = self._execute_query(query, params, session)
         data = result[0] if result else {}
         return {
-            "summary": {
-                "total_incidents": data.get("total_incidents", 0),
-                "branches_impacted": data.get("branches_impacted", 0),
-                "locations_impacted": data.get("locations_impacted", 0),
-                "incident_types": data.get("incident_types", 0),
-            },
-            "impact_metrics": {
-                "operational_disruption_rate": float(data.get("operational_disruption_rate") or 0.0),
-                "safety_risk_rate": float(data.get("safety_risk_rate") or 0.0),
-                "overall_impact_score": float(data.get("overall_impact_score") or 0.0),
-            },
-            "incident_breakdown": {
-                "work_stopped_incidents": data.get("work_stopped_incidents", 0),
-                "serious_incidents": data.get("serious_incidents", 0),
+            "data": {
+                "summary": {
+                    "total_incidents": data.get("total_incidents", 0),
+                    "branches_impacted": data.get("branches_impacted", 0),
+                    "locations_impacted": data.get("locations_impacted", 0),
+                    "incident_types": data.get("incident_types", 0),
+                },
+                "impact_metrics": {
+                    "operational_disruption_rate": float(data.get("operational_disruption_rate") or 0.0),
+                    "safety_risk_rate": float(data.get("safety_risk_rate") or 0.0),
+                    "overall_impact_score": float(data.get("overall_impact_score") or 0.0),
+                },
+                "incident_breakdown": {
+                    "work_stopped_incidents": data.get("work_stopped_incidents", 0),
+                    "serious_incidents": data.get("serious_incidents", 0),
+                }
             },
             "description": "Comprehensive analysis of operational and business impact",
             "chart_type": "card"
@@ -447,19 +459,21 @@ class SRSAugmentedDashboardService:
         peak_time_period = time_of_day_results[0]['time_period'] if time_of_day_results else "N/A"
         peak_day = max(day_of_week_results, key=lambda x: x['incident_count'])['day_of_week'].strip() if day_of_week_results else "N/A"
         return {
-            "time_of_day_analysis": time_of_day_results,
-            "day_of_week_analysis": day_of_week_results,
-            "peak_patterns": {
-                "peak_time_period": peak_time_period,
-                "peak_day_of_week": peak_day,
-            },
-            "summary": {
-                "total_time_periods_analyzed": len(time_of_day_results),
-                "total_days_analyzed": len(day_of_week_results),
-                "description": "Time-based incident pattern analysis (date-only data)",
-                "has_hourly_data": False,
-            },
-            "chart_type": "bar"
+            "chart_type": "bar",
+            "description": "Time-based incident pattern analysis (date-only data)",
+            "data": [{
+                "time_of_day_analysis": time_of_day_results,
+                "day_of_week_analysis": day_of_week_results,
+                "peak_patterns": {
+                    "peak_time_period": peak_time_period,
+                    "peak_day_of_week": peak_day,
+                },
+                "summary": {
+                    "total_time_periods_analyzed": len(time_of_day_results),
+                    "total_days_analyzed": len(day_of_week_results),
+                    "has_hourly_data": False,
+                }
+            }]
         }
 
     def _get_srs_standard_kpis(self, start_date: str, end_date: str, region: Optional[str], session: Session) -> Dict[str, Any]:

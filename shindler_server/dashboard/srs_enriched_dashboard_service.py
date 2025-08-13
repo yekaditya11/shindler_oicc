@@ -741,28 +741,16 @@ class SRSEnrichedDashboardService:
             peak_day = max(day_of_week_results, key=lambda x: x['incident_count'])['day_of_week'].strip() if day_of_week_results else "N/A"
 
             return {
-                "time_of_day_analysis": time_of_day_results,
-                "day_of_week_analysis": day_of_week_results,
-                "peak_patterns": {
-                    "peak_time_period": peak_time_period,
-                    "peak_day_of_week": peak_day
-                },
-                "summary": {
-                    "total_time_periods_analyzed": len(time_of_day_results),
-                    "total_days_analyzed": len(day_of_week_results),
-                    "description": "Time-based incident pattern analysis (date-only data)",
-                    "has_hourly_data": False
-                },
-                "chart_type": "bar"
+                "chart_type": "bar",
+                "description": "Time-based incident pattern analysis (date-only data)",
+                "data": day_of_week_results
             }
         except Exception as e:
             logger.error(f"Error getting time-based analysis: {e}")
             return {
-                "time_of_day_analysis": [],
-                "day_of_week_analysis": [],
-                "peak_patterns": {"peak_time_period": "N/A", "peak_day_of_week": "N/A"},
-                "summary": {"total_time_periods_analyzed": 0, "total_days_analyzed": 0, "description": "Error retrieving time-based analysis data", "has_hourly_data": False},
-                "chart_type": "bar"
+                "chart_type": "bar",
+                "description": "Error retrieving time-based analysis data",
+                "data": []
             }
 
     def _get_empty_dashboard_data(self) -> Dict[str, Any]:
@@ -843,11 +831,6 @@ class SRSEnrichedDashboardService:
             "time_based_analysis": {
                 "chart_type": "bar",
                 "description": "No data available",
-                "data": {
-                    "time_of_day_analysis": [],
-                    "day_of_week_analysis": [],
-                    "peak_patterns": {"peak_time_period": "N/A", "peak_day_of_week": "N/A"},
-                    "summary": {"total_time_periods_analyzed": 0, "total_days_analyzed": 0, "has_hourly_data": False}
-                }
+                "data": []
             }
         } 
