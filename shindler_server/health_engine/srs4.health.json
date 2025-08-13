@@ -362,6 +362,19 @@
         "dimensions_checked": ["completeness", "consistency"],
         "dimensions_skipped": ["uniqueness", "timeliness"],
         "issues": ["3 missing values"]
-      }
-    }
-  }
+          }
+  },
+  "actionable_insights": [
+    "Implement data validation for event_id and employee_id fields",
+    "Critical fields showing 1-2 duplicate entries need immediate attention to maintain data integrity.",
+    "Standardize time format validation across time and time_of_unsafe_event columns",
+    "Create mandatory field requirements for unsafe_act and unsafe_condition fields",
+    "High-priority fields with 8-10 inconsistent categorizations impact incident analysis accuracy.",
+    "Establish data quality monitoring for subcontractor information fields",
+    "Subcontractor fields show 10-14 missing values, affecting compliance tracking.",
+    "Optimize action description fields with progressive disclosure approach",
+    "Action description fields 2-5 show 24-38 missing values, suggesting optional nature.",
+    "Implement data cleansing for manager_name and reporter_name fields",
+    "Manager and reporter fields show 3-8 missing values, affecting accountability tracking."
+  ]
+}

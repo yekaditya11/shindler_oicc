@@ -715,5 +715,14 @@
       ],
       "issues": []
     }
-  }
+  },
+  "actionable_insights": [
+    "Leverage improved data quality for enhanced analytics capabilities",
+    "Address minor formatting inconsistencies in unsafe act and unsafe condition fields",
+    "Trailing commas and spaces detected in 5-7% of safety categorization values.",
+    "Focus on remaining time format standardization for complete data consistency",
+    "Critical fields showing 2-3% duplicate entries need immediate attention to maintain data integrity.",
+    "Establish data quality monitoring for subcontractor information fields",
+    "Subcontractor fields show 90% missing values, affecting compliance tracking."
+  ]
 }

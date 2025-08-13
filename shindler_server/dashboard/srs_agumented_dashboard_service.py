@@ -68,6 +68,7 @@ class SRSAugmentedDashboardService:
                 "unique_events": data.get("unique_events", 0),
             },
             "description": "Total unsafe events recorded",
+            "chart_type": "card"
         }
 
     def _srs_serious_near_miss_rate(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> Dict[str, Any]:
@@ -95,6 +96,7 @@ class SRSAugmentedDashboardService:
                 "serious_near_miss_percentage": f"{perc}",
             },
             "description": "Percentage of events classified as serious near misses",
+            "chart_type": "card"
         }
 
     def _srs_work_stoppage_rate(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> Dict[str, Any]:
@@ -118,9 +120,10 @@ class SRSAugmentedDashboardService:
             "count": data.get("work_stopped_count", 0),
             "total": {"total_events": data.get("total_events", 0), "unique_events": data.get("total_events", 0)},
             "description": "Percentage of events that resulted in work stoppage",
+            "chart_type": "card"
         }
 
-    def _srs_monthly_trends(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> List[Dict]:
+    def _srs_monthly_trends(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> Dict[str, Any]:
         region_filter = f"AND {config['region_field']} = :region" if region else ""
         query = f"""
         SELECT
@@ -135,9 +138,14 @@ class SRSAugmentedDashboardService:
         ORDER BY month
         """
         params = {"start_date": start_date, "end_date": end_date, **({"region": region} if region else {})}
-        return self._execute_query(query, params, session)
+        data = self._execute_query(query, params, session)
+        return {
+            "data": data,
+            "description": "Monthly trends of unsafe events",
+            "chart_type": "line"
+        }
 
-    def _srs_branch_performance(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> List[Dict]:
+    def _srs_branch_performance(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> Dict[str, Any]:
         region_filter = f"AND {config['region_field']} = :region" if region else ""
         query = f"""
         SELECT
@@ -167,9 +175,14 @@ class SRSAugmentedDashboardService:
         LIMIT 15
         """
         params = {"start_date": start_date, "end_date": end_date, **({"region": region} if region else {})}
-        return self._execute_query(query, params, session)
+        data = self._execute_query(query, params, session)
+        return {
+            "data": data,
+            "description": "Branch performance analysis",
+            "chart_type": "bar"
+        }
 
-    def _srs_event_type_distribution(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> List[Dict]:
+    def _srs_event_type_distribution(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> Dict[str, Any]:
         region_filter = f"AND {config['region_field']} = :region" if region else ""
         query = f"""
         SELECT
@@ -185,9 +198,14 @@ class SRSAugmentedDashboardService:
         LIMIT 10
         """
         params = {"start_date": start_date, "end_date": end_date, **({"region": region} if region else {})}
-        return self._execute_query(query, params, session)
+        data = self._execute_query(query, params, session)
+        return {
+            "data": data,
+            "description": "Distribution of unsafe event types",
+            "chart_type": "pie"
+        }
 
-    def _srs_repeat_locations(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> List[Dict]:
+    def _srs_repeat_locations(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> Dict[str, Any]:
         region_filter = f"AND {config['region_field']} = :region" if region else ""
         query = f"""
         SELECT
@@ -209,7 +227,12 @@ class SRSAugmentedDashboardService:
         LIMIT 10
         """
         params = {"start_date": start_date, "end_date": end_date, **({"region": region} if region else {})}
-        return self._execute_query(query, params, session)
+        data = self._execute_query(query, params, session)
+        return {
+            "data": data,
+            "description": "Repeat incident locations",
+            "chart_type": "bar"
+        }
 
     def _srs_response_time_analysis(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> Dict[str, Any]:
         region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -237,15 +260,17 @@ class SRSAugmentedDashboardService:
                 "median_response_time": "N/A",
                 "events_analyzed": data.get("events_with_timing_data", 0),
                 "description": "Average time between incident occurrence and reporting",
+                "chart_type": "card"
             }
         return {
             "average_response_time": "N/A",
             "median_response_time": "N/A",
             "events_analyzed": 0,
             "description": "Response time analysis not available - insufficient timing data",
+            "chart_type": "card"
         }
 
-    def _srs_safety_performance_trends(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> List[Dict]:
+    def _srs_safety_performance_trends(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> Dict[str, Any]:
         region_filter = f"AND {config['region_field']} = :region" if region else ""
         query = f"""
         SELECT
@@ -269,9 +294,14 @@ class SRSAugmentedDashboardService:
         LIMIT 8
         """
         params = {"start_date": start_date, "end_date": end_date, **({"region": region} if region else {})}
-        return self._execute_query(query, params, session)
+        data = self._execute_query(query, params, session)
+        return {
+            "data": data,
+            "description": "Safety performance trends by quarter",
+            "chart_type": "line"
+        }
 
-    def _srs_incident_severity_distribution(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> List[Dict]:
+    def _srs_incident_severity_distribution(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> Dict[str, Any]:
         region_filter = f"AND {config['region_field']} = :region" if region else ""
         query = f"""
         WITH severity_data AS (
@@ -322,14 +352,21 @@ class SRSAugmentedDashboardService:
             count_result = self._execute_query(count_query, params, session)
             total_count = count_result[0].get('total_count', 0) if count_result else 0
             if total_count > 0:
-                return [{
+                data = [{
                     'severity_level': 'Low',
                     'incident_count': total_count,
                     'percentage': 100.0,
                     'sort_order': 4,
                 }]
-            return []
-        return result
+            else:
+                data = []
+        else:
+            data = result
+        return {
+            "data": data,
+            "description": "Distribution of incidents by severity level",
+            "chart_type": "pie"
+        }
 
     def _srs_operational_impact(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> Dict[str, Any]:
         region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -374,6 +411,7 @@ class SRSAugmentedDashboardService:
                 "serious_incidents": data.get("serious_incidents", 0),
             },
             "description": "Comprehensive analysis of operational and business impact",
+            "chart_type": "card"
         }
 
     def _srs_time_based_analysis(self, config: Dict, start_date: str, end_date: str, region: str, session: Session) -> Dict[str, Any]:
@@ -421,6 +459,7 @@ class SRSAugmentedDashboardService:
                 "description": "Time-based incident pattern analysis (date-only data)",
                 "has_hourly_data": False,
             },
+            "chart_type": "bar"
         }
 
     def _get_srs_standard_kpis(self, start_date: str, end_date: str, region: Optional[str], session: Session) -> Dict[str, Any]:
@@ -440,6 +479,71 @@ class SRSAugmentedDashboardService:
             "operational_impact_analysis": self._srs_operational_impact(config, start_date, end_date, region, session),
             "time_based_analysis": self._srs_time_based_analysis(config, start_date, end_date, region, session),
         }
+
+    def _get_augmented_kpis(self, session: Session) -> Dict[str, Any]:
+        """Get 10 important augmented KPIs from the augmented KPI queries."""
+        try:
+            # Get all augmented KPIs
+            all_augmented_kpis = self.kpi_queries.get_all_kpis(session)
+            
+            # Select 10 most important augmented KPIs for dashboard with chart types
+            selected_augmented_kpis = {
+                "unsafe_events_per_employee": {
+                    "data": all_augmented_kpis.get("unsafe_events_per_employee", []),
+                    "description": "Unsafe events per employee analysis",
+                    "chart_type": "bar"
+                },
+                "training_compliance_rate": {
+                    "data": all_augmented_kpis.get("training_compliance_rate", {}),
+                    "description": "Training compliance rate across organization",
+                    "chart_type": "card"
+                },
+                "repeat_offenders": {
+                    "data": all_augmented_kpis.get("repeat_offenders", []),
+                    "description": "Employees with multiple incidents",
+                    "chart_type": "bar"
+                },
+                "incidents_by_hour_of_day": {
+                    "data": all_augmented_kpis.get("incidents_by_hour_of_day", []),
+                    "description": "Incident distribution by hour of day",
+                    "chart_type": "line"
+                },
+                "top_equipment_involved_in_unsafe_events": {
+                    "data": all_augmented_kpis.get("top_equipment_involved_in_unsafe_events", []),
+                    "description": "Equipment most involved in unsafe events",
+                    "chart_type": "bar"
+                },
+                "percent_of_incidents_with_corrective_actions": {
+                    "data": all_augmented_kpis.get("percent_of_incidents_with_corrective_actions", {}),
+                    "description": "Percentage of incidents with corrective actions implemented",
+                    "chart_type": "card"
+                },
+                "top_5_recurrent_root_causes": {
+                    "data": all_augmented_kpis.get("top_5_recurrent_root_causes", []),
+                    "description": "Top 5 most recurrent root causes",
+                    "chart_type": "pie"
+                },
+                "average_time_to_close_investigation": {
+                    "data": all_augmented_kpis.get("average_time_to_close_investigation", {}),
+                    "description": "Average time to close investigations",
+                    "chart_type": "card"
+                },
+                "incident_rate_by_weather_condition": {
+                    "data": all_augmented_kpis.get("incident_rate_by_weather_condition", []),
+                    "description": "Incident rates by weather conditions",
+                    "chart_type": "bar"
+                },
+                "percent_of_incidents_during_extreme_weather_days": {
+                    "data": all_augmented_kpis.get("percent_of_incidents_during_extreme_weather_days", {}),
+                    "description": "Percentage of incidents during extreme weather",
+                    "chart_type": "card"
+                }
+            }
+            
+            return selected_augmented_kpis
+        except Exception as e:
+            logger.error(f"Error getting augmented KPIs: {e}")
+            return {}
 
     def _categorize_kpis_for_dashboard(self, kpi_data: Dict[str, Any]) -> Dict[str, Any]:
         """Organize KPIs into dashboard-friendly categories"""
@@ -531,8 +635,11 @@ class SRSAugmentedDashboardService:
 
             session = self.get_session()
             try:
-                # Compute only the 12 standard SRS dashboard KPIs using augmented table
+                # Compute the 12 standard SRS dashboard KPIs using augmented table
                 srs_standard_kpis = self._get_srs_standard_kpis(start_date, end_date, region, session)
+                
+                # Get 10 important augmented KPIs
+                augmented_kpis = self._get_augmented_kpis(session)
 
                 dashboard_data = {
                     "schema_type": "srs_agumented",
@@ -546,7 +653,10 @@ class SRSAugmentedDashboardService:
                         "region": region,
                         "data_scope": "regional" if region else "global"
                     },
-                    "dashboard_data": srs_standard_kpis
+                    "dashboard_data": {
+                        **srs_standard_kpis,
+                        **augmented_kpis
+                    }
                 }
                 return dashboard_data
             finally:
@@ -570,14 +680,23 @@ class SRSAugmentedDashboardService:
 
             session = self.get_session()
             try:
-                # Compute only the 12 standard SRS dashboard KPIs using augmented table
+                # Compute the 12 standard SRS dashboard KPIs using augmented table
                 srs_standard_kpis = self._get_srs_standard_kpis(start_date, end_date, region, session)
+                
+                # Get augmented KPIs for summary
+                augmented_kpis = self._get_augmented_kpis(session)
 
                 # Derive a concise summary from the standard KPIs
                 total_events = srs_standard_kpis.get("total_events", {}).get("count", {}).get("total_events", 0)
                 serious_rate = srs_standard_kpis.get("serious_near_miss_rate", {}).get("rate", 0.0)
                 work_stop_rate = srs_standard_kpis.get("work_stoppage_rate", {}).get("rate", 0.0)
                 avg_resp = srs_standard_kpis.get("response_time_analysis", {}).get("average_response_time", "N/A")
+                
+                # Get augmented KPI summary metrics
+                training_compliance = augmented_kpis.get("training_compliance_rate", {}).get("data", {}).get("compliance_rate", 0.0)
+                corrective_actions = augmented_kpis.get("percent_of_incidents_with_corrective_actions", {}).get("data", {}).get("corrective_actions_percentage", 0.0)
+                repeat_offenders_count = len(augmented_kpis.get("repeat_offenders", {}).get("data", []))
+                top_equipment_count = len(augmented_kpis.get("top_equipment_involved_in_unsafe_events", {}).get("data", []))
 
                 summary_data = {
                     "schema_type": "srs_agumented_summary",
@@ -595,7 +714,11 @@ class SRSAugmentedDashboardService:
                         "total_events": total_events,
                         "serious_near_miss_rate": serious_rate,
                         "work_stoppage_rate": work_stop_rate,
-                        "average_response_time": avg_resp
+                        "average_response_time": avg_resp,
+                        "training_compliance_rate": training_compliance,
+                        "corrective_actions_rate": corrective_actions,
+                        "repeat_offenders_count": repeat_offenders_count,
+                        "equipment_incidents_count": top_equipment_count
                     }
                 }
                 return summary_data

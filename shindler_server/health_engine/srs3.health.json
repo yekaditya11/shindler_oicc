@@ -418,6 +418,14 @@
         "dimensions_checked": ["completeness", "validity", "consistency"],
         "dimensions_skipped": ["uniqueness", "timeliness"],
         "issues": []
-      }
-    }
-  }
+          }
+  },
+  "actionable_insights": [
+    "Leverage excellent data quality for advanced analytics and AI insights",
+    "Address minor formatting inconsistencies in unsafe act and unsafe condition fields",
+    "Trailing commas and spaces detected in 15-25% of safety categorization values.",
+    "Implement training expiry monitoring for compliance management",
+    "Monitor overtime and work hour compliance for employee safety"
+
+  ]
+}

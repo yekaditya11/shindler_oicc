@@ -675,5 +675,27 @@
         "4000 missing values"
       ]
     }
-  }
+  },
+  "actionable_insights": [
+    "Implement data validation for reporting_id and reporter_sap_id fields",
+    "Critical fields showing 29-3197 duplicate entries need immediate attention to maintain data integrity.",
+    "Standardize organizational hierarchy data for gl_id and pe_id fields",
+    "Organizational fields show 44-67% missing values, affecting accountability and reporting structure.",
+    "Establish data quality monitoring for site_name field consistency",
+    "Site name field shows mixed data types and case inconsistencies, requiring standardization.",
+    "Optimize attachment documentation protocols for incident evidence",
+    "Attachment field shows 100% missing values, indicating underutilization of visual documentation.",
+    "Implement validation for no_go_violation and action_related_to_high_risk_situation fields",
+    "High-risk safety fields show 53-58% missing values, affecting critical safety protocol analysis.",
+    "Enhance persons_involved field completeness for incident investigation",
+    "Persons involved field shows 35% missing values, limiting comprehensive incident analysis.",
+    "Standardize additional_comments field data entry protocols",
+    "Comments field shows 25% missing values, indicating underutilization of narrative data.",
+    "Address future date anomalies in date_and_time_of_unsafe_event field",
+    "Future dates detected suggest data entry errors requiring immediate correction protocols.",
+    "Implement duplicate detection for organizational hierarchy fields",
+    "GL and PE ID fields show 99% duplicate values, affecting organizational structure integrity.",
+    "Establish mandatory reporting requirements for unsafe_event_details field",
+    "Event details field shows 6% missing values, limiting comprehensive incident categorization."
+  ]
 }

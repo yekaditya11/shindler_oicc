@@ -240,7 +240,6 @@
       ],
       "issues": [
         "3606 missing values",
-        "Mixed data types detected: {<class 'float'>: 3606, <class 'str'>: 395}",
         "Case inconsistencies detected",
         "Leading/trailing whitespace detected"
       ]
@@ -323,8 +322,7 @@
         "timeliness"
       ],
       "issues": [
-        "395 missing values",
-        "Mixed data types detected: {<class 'str'>: 3606, <class 'float'>: 395}"
+        "395 missing values"
       ]
     },
     "division": {
@@ -715,5 +713,22 @@
       ],
       "issues": []
     }
-  }
+  },
+  "actionable_insights": [
+    "Implement data validation for employee_id and reporter_id fields",
+    "Critical fields showing 2-3% duplicate entries need immediate attention to maintain data integrity.",
+    "Standardize time format validation across time of unsafe event column",
+    "High-priority fields with 18-22% missing values impact incident analysis accuracy.",
+    "Establish data quality monitoring for subcontractor information fields",
+    "Subcontractor fields show 90% missing values, affecting compliance tracking.",
+    "Optimize action description fields with progressive disclosure approach",
+    "Action description fields 2-5 show 99-100% missing values, suggesting optional nature.",
+    "Case inconsistencies and whitespace issues detected in 5-10% of name entries.",
+    "District field shows 100% missing values, 'sub area' shows 23% missing values.",
+    "Standardize 'comments remarks' field data entry protocols",
+    "Comments field shows 94% missing values, indicating underutilization of narrative data.",
+    "Implement validation for 'stop work duration' and 'nogo violation detail' fields",
+    "Stop work fields show 80-100% missing values, affecting safety protocol analysis.",
+    "Establish mandatory reporting requirements for unsafe act other and unsafe condition other"
+  ]
 }
