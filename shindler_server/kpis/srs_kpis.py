@@ -741,6 +741,20 @@ class SRSKPIQueries:
         """
         return self.execute_query(query, {}, session)
 
+    def get_top_5_recurrent_root_causes(self, session: Session = None) -> List[Dict]:
+        """Top 5 Recurrent Root Causes"""
+        query = f"""
+        SELECT 
+            unsafe_act,
+            COUNT(*) as recurrence_count
+        FROM {self.table_name}
+        GROUP BY unsafe_act
+        HAVING COUNT(*) > 1
+        ORDER BY recurrence_count DESC
+        LIMIT 5
+        """
+        return self.execute_query(query, {}, session)
+
     # ==================== COMPREHENSIVE KPI COLLECTION ====================
 
     def get_all_kpis(self, session: Session = None) -> Dict[str, Any]:
@@ -806,6 +820,9 @@ class SRSKPIQueries:
                     "violation_patterns_with_context": self.get_violation_patterns_with_context(30, session),
                     "staff_impact_analysis": self.get_staff_impact_analysis(session),
                     "resource_optimization_insights": self.get_resource_optimization_insights(session),
+                    
+                    # ==================== ROOT CAUSE ANALYSIS ====================
+                    "top_5_recurrent_root_causes": self.get_top_5_recurrent_root_causes(session),
                 }
 
                 logger.info("Successfully executed essential SRS KPI queries")

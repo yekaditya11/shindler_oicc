@@ -151,6 +151,7 @@ class SRSEnrichedDashboardService:
             incident_severity = self._get_incident_severity_distribution(config, start_date, end_date, region, session)
             operational_impact = self._get_operational_impact_analysis(config, start_date, end_date, region, session)
             time_based_analysis = self._get_time_based_analysis(config, start_date, end_date, region, session)
+            top_recurrent_root_causes = self._get_top_5_recurrent_root_causes(config, start_date, end_date, region, session)
 
             return {
                 "total_events": total_events,
@@ -164,7 +165,8 @@ class SRSEnrichedDashboardService:
                 "safety_performance_trends": safety_performance_trends,
                 "incident_severity_distribution": incident_severity,
                 "operational_impact_analysis": operational_impact,
-                "time_based_analysis": time_based_analysis
+                "time_based_analysis": time_based_analysis,
+                "top_5_recurrent_root_causes": top_recurrent_root_causes
             }
 
         except Exception as e:
@@ -753,8 +755,53 @@ class SRSEnrichedDashboardService:
                 "data": []
             }
 
+    def _get_top_5_recurrent_root_causes(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
+        """KPI 13: Top 5 Recurrent Root Causes"""
+        try:
+            region_filter = f"AND {config['region_field']} = :region" if region else ""
+            
+            query = f"""
+            SELECT 
+                CASE 
+                    WHEN unsafe_act IS NULL OR unsafe_act = '' OR unsafe_act = 'NaN' THEN 'Unspecified'
+                    ELSE unsafe_act
+                END as unsafe_act,
+                COUNT(*) as recurrence_count
+            FROM {config['table_name']}
+            WHERE {config['event_date_field']} BETWEEN :start_date AND :end_date
+                {region_filter}
+            GROUP BY 
+                CASE 
+                    WHEN unsafe_act IS NULL OR unsafe_act = '' OR unsafe_act = 'NaN' THEN 'Unspecified'
+                    ELSE unsafe_act
+                END
+            HAVING COUNT(*) > 1
+            ORDER BY recurrence_count DESC
+            LIMIT 5
+            """
+
+            params = {"start_date": start_date, "end_date": end_date}
+            if region:
+                params["region"] = region
+
+            data = self.execute_query(query, params, session)
+            
+            return {
+                "chart_type": "pie",
+                "description": "Top 5 most frequently occurring unsafe acts (root causes)",
+                "data": data
+            }
+
+        except Exception as e:
+            logger.error(f"Error getting top 5 recurrent root causes: {e}")
+            return {
+                "chart_type": "pie",
+                "description": "Error retrieving recurrent root causes data",
+                "data": []
+            }
+
     def _get_empty_dashboard_data(self) -> Dict[str, Any]:
-        """Return empty dashboard data structure for all 12 KPIs"""
+        """Return empty dashboard data structure for all 13 KPIs"""
         return {
             "total_events": {
                 "chart_type": "card",
@@ -830,6 +877,11 @@ class SRSEnrichedDashboardService:
             },
             "time_based_analysis": {
                 "chart_type": "bar",
+                "description": "No data available",
+                "data": []
+            },
+            "top_5_recurrent_root_causes": {
+                "chart_type": "pie",
                 "description": "No data available",
                 "data": []
             }
