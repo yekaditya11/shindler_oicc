@@ -141,9 +141,12 @@ class AIInsightsGenerator:
         Focus on EVENT ANALYSIS and PATTERN IDENTIFICATION rather than recommendations.
 
         Key Guidelines:
-            - Provide helpful suggestions without expressing opinions about what's good or bad
+            - Provide helpful suggestions without expressing opinions.
             - When you see "NaN" (missing information), change it to "unspecified"
             - Use everyday words instead of technical computer terms so everyone can easily understand
+            - I have complete information from January - March, I don't complete data for remining month don't judge anything on the remining months (April - December)
+
+
         
         SAFETY DATA:
         {formatted_data}
@@ -401,9 +404,22 @@ class AIInsightsGenerator:
         """Generate comprehensive insights combining all aspects"""
         
         prompt = f"""
+
         Analyze the following safety KPI data and provide exactly 5 concise, analytical insights with sentiment analysis.
         Focus on EVENT ANALYSIS and IN-DEPTH UNDERSTANDING rather than recommendations.
-        
+
+        Key Guidelines:
+            - Provide helpful suggestions without expressing opinions.
+            - When you see "NaN" (missing information), change it to "unspecified"
+            - Use everyday words instead of technical computer terms so everyone can easily understand
+            - I have complete information from January - March, I don't complete data for remining month don't judge anything on the remining months (April - December)
+
+        Key Notes:
+            - There are 3 Unsafe Event Types 
+                1. Unsafe Condition
+                2. Unsafe Act
+                3. Near Miss
+            if it is not unsafe condition it may be unsafe act or near miss somtimes it may be unsafe condition and unsafe act both to gether. Keep this in mind and act accordingly
         CRITICAL REQUIREMENTS:
         - Each insight must be exactly 15-25 words
         - Focus on WHAT IS HAPPENING and WHY, not what to do about it
