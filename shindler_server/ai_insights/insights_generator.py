@@ -400,70 +400,81 @@ class AIInsightsGenerator:
         
         return formatted_summary
     
+ 
     def _generate_comprehensive_insights(self, data: str) -> List[str]:
         """Generate comprehensive insights combining all aspects"""
         
         prompt = f"""
+        CRITICAL INSTRUCTION: Follow these rules EXACTLY:
+
+        WORD RESTRICTIONS - NEVER use these words:
+        - "operational" or "operations" 
+        - "indicating" or "suggests" or "implying"
+        - Any interpretive conclusions beyond stating facts
+
+        PHRASING RULES:
+        ✅ CORRECT: "January shows 1502 unsafe events with 298 work stoppages"
+        ❌ WRONG: "January shows 1502 unsafe events with 298 work stoppages, indicating operational disruptions"
+        
+        ✅ CORRECT: "February reports 1553 incidents correlating with 329 work interruptions"  
+        ❌ WRONG: "February reports 1553 incidents correlating with 329 work interruptions, suggesting operational factors"
+
+        REPLACEMENT WORDS to use instead of "operational":
+        - "workplace" instead of "operational"
+        - "work-related" instead of "operational factors"  
+        - "site activities" instead of "operations"
+        - "interruptions" instead of "operational disruptions"
 
         Analyze the following safety KPI data and provide exactly 5 concise, analytical insights with sentiment analysis.
-        Focus on EVENT ANALYSIS and IN-DEPTH UNDERSTANDING rather than recommendations.
+        Focus on EVENT ANALYSIS and DATA OBSERVATIONS only - NO interpretive conclusions.
 
         Key Guidelines:
-            - Provide helpful suggestions without expressing opinions.
-            - When you see "NaN" (missing information), change it to "unspecified"
-            - Use everyday words instead of technical computer terms so everyone can easily understand
-            - I have complete information from January - March, I don't complete data for remining month don't judge anything on the remining months (April - December)
+        - State what the data shows - do not add interpretive phrases like "indicating", "suggesting", "implying"
+        - When you see "NaN" (missing information), change it to "unspecified"
+        - Use everyday words instead of technical terms
+        - Complete data available: January-March only (ignore April-December)
 
-        Key Notes:
-            - There are 3 Unsafe Event Types 
-                1. Unsafe Condition
-                2. Unsafe Act
-                3. Near Miss
-            if it is not unsafe condition it may be unsafe act or near miss somtimes it may be unsafe condition and unsafe act both to gether. Keep this in mind and act accordingly
-        CRITICAL REQUIREMENTS:
-        - Each insight must be exactly 15-25 words
-        - Focus on WHAT IS HAPPENING and WHY, not what to do about it
-        - Provide deep analytical observations about event patterns, correlations, and trends
-        - Include specific data points and statistical observations
-        - CLASSIFY each insight's sentiment as 'positive', 'negative', or 'neutral'
+        UNSAFE EVENT TYPES (3 types):
+        1. Unsafe Condition
+        2. Unsafe Act  
+        3. Near Miss
+
+        REQUIREMENTS:
+        - Each insight: exactly 15-25 words
+        - Focus on WHAT IS HAPPENING - state facts and patterns only
+        - Include specific data points
+        - CLASSIFY sentiment: 'positive', 'negative', or 'neutral'
+
+        CLARITY REQUIREMENTS:
+        - When stating counts across multiple periods, be specific: "2 in February and 2 in March" not "2 in February and March"
+        - Ensure mathematical consistency: if stating individual counts, verify the total adds up correctly
         
-        SENTIMENT CLASSIFICATION GUIDELINES:
-        - POSITIVE: Improvements, achievements, good performance, declining risks, successful interventions
-        - NEGATIVE: Deteriorating conditions, high risks, compliance failures, safety concerns, incidents increasing
-        - NEUTRAL: Status updates, procedural information, data observations without clear positive/negative impact
-        
-        ANALYTICAL FOCUS AREAS (NO RECOMMENDATIONS):
-        1. Event frequency patterns and statistical correlations across time periods
-        2. Geographic clustering analysis and regional incident concentration patterns
-        3. Behavioral pattern analysis and incident type correlations
-        4. Temporal trend analysis showing cyclical or seasonal patterns
-        5. Severity escalation patterns from near misses to actual incidents
-        6. Work disruption impact analysis and productivity correlation patterns
-        7. Compliance gap analysis showing systematic non-adherence patterns
-        8. Risk manifestation patterns and incident prediction indicators
-        9. Organizational safety culture indicators based on reporting patterns
-        5. Resource impact analysis showing cost and efficiency correlations
-        
-        EXAMPLE ANALYTICAL INSIGHTS (NOT RECOMMENDATIONS):
-        - "Branch X shows 300% higher incident rate during morning shifts indicating systematic operational stress"
-        - "Near miss reporting declined 40% while actual incidents increased, suggesting underreporting culture developing"
-        - "NOGO violations cluster in specific equipment categories, indicating design or training gaps"
-        
+        SENTIMENT GUIDELINES:
+        - POSITIVE: Improvements, declining risks, better performance
+        - NEGATIVE: Increasing incidents, high risks, deteriorating conditions  
+        - NEUTRAL: Data observations without clear positive/negative impact
+
+        EXAMPLE FORMAT:
+        ✅ "Branch X reports 300% higher incident rate during morning shifts compared to afternoon periods"
+        ✅ "Near miss reporting declined 40% while actual incidents increased across all sites"
+        ❌ "Branch X shows concerning patterns indicating operational stress factors requiring attention"
+
         Data:
         {data}
         
-        Response format: Return EXACTLY 5 insights in this JSON format:
+        Response format - EXACTLY 5 insights in JSON:
         [
-          {{"text": "analytical insight about events/patterns here", "sentiment": "positive|negative|neutral"}},
-          {{"text": "analytical insight about events/patterns here", "sentiment": "positive|negative|neutral"}},
-          ...
+        {{"text": "factual data observation here", "sentiment": "positive|negative|neutral"}},
+        {{"text": "factual data observation here", "sentiment": "positive|negative|neutral"}},
+        ...
         ]
         
-        Provide ONLY the JSON array, no additional text or formatting.
+        Provide ONLY the JSON array, no additional text.
         """
         
         return self._call_openai_for_structured_insights(prompt)
-    
+
+
     def _call_openai_for_structured_insights(self, prompt: str) -> List[Dict[str, str]]:
         """Make API call to Azure OpenAI and process response for structured insights with sentiment"""
         
@@ -473,7 +484,21 @@ class AIInsightsGenerator:
                 messages=[
                     {
                         "role": "system",
-                        "content": "You are a senior safety analytics expert with deep expertise in EI Tech workplace safety data analysis, event pattern recognition, and statistical correlation analysis. Provide comprehensive, analytical insights with accurate sentiment classification that identify patterns, trends, and correlations in safety events. Focus on WHAT IS HAPPENING and WHY rather than recommendations. Always respond with valid JSON format."
+                        "content": """You are a senior safety analytics expert specializing in workplace safety data analysis and event pattern recognition. 
+
+                        CRITICAL RULES - Follow these EXACTLY:
+                        - NEVER use words: "operational", "operations", "indicating", "suggesting", "implying"
+                        - Use alternatives: "workplace", "work-related", "site activities", "interruptions"
+                        - State ONLY factual data observations - NO interpretive conclusions
+                        - Focus on WHAT IS HAPPENING in the data, not what it means or suggests
+                        - Always respond in valid JSON format with exactly 5 insights
+                        - Each insight must be 15-25 words and include sentiment classification
+                        
+                        EXAMPLES:
+                        ✅ CORRECT: "January reports 1502 unsafe events with 298 work stoppages"
+                        ❌ WRONG: "January shows concerning operational disruptions indicating systemic issues"
+                        
+                        Provide comprehensive, analytical insights that identify patterns, trends, and correlations in safety events through pure data observation."""
                     },
                     {
                         "role": "user",
@@ -481,7 +506,7 @@ class AIInsightsGenerator:
                     }
                 ],
                 max_tokens=self.max_tokens,
-                temperature=self.temperature,
+                temperature=self.temperature,  # Consider lowering this to 0.1-0.3 for more consistent compliance
                 top_p=0.9
             )
             
@@ -495,17 +520,26 @@ class AIInsightsGenerator:
                     validated_insights = []
                     for item in insights_json:
                         if 'text' in item and 'sentiment' in item:
+                            # Additional validation: check for banned words
+                            text = item['text']
+                            banned_words = ['operational', 'operations', 'indicating', 'suggesting', 'implying']
+                            contains_banned = any(word.lower() in text.lower() for word in banned_words)
+                            
+                            if contains_banned:
+                                # Log warning but still include (you could choose to reject instead)
+                                logger.warning(f"Insight contains banned words: {text}")
+                            
                             # Validate sentiment values
                             sentiment = item['sentiment'].lower()
                             if sentiment in ['positive', 'negative', 'neutral']:
                                 validated_insights.append({
-                                    'text': item['text'],
+                                    'text': text,
                                     'sentiment': sentiment
                                 })
                             else:
                                 # Default to neutral if invalid sentiment
                                 validated_insights.append({
-                                    'text': item['text'],
+                                    'text': text,
                                     'sentiment': 'neutral'
                                 })
                         else:
@@ -539,8 +573,8 @@ class AIInsightsGenerator:
                 
         except Exception as e:
             logger.error(f"Error calling Azure OpenAI for structured insights: {str(e)}")
-            return self._create_fallback_insights()
-    
+            return self._create_fallback_insights() 
+        
     def _create_fallback_insights(self) -> List[Dict[str, str]]:
         """Create fallback insights when API fails"""
         return [
@@ -580,7 +614,7 @@ class AIInsightsGenerator:
         
         prompt = f"""
         Based on the following safety KPI data, provide a concise executive summary (2-3 paragraphs) 
-        highlighting the most critical safety performance points for leadership review.
+        highlighting the most critical safety performance points for ladership review.
         
         Data:
         {formatted_data}
