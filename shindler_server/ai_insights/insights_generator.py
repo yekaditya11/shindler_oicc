@@ -144,10 +144,32 @@ class AIInsightsGenerator:
             - Provide helpful suggestions without expressing opinions.
             - When you see "NaN" (missing information), change it to "unspecified"
             - Use everyday words instead of technical computer terms so everyone can easily understand
-            - I have complete information from January - March, I don't complete data for remining month don't judge anything on the remining months (April - December)
 
+        CRITICAL DATA LIMITATION:
+        - ONLY analyze data from January through March - this is the complete dataset available
+        - DO NOT reference, analyze, or make any observations about April through December
+        - DO NOT mention incomplete data for remaining months or suggest seasonal patterns beyond March
+        - Focus ALL insights exclusively on the January-March timeframe
+        - If you identify patterns, specify they are "within the January-March period" or "during the first quarter"
 
+        WORD RESTRICTIONS - NEVER use these words:
+        - "operational" or "operations" 
+        - "indicating" or "suggests" or "implying"
+        - Any interpretive conclusions beyond stating facts
+
+        PHRASING RULES:
+        ✅ CORRECT: "January shows 1502 unsafe events with 298 work stoppages"
+        ❌ WRONG: "January shows 1502 unsafe events with 298 work stoppages, indicating operational disruptions"
         
+        ✅ CORRECT: "February reports 1553 incidents correlating with 329 work interruptions"  
+        ❌ WRONG: "February reports 1553 incidents correlating with 329 work interruptions, suggesting operational factors"
+
+        REPLACEMENT WORDS to use instead of "operational":
+        - "workplace" instead of "operational"
+        - "work-related" instead of "operational factors"  
+        - "site activities" instead of "operations"
+        - "interruptions" instead of "operational disruptions"
+
         SAFETY DATA:
         {formatted_data}
 
@@ -165,12 +187,13 @@ class AIInsightsGenerator:
         GENERATION REQUIREMENTS:
         1. Generate exactly {count} analytical insights that are COMPLETELY DIFFERENT from existing ones
         2. Each insight must provide NEW analytical observations about event patterns or correlations
-        3. Focus on WHAT IS HAPPENING and WHY, not what should be done about it
+        3. Focus on WHAT IS HAPPENING and WHY within the January-March period ONLY
         4. Avoid repetition or paraphrasing of existing insights
-        5. Be specific, data-driven, and focused on event analysis
+        5. Be specific, data-driven, and focused on event analysis from the available timeframe
         6. Each insight should be 1-2 sentences maximum
-        7. Focus on statistical patterns, correlations, and event characteristics
+        7. Focus on statistical patterns, correlations, and event characteristics within Q1 data
         8. CLASSIFY each insight's sentiment as 'positive', 'negative', or 'neutral'
+        9. When referencing time periods, explicitly limit observations to January-March data
 
         SENTIMENT CLASSIFICATION GUIDELINES:
         - POSITIVE: Improvements, achievements, good performance, declining risks, successful interventions
@@ -178,11 +201,11 @@ class AIInsightsGenerator:
         - NEUTRAL: Status updates, procedural information, data observations without clear positive/negative impact
 
         ANALYTICAL FOCUS (NO RECOMMENDATIONS):
-        - Event frequency patterns and their statistical significance
-        - Correlation analysis between different incident types and factors
-        - Temporal and geographic clustering patterns in event data
-        - Performance indicators and their relationship to incident rates
-        - Cultural and behavioral pattern analysis from event reporting
+        - Event frequency patterns and their statistical significance within the first quarter
+        - Correlation analysis between different incident types and factors in January-March data
+        - Monthly progression patterns within the available three-month period
+        - Performance indicators and their relationship to incident rates in Q1
+        - Cultural and behavioral pattern analysis from event reporting during January-March
 
         Response format: Return EXACTLY {count} insights in this JSON format:
         [
@@ -405,12 +428,21 @@ class AIInsightsGenerator:
         """Generate comprehensive insights combining all aspects"""
         
         prompt = f"""
+
+        CRITICAL DATA LIMITATION:
+        - ONLY analyze data from January through March - this is the complete dataset available
+        - DO NOT reference, analyze, or make any observations about April through December
+        - DO NOT mention incomplete data for remaining months or suggest seasonal patterns beyond March
+        - Focus ALL insights exclusively on the January-March timeframe
+        - If you identify patterns, specify they are "within the January-March period" or "during the first quarter"
+        
         CRITICAL INSTRUCTION: Follow these rules EXACTLY:
 
         WORD RESTRICTIONS - NEVER use these words:
         - "operational" or "operations" 
         - "indicating" or "suggests" or "implying"
         - Any interpretive conclusions beyond stating facts
+
 
         PHRASING RULES:
         ✅ CORRECT: "January shows 1502 unsafe events with 298 work stoppages"

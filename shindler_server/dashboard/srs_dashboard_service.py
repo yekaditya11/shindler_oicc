@@ -152,6 +152,9 @@ class SRSDashboardService:
             operational_impact = self._get_operational_impact_analysis(config, start_date, end_date, region, session)
             time_based_analysis = self._get_time_based_analysis(config, start_date, end_date, region, session)
             top_recurrent_root_causes = self._get_top_5_recurrent_root_causes(config, start_date, end_date, region, session)
+            regional_unsafe_acts_conditions = self._get_regional_unsafe_acts_conditions_analysis(config, start_date, end_date, region, session)
+            regional_work_stoppages = self._get_regional_work_stoppages_analysis(config, start_date, end_date, region, session)
+            work_stoppage_duration = self._get_work_stoppage_duration_analysis(config, start_date, end_date, region, session)
 
             return {
                 "total_events": total_events,
@@ -166,7 +169,10 @@ class SRSDashboardService:
                 "incident_severity_distribution": incident_severity,
                 "operational_impact_analysis": operational_impact,
                 "time_based_analysis": time_based_analysis,
-                "top_5_recurrent_root_causes": top_recurrent_root_causes
+                "top_5_recurrent_root_causes": top_recurrent_root_causes,
+                "regional_unsafe_acts_conditions_analysis": regional_unsafe_acts_conditions,
+                "regional_work_stoppages_analysis": regional_work_stoppages,
+                "work_stoppage_duration_analysis": work_stoppage_duration
             }
 
         except Exception as e:
@@ -800,8 +806,386 @@ class SRSDashboardService:
                 "data": []
             }
 
+    def _get_regional_unsafe_acts_conditions_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
+        """KPI 14: Regional Unsafe Acts and Conditions Analysis"""
+        try:
+            region_filter = f"AND {config['region_field']} = :region" if region else ""
+
+            query = f"""
+            WITH unsafe_events_processed AS (
+                SELECT 
+                    {config['region_field']},
+                    unsafe_event_type,
+                    unsafe_act,
+                    unsafe_act_other,
+                    unsafe_condition,
+                    unsafe_condition_other,
+                    -- Determine if this record involves an unsafe act based on unsafe_event_type
+                    CASE 
+                        WHEN unsafe_event_type ILIKE '%unsafe act%' THEN 1 
+                        ELSE 0 
+                    END as has_unsafe_act_type,
+                    -- Determine if this record involves an unsafe condition based on unsafe_event_type
+                    CASE 
+                        WHEN unsafe_event_type ILIKE '%unsafe condition%' THEN 1 
+                        ELSE 0 
+                    END as has_unsafe_condition_type
+                FROM {config['table_name']}
+                WHERE {config['region_field']} IS NOT NULL AND {config['region_field']} != ''
+                    AND {config['event_date_field']} BETWEEN :start_date AND :end_date
+                    {region_filter}
+            ),
+            unsafe_acts_extracted AS (
+                -- Extract Unsafe Acts
+                SELECT 
+                    {config['region_field']},
+                    'Unsafe Act' as category,
+                    CASE 
+                        -- If event type includes "Unsafe Act" and unsafe_act field has data, use it
+                        WHEN has_unsafe_act_type = 1 AND unsafe_act IS NOT NULL AND TRIM(unsafe_act) != '' 
+                            THEN TRIM(unsafe_act)
+                        -- If event type includes "Unsafe Act" and unsafe_act is empty, check unsafe_act_other
+                        WHEN has_unsafe_act_type = 1 AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '') 
+                             AND unsafe_act_other IS NOT NULL AND TRIM(unsafe_act_other) != ''
+                            THEN TRIM(unsafe_act_other)
+                        -- If event type includes "Unsafe Act" but both unsafe_act fields are empty, check unsafe_condition
+                        WHEN has_unsafe_act_type = 1 AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '') 
+                             AND (unsafe_act_other IS NULL OR TRIM(unsafe_act_other) = '')
+                             AND unsafe_condition IS NOT NULL AND TRIM(unsafe_condition) != ''
+                            THEN TRIM(unsafe_condition)
+                        -- If event type includes "Unsafe Act" but unsafe_condition is also empty, check unsafe_condition_other
+                        WHEN has_unsafe_act_type = 1 AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '') 
+                             AND (unsafe_act_other IS NULL OR TRIM(unsafe_act_other) = '')
+                             AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '')
+                             AND unsafe_condition_other IS NOT NULL AND TRIM(unsafe_condition_other) != ''
+                            THEN TRIM(unsafe_condition_other)
+                        ELSE NULL
+                    END AS description
+                FROM unsafe_events_processed
+                WHERE has_unsafe_act_type = 1
+                
+                UNION ALL
+                
+                -- Extract Unsafe Conditions
+                SELECT 
+                    {config['region_field']},
+                    'Unsafe Condition' as category,
+                    CASE 
+                        -- If event type includes "Unsafe Condition" and unsafe_condition field has data, use it
+                        WHEN has_unsafe_condition_type = 1 AND unsafe_condition IS NOT NULL AND TRIM(unsafe_condition) != '' 
+                            THEN TRIM(unsafe_condition)
+                        -- If event type includes "Unsafe Condition" and unsafe_condition is empty, check unsafe_condition_other
+                        WHEN has_unsafe_condition_type = 1 AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '') 
+                             AND unsafe_condition_other IS NOT NULL AND TRIM(unsafe_condition_other) != ''
+                            THEN TRIM(unsafe_condition_other)
+                        -- If event type includes "Unsafe Condition" but both condition fields are empty, check unsafe_act
+                        WHEN has_unsafe_condition_type = 1 AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '') 
+                             AND (unsafe_condition_other IS NULL OR TRIM(unsafe_condition_other) = '')
+                             AND unsafe_act IS NOT NULL AND TRIM(unsafe_act) != ''
+                            THEN TRIM(unsafe_act)
+                        -- If event type includes "Unsafe Condition" but unsafe_act is also empty, check unsafe_act_other
+                        WHEN has_unsafe_condition_type = 1 AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '') 
+                             AND (unsafe_condition_other IS NULL OR TRIM(unsafe_condition_other) = '')
+                             AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '')
+                             AND unsafe_act_other IS NOT NULL AND TRIM(unsafe_act_other) != ''
+                            THEN TRIM(unsafe_act_other)
+                        ELSE NULL
+                    END AS description
+                FROM unsafe_events_processed
+                WHERE has_unsafe_condition_type = 1
+            ),
+            all_items_counts AS (
+                -- Count occurrences of each unsafe act/condition by region and category
+                SELECT 
+                    {config['region_field']},
+                    category,
+                    description,
+                    COUNT(*) as item_count
+                FROM unsafe_acts_extracted
+                WHERE description IS NOT NULL AND description != ''
+                GROUP BY {config['region_field']}, category, description
+            ),
+            region_category_totals AS (
+                -- Get totals per region and category
+                SELECT 
+                    {config['region_field']},
+                    category,
+                    SUM(item_count) as total_items_in_region_category
+                FROM all_items_counts
+                GROUP BY {config['region_field']}, category
+            ),
+            region_totals AS (
+                -- Get overall totals per region
+                SELECT 
+                    {config['region_field']},
+                    SUM(item_count) as total_items_in_region
+                FROM all_items_counts
+                GROUP BY {config['region_field']}
+            ),
+            most_common_items AS (
+                -- Get the most common item per region and category
+                SELECT 
+                    {config['region_field']},
+                    category,
+                    description as most_common_item,
+                    item_count as most_common_count,
+                    ROW_NUMBER() OVER (PARTITION BY {config['region_field']}, category ORDER BY item_count DESC) as rn
+                FROM all_items_counts
+            )
+            -- Final comprehensive result
+            SELECT 
+                rt.{config['region_field']},
+                rt.total_items_in_region as total_unsafe_items,
+                
+                -- Unsafe Acts Summary
+                COALESCE(rct_act.total_items_in_region_category, 0) as total_unsafe_acts,
+                COALESCE(mci_act.most_common_item, 'None recorded') as most_common_unsafe_act,
+                COALESCE(mci_act.most_common_count, 0) as most_common_act_count,
+                CASE 
+                    WHEN mci_act.most_common_count IS NOT NULL AND rt.total_items_in_region > 0
+                    THEN ROUND((mci_act.most_common_count * 100.0 / rt.total_items_in_region), 2) 
+                    ELSE 0 
+                END as act_percentage_of_region_total,
+                
+                -- Unsafe Conditions Summary
+                COALESCE(rct_cond.total_items_in_region_category, 0) as total_unsafe_conditions,
+                COALESCE(mci_cond.most_common_item, 'None recorded') as most_common_unsafe_condition,
+                COALESCE(mci_cond.most_common_count, 0) as most_common_condition_count,
+                CASE 
+                    WHEN mci_cond.most_common_count IS NOT NULL AND rt.total_items_in_region > 0
+                    THEN ROUND((mci_cond.most_common_count * 100.0 / rt.total_items_in_region), 2) 
+                    ELSE 0 
+                END as condition_percentage_of_region_total
+
+            FROM region_totals rt
+            LEFT JOIN region_category_totals rct_act ON rt.{config['region_field']} = rct_act.{config['region_field']} AND rct_act.category = 'Unsafe Act'
+            LEFT JOIN region_category_totals rct_cond ON rt.{config['region_field']} = rct_cond.{config['region_field']} AND rct_cond.category = 'Unsafe Condition'
+            LEFT JOIN most_common_items mci_act ON rt.{config['region_field']} = mci_act.{config['region_field']} AND mci_act.category = 'Unsafe Act' AND mci_act.rn = 1
+            LEFT JOIN most_common_items mci_cond ON rt.{config['region_field']} = mci_cond.{config['region_field']} AND mci_cond.category = 'Unsafe Condition' AND mci_cond.rn = 1
+            ORDER BY rt.total_items_in_region DESC
+            """
+
+            params = {"start_date": start_date, "end_date": end_date}
+            if region:
+                params["region"] = region
+
+            data = self.execute_query(query, params, session)
+            
+            return {
+                "chart_type": "table",
+                "description": "Regional analysis of unsafe acts and conditions with most common occurrences per region",
+                "data": data
+            }
+
+        except Exception as e:
+            logger.error(f"Error getting regional unsafe acts and conditions analysis: {e}")
+            return {
+                "chart_type": "table",
+                "description": "Error retrieving regional unsafe acts and conditions analysis data",
+                "data": []
+            }
+
+    def _get_regional_work_stoppages_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
+        """KPI 15: Work Stoppages by Region with most common causes"""
+        try:
+            region_filter = f"AND {config['region_field']} = :region" if region else ""
+
+            query = f"""
+            WITH work_stoppages_data AS (
+                SELECT 
+                    {config['region_field']},
+                    {config['work_stopped_field']} as work_stopped,
+                    {config['event_type_field']} as unsafe_event_type,
+                    unsafe_act,
+                    unsafe_act_other,
+                    unsafe_condition,
+                    unsafe_condition_other,
+                    CASE 
+                        WHEN {config['event_type_field']} ILIKE '%unsafe act%' THEN 1 
+                        ELSE 0 
+                    END as has_unsafe_act_type,
+                    CASE 
+                        WHEN {config['event_type_field']} ILIKE '%unsafe condition%' THEN 1 
+                        ELSE 0 
+                    END as has_unsafe_condition_type
+                FROM {config['table_name']}
+                WHERE {config['region_field']} IS NOT NULL AND {config['region_field']} != ''
+                    AND {config['work_stopped_field']} IS NOT NULL 
+                    AND UPPER(TRIM({config['work_stopped_field']})) IN ('YES', 'Y', '1', 'TRUE')
+                    AND {config['event_date_field']} BETWEEN :start_date AND :end_date
+                    {region_filter}
+            ),
+            work_stoppage_causes AS (
+                SELECT 
+                    {config['region_field']},
+                    work_stopped,
+                    CASE 
+                        WHEN has_unsafe_act_type = 1 AND unsafe_act IS NOT NULL AND TRIM(unsafe_act) != '' 
+                            THEN CONCAT('Unsafe Act: ', TRIM(unsafe_act))
+                        WHEN has_unsafe_act_type = 1 AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '') 
+                             AND unsafe_act_other IS NOT NULL AND TRIM(unsafe_act_other) != ''
+                            THEN CONCAT('Unsafe Act: ', TRIM(unsafe_act_other))
+                        WHEN has_unsafe_condition_type = 1 AND unsafe_condition IS NOT NULL AND TRIM(unsafe_condition) != '' 
+                            THEN CONCAT('Unsafe Condition: ', TRIM(unsafe_condition))
+                        WHEN has_unsafe_condition_type = 1 AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '') 
+                             AND unsafe_condition_other IS NOT NULL AND TRIM(unsafe_condition_other) != ''
+                            THEN CONCAT('Unsafe Condition: ', TRIM(unsafe_condition_other))
+                        WHEN has_unsafe_act_type = 1 AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '') 
+                             AND (unsafe_act_other IS NULL OR TRIM(unsafe_act_other) = '')
+                             AND unsafe_condition IS NOT NULL AND TRIM(unsafe_condition) != ''
+                            THEN CONCAT('Unsafe Condition: ', TRIM(unsafe_condition))
+                        WHEN has_unsafe_act_type = 1 AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '') 
+                             AND (unsafe_act_other IS NULL OR TRIM(unsafe_act_other) = '')
+                             AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '')
+                             AND unsafe_condition_other IS NOT NULL AND TRIM(unsafe_condition_other) != ''
+                            THEN CONCAT('Unsafe Condition: ', TRIM(unsafe_condition_other))
+                        WHEN has_unsafe_condition_type = 1 AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '') 
+                             AND (unsafe_condition_other IS NULL OR TRIM(unsafe_condition_other) = '')
+                             AND unsafe_act IS NOT NULL AND TRIM(unsafe_act) != ''
+                            THEN CONCAT('Unsafe Act: ', TRIM(unsafe_act))
+                        WHEN has_unsafe_condition_type = 1 AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '') 
+                             AND (unsafe_condition_other IS NULL OR TRIM(unsafe_condition_other) = '')
+                             AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '')
+                             AND unsafe_act_other IS NOT NULL AND TRIM(unsafe_act_other) != ''
+                            THEN CONCAT('Unsafe Act: ', TRIM(unsafe_act_other))
+                        WHEN unsafe_act IS NOT NULL AND TRIM(unsafe_act) != ''
+                            THEN CONCAT('Unsafe Act: ', TRIM(unsafe_act))
+                        WHEN unsafe_act_other IS NOT NULL AND TRIM(unsafe_act_other) != ''
+                            THEN CONCAT('Unsafe Act: ', TRIM(unsafe_act_other))
+                        WHEN unsafe_condition IS NOT NULL AND TRIM(unsafe_condition) != ''
+                            THEN CONCAT('Unsafe Condition: ', TRIM(unsafe_condition))
+                        WHEN unsafe_condition_other IS NOT NULL AND TRIM(unsafe_condition_other) != ''
+                            THEN CONCAT('Unsafe Condition: ', TRIM(unsafe_condition_other))
+                        ELSE 'Cause Not Specified'
+                    END AS stoppage_cause
+                FROM work_stoppages_data
+            ),
+            cause_counts AS (
+                SELECT 
+                    {config['region_field']},
+                    stoppage_cause,
+                    COUNT(*) as cause_count
+                FROM work_stoppage_causes
+                GROUP BY {config['region_field']}, stoppage_cause
+            ),
+            region_totals AS (
+                SELECT 
+                    {config['region_field']},
+                    SUM(cause_count) as total_work_stoppages
+                FROM cause_counts
+                GROUP BY {config['region_field']}
+            ),
+            most_common_causes AS (
+                SELECT 
+                    {config['region_field']},
+                    stoppage_cause as most_common_cause,
+                    cause_count as most_common_count,
+                    ROW_NUMBER() OVER (PARTITION BY {config['region_field']} ORDER BY cause_count DESC) as rn
+                FROM cause_counts
+            )
+            SELECT 
+                rt.{config['region_field']},
+                rt.total_work_stoppages,
+                COALESCE(mcc.most_common_cause, 'No causes recorded') as most_common_stoppage_cause,
+                COALESCE(mcc.most_common_count, 0) as most_common_cause_count,
+                CASE 
+                    WHEN mcc.most_common_count IS NOT NULL AND rt.total_work_stoppages > 0
+                    THEN ROUND((mcc.most_common_count * 100.0 / rt.total_work_stoppages), 2) 
+                    ELSE 0 
+                END as percentage_of_region_stoppages
+            FROM region_totals rt
+            LEFT JOIN most_common_causes mcc ON rt.{config['region_field']} = mcc.{config['region_field']} AND mcc.rn = 1
+            ORDER BY rt.total_work_stoppages DESC
+            """
+
+            params = {"start_date": start_date, "end_date": end_date}
+            if region:
+                params["region"] = region
+
+            data = self.execute_query(query, params, session)
+            return {
+                "chart_type": "table",
+                "description": "Work stoppages by region with most common causes",
+                "data": data
+            }
+        except Exception as e:
+            logger.error(f"Error getting regional work stoppages analysis: {e}")
+            return {
+                "chart_type": "table",
+                "description": "Error retrieving regional work stoppages analysis data",
+                "data": []
+            }
+
+    def _get_work_stoppage_duration_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
+        """KPI 16: Work Stoppage Duration Analysis by duration categories"""
+        try:
+            region_filter = f"AND {config['region_field']} = :region" if region else ""
+
+            query = f"""
+            SELECT 
+                duration_category,
+                COUNT(*) as event_count,
+                ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(), 2) as percentage_of_stoppages,
+                ROUND(COUNT(*) * 100.0 / (SELECT COUNT(*) FROM {config['table_name']} WHERE event_id IS NOT NULL AND {config['event_date_field']} BETWEEN :start_date AND :end_date {region_filter}), 2) as percentage_of_total_events
+            FROM (
+                SELECT 
+                    event_id,
+                    work_stopped,
+                    stop_work_duration,
+                    CASE 
+                        -- No work stoppage
+                        WHEN LOWER(COALESCE(work_stopped, '')) != 'yes' THEN 'No Work Stoppage'
+                        
+                        -- Work stopped - categorize by duration
+                        WHEN LOWER(COALESCE(work_stopped, '')) = 'yes' THEN
+                            CASE 
+                                WHEN LOWER(TRIM(COALESCE(stop_work_duration, ''))) = 'one day or less' THEN 'One Day or Less'
+                                WHEN LOWER(TRIM(COALESCE(stop_work_duration, ''))) = 'more than one day' THEN 'More than One Day'
+                                WHEN stop_work_duration IS NULL OR TRIM(stop_work_duration) = '' THEN 'Duration Unknown'
+                                ELSE 'Other Duration'
+                            END
+                        
+                        ELSE 'Work Stoppage Status Unknown'
+                    END as duration_category
+                FROM {config['table_name']}
+                WHERE event_id IS NOT NULL
+                    AND {config['event_date_field']} BETWEEN :start_date AND :end_date
+                    {region_filter}
+            ) categorized_events
+            GROUP BY duration_category
+            ORDER BY 
+                CASE duration_category
+                    WHEN 'No Work Stoppage' THEN 1
+                    WHEN 'One Day or Less' THEN 2
+                    WHEN 'More than One Day' THEN 3
+                    WHEN 'Duration Unknown' THEN 4
+                    WHEN 'Other Duration' THEN 5
+                    ELSE 6
+                END
+            """
+
+            params = {"start_date": start_date, "end_date": end_date}
+            if region:
+                params["region"] = region
+
+            data = self.execute_query(query, params, session)
+
+            return {
+                "chart_type": "pie",
+                "description": "Analysis of work stoppages by duration categories",
+                "data": data
+            }
+
+        except Exception as e:
+            logger.error(f"Error getting work stoppage duration analysis: {e}")
+            return {
+                "chart_type": "pie",
+                "description": "Error retrieving work stoppage duration analysis data",
+                "data": []
+            }
+
     def _get_empty_dashboard_data(self) -> Dict[str, Any]:
-        """Return empty dashboard data structure for all 13 KPIs"""
+        """Return empty dashboard data structure for all 16 KPIs"""
         return {
             "total_events": {
                 "chart_type": "card",
@@ -881,6 +1265,21 @@ class SRSDashboardService:
                 "data": []
             },
             "top_5_recurrent_root_causes": {
+                "chart_type": "pie",
+                "description": "No data available",
+                "data": []
+            },
+            "regional_unsafe_acts_conditions_analysis": {
+                "chart_type": "table",
+                "description": "No data available",
+                "data": []
+            },
+            "regional_work_stoppages_analysis": {
+                "chart_type": "table",
+                "description": "No data available",
+                "data": []
+            },
+            "work_stoppage_duration_analysis": {
                 "chart_type": "pie",
                 "description": "No data available",
                 "data": []
