@@ -140,6 +140,11 @@ class AIInsightsGenerator:
         analyze this comprehensive safety data and generate {count} NEW and UNIQUE analytical insights that are DIFFERENT from the existing insights.
         Focus on EVENT ANALYSIS and PATTERN IDENTIFICATION rather than recommendations.
 
+        Key Guidelines:
+            - Provide helpful suggestions without expressing opinions about what's good or bad
+            - When you see "NaN" (missing information), change it to "unspecified"
+            - Use everyday words instead of technical computer terms so everyone can easily understand
+        
         SAFETY DATA:
         {formatted_data}
 
@@ -151,6 +156,8 @@ class AIInsightsGenerator:
 
         FOCUS REQUIREMENTS:
         {focus_text}
+
+
 
         GENERATION REQUIREMENTS:
         1. Generate exactly {count} analytical insights that are COMPLETELY DIFFERENT from existing ones
