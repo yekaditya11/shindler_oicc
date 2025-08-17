@@ -42,10 +42,11 @@ azure_config = AzureOpenAIConfig()
 
 def get_azure_openai_client():
     """Get configured Azure OpenAI client"""
-    from openai import AzureOpenAI
+    # from openai import AzureOpenAI
+    from langfuse.openai import AzureOpenAI
     
     return AzureOpenAI(
         azure_endpoint=azure_config.azure_openai_endpoint,
         api_key=azure_config.azure_openai_api_key,
-        api_version=azure_config.azure_openai_api_version,
+        api_version=azure_config.azure_openai_api_version
     ) 

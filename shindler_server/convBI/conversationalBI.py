@@ -16,10 +16,15 @@ from typing import Annotated,Dict,Any,Optional
 from datetime import datetime
 from pydantic import BaseModel
 import asyncio
+from langfuse.langchain import CallbackHandler
+
+ 
+
 
 from convBI.prompts import intent_prompt,greeting_prompt,table_identification_prompt,prompt_ddl,text_to_sql_prompt,clarification_prompt,summarizer_prompt,summarizer_prompt_3
 import psycopg 
 import json
+
 
 
 
@@ -57,6 +62,15 @@ class TextToSQLWorkflow:
             openai_api_version=os.environ["AZURE_OPENAI_API_VERSION"],
             api_key=os.environ["AZURE_OPENAI_API_KEY"]
         )
+        # Create individual handlers for each agent
+        self.intent_handler = CallbackHandler()
+        self.greeting_handler = CallbackHandler()
+        self.table_id_handler = CallbackHandler()
+        self.text_to_sql_handler = CallbackHandler()
+        self.summarizer_handler = CallbackHandler()
+        self.clarification_handler = CallbackHandler()
+        self.visualization_handler = CallbackHandler()
+    
     
     def _serialize_state_for_json(self, state: WorkflowState) -> Dict[str, Any]:
         """Helper method to serialize state for JSON output, handling non-serializable objects"""
@@ -123,7 +137,10 @@ class TextToSQLWorkflow:
         result=chain.invoke({
             "question":state["question"],
             "history":prev_conv   
-            })
+            }, 
+        config={"callbacks": [self.intent_handler],
+                "metadata": {"langfuse_tags": ["intent_classification_agent", "text_to_sql_workflow"]}
+                })
         
         state["intent"]=result.content.strip().lower() # need to a validation for the ["general","system_query"]
         
@@ -142,7 +159,9 @@ class TextToSQLWorkflow:
         chain=prompt|self.llm 
         result=chain.invoke({
             "question":state["question"]
-        })
+        }, 
+        config={"callbacks": [self.greeting_handler],
+                "metadata": {"langfuse_tags": ["greeting_agent", "text_to_sql_workflow"]}})
         state["final_answer"]=result.content.strip()
 
         return state
@@ -157,7 +176,9 @@ class TextToSQLWorkflow:
             "question":state["question"],
             "history":prev_conv, 
             "ddl":state["database_ddl"]
-        })
+        }, 
+        config={"callbacks": [self.table_id_handler],       
+                "metadata": {"langfuse_tags": ["table_identification_agent", "text_to_sql_workflow"]}})
         state["tablename"]=result.content.strip()
         return state
     
@@ -185,7 +206,9 @@ class TextToSQLWorkflow:
             "semantic_info":state["semantic_info"] ,
             "question":state["question"],
             "history":prev_conv
-        })
+        }, 
+        config={"callbacks": [self.text_to_sql_handler],               
+                 "metadata": {"langfuse_tags": ["text_to_sql_agent", "text_to_sql_workflow"]}})
 
         state["sql_query"]=result.content.strip()
 
@@ -248,7 +271,9 @@ class TextToSQLWorkflow:
             "history": prez_conv,
             "query_result": state["query_result"],
             "tablename": state["tablename"]
-        })
+        }, 
+        config={"callbacks": [self.summarizer_handler],                
+                "metadata": {"langfuse_tags": ["summarizer_agent", "text_to_sql_workflow"]}})
         state["final_answer"] = result.content.strip()
         state["history"] = [
             AIMessage(content=state["final_answer"])
@@ -267,7 +292,9 @@ class TextToSQLWorkflow:
             "question": state["question"],
             "history": prez_conv,
             "error_message": state["error_message"]
-        })
+        }, 
+        config={"callbacks": [self.clarification_handler],                
+                "metadata": {"langfuse_tags": ["clarification_agent", "text_to_sql_workflow"]}})
         state["final_answer"] = result.content.strip()
         
         return state
@@ -312,7 +339,9 @@ class TextToSQLWorkflow:
                 "question": question,
                 "query_result":results, # Pass the results as JSON string to GPT
                 "history": prez_conv
-            })
+            }, 
+            config={"callbacks": [ self.visualization_handler],               
+                     "metadata": {"langfuse_tags": ["visualization_agent", "text_to_sql_workflow"]}})
             # Parse the output and save the JSON to state
 
             state["visualization_data"] = json.loads(result.content.strip())  # Save the generated JSON

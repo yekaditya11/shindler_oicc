@@ -224,6 +224,9 @@ class AIInsightsGenerator:
                     {"role": "system", "content": "You are a senior safety analyst expert at generating unique, analytical insights from safety data with accurate sentiment classification. Focus on event pattern analysis and statistical observations rather than recommendations. Always provide fresh analytical perspectives that complement existing analysis. Always respond with valid JSON format."},
                     {"role": "user", "content": prompt}
                 ],
+                metadata={
+                    "langfuse_tags": ["additional_insights_agent", "insights_workflow"]
+                },
                 max_tokens=self.max_tokens,
                 temperature=0.8,  # Higher temperature for more creative/diverse insights
                 top_p=0.9
@@ -537,10 +540,13 @@ class AIInsightsGenerator:
                         "content": prompt
                     }
                 ],
+                metadata={
+                    "langfuse_tags": ["insights_agent", "insights_workflow"]
+                },
                 max_tokens=self.max_tokens,
                 temperature=self.temperature,  # Consider lowering this to 0.1-0.3 for more consistent compliance
-                top_p=0.9
-            )
+                top_p=0.9,
+                )
             
             content = response.choices[0].message.content.strip()
             
@@ -673,8 +679,13 @@ class AIInsightsGenerator:
                         "content": prompt
                     }
                 ],
+                metadata={
+                    "langfuse_tags": ["insights_summary_agent", "insights_workflow"]
+                },
+                
                 max_tokens=500,
-                temperature=0.5
+                temperature=0.5,
+                
             )
             
             return response.choices[0].message.content.strip()

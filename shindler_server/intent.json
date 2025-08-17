@@ -1515,10 +1515,1098 @@
     {
       "type": "ai",
       "content": "SELECT branch, unsafe_act, COUNT(*) AS occurrence_count\nFROM unsafe_events_srs\nWHERE unsafe_act IS NOT NULL\nGROUP BY branch, unsafe_act\nQUALIFY ROW_NUMBER() OVER (PARTITION BY branch ORDER BY COUNT(*) DESC) = 1\nORDER BY branch;"
+    },
+    {
+      "type": "human",
+      "content": "Which branches are most likely to have accidents?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT branch, COUNT(*) AS accident_count\nFROM unsafe_events_srs\nWHERE unsafe_event_type LIKE '%Unsafe Act%' OR unsafe_event_type LIKE '%Unsafe Condition%'\nGROUP BY branch\nORDER BY accident_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The branches most likely to have accidents in the srs system are North Delhi with 492 incidents, followed by Bangalore 1 (292), INFRA / TRD (289), South Delhi (244), and Bangalore 2 (198). These locations show the highest accident counts and should be prioritized for safety improvements and audits."
+    },
+    {
+      "type": "human",
+      "content": "Who are the top 5 reporters of unsafe events?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT reporter_name, COUNT(*) AS unsafe_event_count\nFROM unsafe_events_srs\nWHERE reporter_name IS NOT NULL\nGROUP BY reporter_name\nORDER BY unsafe_event_count DESC\nLIMIT 5;"
+    },
+    {
+      "type": "ai",
+      "content": "The top 5 reporters of unsafe events in the srs system are Johndevanand with 63 reports, JoyalFrank with 54, AnkitKumar with 42, KamleshPrasad with 41, and PradeepKumar with 31 unsafe event reports."
+    },
+    {
+      "type": "human",
+      "content": "I want to see it as a pie chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT reporter_name, COUNT(*) AS unsafe_event_count\nFROM unsafe_events_srs\nWHERE reporter_name IS NOT NULL\nGROUP BY reporter_name\nORDER BY unsafe_event_count DESC\nLIMIT 5;"
+    },
+    {
+      "type": "ai",
+      "content": "The pie chart for unsafe events reported in the srs system shows the top five reporters as follows: Johndevanand with 63 events, JoyalFrank with 54, AnkitKumar with 42, KamleshPrasad with 41, and PradeepKumar with 31 events."
+    },
+    {
+      "type": "human",
+      "content": "What visualizations can you create?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT 'Pie Chart' AS visualization_type\nUNION ALL\nSELECT 'Bar Chart' AS visualization_type\nUNION ALL\nSELECT 'Line Chart' AS visualization_type\nUNION ALL\nSELECT 'Histogram' AS visualization_type\nUNION ALL\nSELECT 'Scatter Plot' AS visualization_type\nUNION ALL\nSELECT 'Heat Map' AS visualization_type\nUNION ALL\nSELECT 'Area Chart' AS visualization_type\nUNION ALL\nSELECT 'Bubble Chart' AS visualization_type\nUNION ALL\nSELECT 'Stacked Bar Chart' AS visualization_type\nUNION ALL\nSELECT 'Treemap' AS visualization_type;"
+    },
+    {
+      "type": "ai",
+      "content": "The visualizations available to create from the unsafe_events_srs_agumented data include Pie Chart, Bar Chart, Line Chart, Histogram, Scatter Plot, Heat Map, Area Chart, Bubble Chart, Stacked Bar Chart, and Treemap."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS unsafe_events_with_no_actions\nFROM unsafe_events_srs ue\nWHERE NOT EXISTS (\n    SELECT 1\n    FROM actions a\n    WHERE a.event_id = ue.event_id\n);"
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events are related to PPE non compliance?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS unsafe_events_related_to_ppe_non_compliance\nFROM unsafe_events_srs\nWHERE unsafe_act ILIKE '%PPE non compliance%'\n   OR unsafe_act ILIKE '%Lack or improper use of PPE%'\n   OR unsafe_act ILIKE '%Lack or improper use of PPE, %'\n   OR unsafe_act ILIKE '%Lack or improper use of PPE,%'\n   OR unsafe_act ILIKE '%Lack or improper use of PPE, Other%'\n   OR unsafe_act ILIKE '%Lack or improper use of PPE, Operating without following adequate procedure%'\n   OR unsafe_act ILIKE '%Operating without following adequate procedure, Lack or improper use of PPE%'\n   OR unsafe_act ILIKE '%Operating without following adequate procedure, Lack or improper use of PPE, %';"
+    },
+    {
+      "type": "ai",
+      "content": "There are 138 unsafe events related to PPE non-compliance recorded in the srs system."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT work_stopped, COUNT(*) AS event_count\nFROM unsafe_events_srs\nGROUP BY work_stopped\nORDER BY work_stopped;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there were 802 events where work stoppage occurred, compared to 3,199 events where work continued without stoppage."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT date_of_unsafe_event, COUNT(*) AS incident_count\nFROM unsafe_events_srs\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event;"
+    },
+    {
+      "type": "ai",
+      "content": "Incident trends in the srs system show a gradual increase in unsafe events from early January 2025, with a sharp rise around mid to late January peaking at over 100 incidents on a few days. February continues with consistently high incident counts, reaching a peak of 122 incidents on February 25. March sees a gradual decline in numbers, with a few fluctuations, while April reports much lower incident counts. This indicates a significant surge in incidents during late January and February that should be a focus area for targeted safety interventions."
+    },
+    {
+      "type": "human",
+      "content": "give me graph"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT date_of_unsafe_event, COUNT(*) AS incident_count\nFROM unsafe_events_srs\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event;"
+    },
+    {
+      "type": "ai",
+      "content": "The graph data for unsafe events in the srs system shows daily incident counts from January 1, 2025, through April 16, 2025, mostly ranging between low single digits up to peaks exceeding 100 incidents on specific days, indicating fluctuating safety risks over time with several notable spikes in incident frequency."
+    },
+    {
+      "type": "human",
+      "content": "give me graph for incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT date_of_unsafe_event, COUNT(*) AS incident_count\nFROM unsafe_events_srs\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event;"
+    },
+    {
+      "type": "ai",
+      "content": "The incident trends for srs show fluctuation over the period from January to April 2025, with initial low counts in early January rising sharply around mid-month, peaking multiple times through February and March with incidents exceeding 100 on several days, then generally tapering down towards April. This indicates periods of heightened unsafe events requiring targeted safety interventions."
+    },
+    {
+      "type": "human",
+      "content": "give me an incident breakdown pie chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT unsafe_event_type, COUNT(*) AS incident_count\nFROM unsafe_events_srs\nGROUP BY unsafe_event_type\nORDER BY incident_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the incident breakdown shows that the majority of events are Unsafe Conditions (3,182 incidents), followed by Unsafe Acts (633 incidents). Near Misses are much lower in number (94 incidents). There are also smaller counts of combined event types, such as Unsafe Act and Unsafe Condition together (54 incidents), and other mixed combinations with fewer occurrences."
+    },
+    {
+      "type": "human",
+      "content": "Which branches have the most number of PPE non compliances?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT branch, COUNT(*) AS ppe_non_compliance_count\nFROM unsafe_events_srs\nWHERE unsafe_act LIKE '%Lack or improper use of PPE%'\nGROUP BY branch\nORDER BY ppe_non_compliance_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The branches with the highest number of PPE non-compliances in the srs system are North Delhi (29), South Delhi (26), and Bangalore 1 (19), followed by Mumbai 1 (11) and RoN (10). These locations show a significant focus area for improving PPE compliance."
+    },
+    {
+      "type": "human",
+      "content": "Create a pie chart for this"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT branch, COUNT(*) AS ppe_non_compliance_count\nFROM unsafe_events_srs\nWHERE unsafe_act LIKE '%Lack or improper use of PPE%'\nGROUP BY branch\nORDER BY ppe_non_compliance_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The pie chart for PPE non-compliance incidents in the srs system would show North Delhi with the highest share (29 cases), followed by South Delhi (26) and Bangalore 1 (19). Other branches have smaller portions, with Mumbai 1 at 11, RoN at 10, and multiple branches reporting between 1 to 6 cases each. This distribution highlights key locations requiring focused PPE compliance improvements."
+    },
+    {
+      "type": "human",
+      "content": "Only show the top 10 branches"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT branch, COUNT(*) AS ppe_non_compliance_count\nFROM unsafe_events_srs\nWHERE unsafe_act LIKE '%Lack or improper use of PPE%'\nGROUP BY branch\nORDER BY ppe_non_compliance_count DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "The top 10 branches with the highest PPE non-compliance counts in the srs system are: North Delhi (29), South Delhi (26), Bangalore 1 (19), Mumbai 1 (11), RoN (10), Noida (6), INFRA / TRD (6), Hyderabad 2 (5), Ahmedabad & MP (4), and Chhattisgarh & Nagpur (4)."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT date_of_unsafe_event, COUNT(*) AS incident_count\nFROM unsafe_events_srs\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The incident trend in the srs system shows a gradual increase in daily incident counts starting from early January 2025, with some low counts on certain days. However, from mid-January through February, there is a significant rise, peaking multiple times above 100 incidents per day. The counts fluctuate but remain generally high through February and March, then start to decline towards early April, with sporadic low counts in mid-April and June. This pattern indicates rising safety concerns during the first quarter of 2025 that require focused attention."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT date_of_unsafe_event, COUNT(*) AS incident_count\nFROM unsafe_events_srs\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The incident trend in the srs system shows a gradual increase in unsafe events from early January 2025, with a sharp rise around mid to late January, peaking on January 23 with 107 incidents. After fluctuating in February, incidents remain relatively high with another peak of 122 on February 25. March incidents gradually decline, settling at lower counts by the end of the month and early April. Overall, the data indicates periods of high incident spikes interspersed with moderate fluctuations."
+    },
+    {
+      "type": "human",
+      "content": "List ongoing safety checks"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT event_id, reported_date, reporter_name, unsafe_event_type, work_stopped, investigation_closure_date\nFROM unsafe_events_srs\nWHERE investigation_closure_date IS NULL\nORDER BY reported_date ASC;"
+    },
+    {
+      "type": "human",
+      "content": "Serious Near Miss Rate"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT date_of_unsafe_event, \n       COUNT(*) AS serious_near_miss_count\nFROM unsafe_events_srs\nWHERE serious_near_miss = 'Yes'\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there have been five serious near misses recorded on the following dates: January 6, February 10, February 14, March 7, and March 11 of 2025, with one serious near miss event reported on each of these dates."
+    },
+    {
+      "type": "human",
+      "content": "Show latest safety insights"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT event_id, reported_date, reporter_name, unsafe_event_type, work_stopped, investigation_closure_date\nFROM unsafe_events_srs\nORDER BY reported_date DESC\nLIMIT 10;"
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    date_of_unsafe_event,\n    COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / NULLIF(COUNT(*),0) AS work_stoppage_rate\nFROM unsafe_events_srs\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate for unsafe events in the srs system from January to April 2025 varies daily, ranging from 0.0 to a peak of 1.0 on January 26. Most days show rates between 0.1 and 0.4, with intermittent days of no stoppages. Notable spikes occurred on April 1 (46.2%) and on several dates in January and February, indicating periods with higher impact of unsafe events on work continuity."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    date_of_unsafe_event,\n    COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / NULLIF(COUNT(*), 0) AS work_stoppage_rate\nFROM unsafe_events_srs\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in the srs system fluctuates daily from January to April 2025, with rates ranging from 0.0 (no stoppage) to a peak of 1.0 on January 26. There are several days with no work stoppage, but intermittent spikes occur, notably around late January, mid-February, and early April, indicating periodic interruptions due to unsafe events. Overall, stoppage rates mostly vary between 0.1 and 0.4, showing a pattern of moderate work interruptions linked to safety concerns."
+    },
+    {
+      "type": "human",
+      "content": "Serious Near Miss"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    date_of_unsafe_event,\n    COUNT(*) AS serious_near_miss_count\nFROM unsafe_events_srs\nWHERE serious_near_miss = 'Yes'\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there have been five serious near miss incidents reported on distinct dates: January 6, February 10, February 14, March 7, and March 11 of 2025\u2014each date recording one serious near miss event."
+    },
+    {
+      "type": "human",
+      "content": "Give me bar chart for work stoppage rate"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    date_of_unsafe_event,\n    COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / NULLIF(COUNT(*), 0) AS work_stoppage_rate\nFROM unsafe_events_srs\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in the srs system shows daily fluctuations from January to April 2025, with rates ranging from 0.0 to a peak of 1.0 on January 26. Several days record zero stoppages, while notable spikes appear on specific dates such as January 1 (0.5), February 23 (0.5), April 1 (0.46), and April 16 (0.33). Overall, the data indicates variable work stoppage rates with intermittent significant interruptions across the period."
+    },
+    {
+      "type": "human",
+      "content": "give me a bar chart for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    date_of_unsafe_event,\n    COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / NULLIF(COUNT(*), 0) AS work_stoppage_rate\nFROM unsafe_events_srs\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rates in the srs system fluctuate over the reporting period from January to June 2025, with several days showing no stoppage and others varying between approximately 6% to 100%. Notable peaks include a 1.0 (100%) stoppage rate on January 26, and high rates around early April and late February. Overall, stoppage rates show a variable pattern rather than a consistent trend."
+    },
+    {
+      "type": "human",
+      "content": "Who are the top 5 reporters of unsafe events?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    reporter_name, \n    COUNT(*) AS unsafe_event_count\nFROM unsafe_events_srs\nGROUP BY reporter_name\nORDER BY unsafe_event_count DESC\nLIMIT 5;"
+    },
+    {
+      "type": "ai",
+      "content": "The top 5 reporters of unsafe events in srs are Johndevanand with 63 reports, JoyalFrank with 54, AnkitKumar with 42, KamleshPrasad with 41, and PradeepKumar with 31 reports."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    COUNT(*) AS unsafe_events_no_actions\nFROM unsafe_events_srs\nWHERE \n    action_description_1 IS NULL\n    AND action_description_2 IS NULL\n    AND action_description_3 IS NULL\n    AND action_description_4 IS NULL\n    AND action_description_5 IS NULL;"
+    },
+    {
+      "type": "ai",
+      "content": "There are currently no unsafe events in srs without any actions created."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events are related to PPE non compliance?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    COUNT(*) AS unsafe_events_ppe_non_compliance\nFROM unsafe_events_srs\nWHERE unsafe_act ILIKE '%PPE non compliance%'\n   OR unsafe_act ILIKE '%Lack or improper use of PPE%'\n   OR unsafe_act ILIKE '%Lack or improper use of PPE,%'\n   OR unsafe_act ILIKE '%Lack or improper use of PPE,%'\n   OR unsafe_act ILIKE '%Lack or improper use of PPE%'  \n   OR unsafe_act ILIKE '%improper use of PPE%'\n   OR unsafe_act ILIKE '%PPE%' ;"
+    },
+    {
+      "type": "ai",
+      "content": "There are 138 unsafe events related to PPE non-compliance recorded in the srs system."
+    },
+    {
+      "type": "human",
+      "content": "Which branches have the most number of PPE non compliances?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch, \n    COUNT(*) AS ppe_non_compliance_count\nFROM unsafe_events_srs\nWHERE \n    unsafe_act ILIKE '%PPE non compliance%'\n    OR unsafe_act ILIKE '%Lack or improper use of PPE%'\n    OR unsafe_act ILIKE '%improper use of PPE%'\n    OR unsafe_act ILIKE '%PPE%'\nGROUP BY branch\nORDER BY ppe_non_compliance_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the branches with the highest number of PPE non-compliances are North Delhi (29) and South Delhi (26), followed by Bangalore 1 with 19 non-compliances. These three branches represent the most significant areas of concern for PPE adherence."
+    },
+    {
+      "type": "human",
+      "content": "Which employee is associated with the most number of unsafe events? Which hazards are commonly occurring across all regions?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    employee_name, \n    COUNT(*) AS unsafe_event_count\nFROM unsafe_events_srs\nWHERE employee_id IS NOT NULL\nGROUP BY employee_name\nORDER BY unsafe_event_count DESC\nLIMIT 1;\n\nSELECT \n    unsafe_condition,\n    COUNT(*) AS occurrence_count\nFROM unsafe_events_srs\nWHERE unsafe_condition IS NOT NULL\nGROUP BY unsafe_condition\nORDER BY occurrence_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the employee associated with the highest number of unsafe events has 395 events recorded (employee name not specified). Commonly occurring hazards across all regions in srs were not detailed in the provided result, so additional data may be needed to identify those specific unsafe conditions."
+    },
+    {
+      "type": "human",
+      "content": "In each branch which is the most common unsafe behaviour observed?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch,\n    unsafe_act,\n    COUNT(*) AS occurrence_count\nFROM unsafe_events_srs\nWHERE unsafe_act IS NOT NULL\nGROUP BY branch, unsafe_act\nQUALIFY ROW_NUMBER() OVER (PARTITION BY branch ORDER BY COUNT(*) DESC) = 1\nORDER BY branch;"
+    },
+    {
+      "type": "human",
+      "content": "Which branches are most likely to have accidents?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch, \n    COUNT(*) AS accident_count\nFROM unsafe_events_srs\nGROUP BY branch\nORDER BY accident_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The branches with the highest accident counts in the unsafe_events_srs system are North Delhi (522 accidents), INFRA / TRD (297), Bangalore 1 (292), South Delhi (244), and Bangalore 2 (202). These locations are most likely to experience accidents and should be prioritized for targeted safety interventions."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    DATE_TRUNC('month', date_of_unsafe_event) AS event_month,\n    COUNT(*) AS total_incidents\nFROM unsafe_events_srs\nGROUP BY event_month\nORDER BY event_month;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, incident trends show high numbers early in the year with 1,502 incidents in January and 1,553 in February. There was a significant drop to 926 incidents in March, followed by a sharp decline to 19 in April and just 1 incident recorded in June. This indicates a steep reduction in reported incidents after March."
+    },
+    {
+      "type": "human",
+      "content": "give me Top 10 Recurrent Root Causes Most frequent unsafe acts and conditions leading to incidents"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    COALESCE(NULLIF(TRIM(unsafe_act), ''), 'Unknown') AS root_cause,\n    COUNT(*) AS frequency\nFROM unsafe_events_srs\nWHERE unsafe_act IS NOT NULL AND unsafe_act <> ''\nGROUP BY root_cause\nORDER BY frequency DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the top 10 most frequent root causes of unsafe acts and conditions leading to incidents are:\n\n1. Unknown/Not specified (3,280 occurrences)\n2. Other (195)\n3. Lack or improper use of PPE (120)\n4. Operating without following adequate procedure (114)\n5. Failure to inform about unsafe situation (65)\n6. Using defective equipment (45)\n7. Lack of control of elevator (32)\n8. Fall hazard exposure (32)\n9. Uncontrolled electrical (Lockout/tag) (31)\n10. Inadequate jumper device or process (10)"
+    },
+    {
+      "type": "human",
+      "content": "Which age group of employees are most involved in the incidents"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n    CASE\n        WHEN employee_age BETWEEN 20 AND 29 THEN '20-29'\n        WHEN employee_age BETWEEN 30 AND 39 THEN '30-39'\n        WHEN employee_age BETWEEN 40 AND 49 THEN '40-49'\n        WHEN employee_age >= 50 THEN '50+'\n        ELSE 'Unknown'\n    END AS age_group,\n    COUNT(*) AS incident_count\nFROM unsafe_events_srs\nWHERE employee_age IS NOT NULL\nGROUP BY age_group\nORDER BY incident_count DESC\nLIMIT 1;"
+    },
+    {
+      "type": "human",
+      "content": "Which regions are at risk for a serious incident"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    region, \n    COUNT(*) AS serious_incident_count\nFROM \n    unsafe_events_srs\nWHERE \n    serious_near_miss = 'Yes'\nGROUP BY \n    region\nORDER BY \n    serious_incident_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The regions at risk for serious incidents in the srs system are WR 2 with 2 serious incidents, followed by NR 1, SR 1, and SR 2, each with 1 serious incident."
+    },
+    {
+      "type": "human",
+      "content": "Show latest safety insights"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    event_id,\n    reported_date,\n    unsafe_event_type,\n    unsafe_act,\n    unsafe_condition,\n    comments/remarks\nFROM \n    unsafe_events_srs\nORDER BY \n    reported_date DESC\nLIMIT 10;"
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    DATE_TRUNC('month', reported_date) AS month,\n    COUNT(*) AS incident_count\nFROM \n    unsafe_events_srs\nWHERE \n    reported_date IS NOT NULL\nGROUP BY \n    month\nORDER BY \n    month ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system, incident counts showed a significant rise from January 2025 (383 incidents) to a peak in March 2025 (1,727 incidents). After March, there was a sharp decline, dropping to 427 in April and nearly zero incidents in May (3) and June (1). This trend suggests a period of heightened unsafe events early in the year, followed by a strong reduction."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    DATE_TRUNC('month', date_of_unsafe_event) AS month,\n    COUNT(CASE WHEN work_stopped = 'Yes' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0) AS work_stoppage_rate_percent\nFROM \n    unsafe_events_srs\nWHERE \n    date_of_unsafe_event IS NOT NULL\nGROUP BY \n    month\nORDER BY \n    month ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in srs shows some fluctuations from January to June 2025. It started at about 19.8% in January, increased slightly to 21.2% in February, then decreased to 18.1% in March. A significant spike occurred in April with a rate of 36.8%, followed by a drop to near zero in June."
+    },
+    {
+      "type": "human",
+      "content": "Avg Response Time chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    DATE_TRUNC('month', reported_date) AS month,\n    AVG(EXTRACT(EPOCH FROM (updated_at - created_at))/60) AS avg_response_time_minutes\nFROM \n    unsafe_events_srs\nWHERE \n    reported_date IS NOT NULL\n    AND created_at IS NOT NULL\n    AND updated_at IS NOT NULL\nGROUP BY \n    month\nORDER BY \n    month ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The Avg Response Time chart for srs shows no data available for the requested period, indicating there are no recorded response times in unsafe_events_srs at this time."
+    },
+    {
+      "type": "human",
+      "content": "Serious Near Miss Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    DATE_TRUNC('month', date_of_unsafe_event) AS month,\n    COUNT(CASE WHEN serious_near_miss = 'Yes' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0) AS serious_near_miss_rate_percent\nFROM \n    unsafe_events_srs\nWHERE \n    date_of_unsafe_event IS NOT NULL\nGROUP BY \n    month\nORDER BY \n    month ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The Serious Near Miss Rate in srs shows a fluctuating trend from January to March 2025, starting at approximately 0.067%, rising to about 0.129% in February, and peaking around 0.216% in March. Notably, there were no serious near misses recorded in April and June 2025."
+    },
+    {
+      "type": "human",
+      "content": "Serious Near Miss Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    DATE_TRUNC('month', date_of_unsafe_event) AS month,\n    COUNT(CASE WHEN serious_near_miss = 'Yes' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0) AS serious_near_miss_rate_percent\nFROM \n    unsafe_events_srs\nWHERE \n    date_of_unsafe_event IS NOT NULL\nGROUP BY \n    month\nORDER BY \n    month ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The Serious Near Miss Rate in the srs system shows a rising trend from January to March 2025, increasing from approximately 0.07% in January to 0.22% in March. However, the rate dropped to zero in both April and June 2025."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate barc hart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    DATE_TRUNC('month', date_of_unsafe_event) AS month,\n    COUNT(CASE WHEN work_stopped = 'Yes' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0) AS work_stoppage_rate_percent\nFROM \n    unsafe_events_srs\nWHERE \n    date_of_unsafe_event IS NOT NULL\nGROUP BY \n    month\nORDER BY \n    month ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in srs shows monthly variation from January to June 2025. It started at about 19.8% in January, increased slightly to 21.2% in February, then dropped to 18.1% in March. April saw a significant spike to 36.8%, while June indicates essentially no work stoppage at 0%."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    DATE_TRUNC('month', date_of_unsafe_event) AS month,\n    COUNT(CASE WHEN work_stopped = 'Yes' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0) AS work_stoppage_rate_percent\nFROM \n    unsafe_events_srs\nWHERE \n    date_of_unsafe_event IS NOT NULL\nGROUP BY \n    month\nORDER BY \n    month ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in the srs system fluctuated over the first half of 2025, with January at 19.8%, February rising to 21.2%, March dipping to 18.1%, and a notable spike in April reaching 36.8%. By June, the rate dropped significantly to nearly zero."
+    },
+    {
+      "type": "human",
+      "content": "Which branches have the most number of unsafe events related to  PPE non compliances?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch,\n    COUNT(*) AS unsafe_event_count\nFROM \n    unsafe_events_srs\nWHERE \n    (unsafe_act LIKE '%Lack or improper use of PPE%' OR unsafe_act LIKE '%Lack or improper use of PPE,%' OR unsafe_act LIKE '%Lack or improper use of PPE, %' OR unsafe_act LIKE '%Lack or improper use of PPE,%')\nGROUP BY \n    branch\nORDER BY \n    unsafe_event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the branches with the highest number of unsafe events related to PPE non-compliance are North Delhi (29 events), South Delhi (26 events), and Bangalore 1 (19 events). These branches show a notably higher count compared to others, indicating critical areas to focus on for PPE compliance improvements."
+    },
+    {
+      "type": "human",
+      "content": "Show as a pie chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch,\n    COUNT(*) AS unsafe_event_count\nFROM \n    unsafe_events_srs\nWHERE \n    (unsafe_act LIKE '%Lack or improper use of PPE%')\nGROUP BY \n    branch\nORDER BY \n    unsafe_event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The pie chart for unsafe events in the srs system shows North Delhi leading with 29 events, followed by South Delhi with 26, Bangalore 1 with 19, and Mumbai 1 with 11. Other branches each contribute fewer incidents, with RoN at 10 and several branches reporting between 1 to 6 events. This distribution highlights key branches like North and South Delhi as primary focus areas for improving PPE usage compliance."
+    },
+    {
+      "type": "human",
+      "content": "In each branch which is the most common unsafe behaviour observed?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch, \n    unsafe_act,\n    COUNT(*) AS occurrence_count\nFROM \n    unsafe_events_srs\nGROUP BY \n    branch, \n    unsafe_act\nQUALIFY \n    ROW_NUMBER() OVER (PARTITION BY branch ORDER BY COUNT(*) DESC) = 1;"
+    },
+    {
+      "type": "human",
+      "content": "Which are the most commonly observed unsafe behaviours"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    unsafe_act,\n    COUNT(*) AS occurrence_count\nFROM \n    unsafe_events_srs\nGROUP BY \n    unsafe_act\nORDER BY \n    occurrence_count DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the most commonly observed unsafe behaviors are: a large number of entries labeled 'NaN' (3,280 occurrences), followed by 'Other' (195), 'Lack or improper use of PPE' (120), 'Operating without following adequate procedure' (114), and 'Failure to inform about unsafe situation' (65). Other notable behaviors include 'Using defective equipment' (45) and 'Fall hazard exposure' (32)."
+    },
+    {
+      "type": "human",
+      "content": "Which branches are most likely to have accidents?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch, \n    COUNT(*) AS accident_count\nFROM \n    unsafe_events_srs\nGROUP BY \n    branch\nORDER BY \n    accident_count DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "Based on unsafe events in the srs system, the branches most likely to have accidents are North Delhi with 522 incidents, followed by INFRA / TRD (297), Bangalore 1 (292), South Delhi (244), and Bangalore 2 (202). These top five branches account for the highest accident counts and should be prioritized for safety interventions."
+    },
+    {
+      "type": "human",
+      "content": "Where are the night shift incidents located in?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    city,\n    COUNT(*) AS night_shift_incident_count\nFROM \n    unsafe_events_srs\nWHERE \n    shift_timings = '22:00 - 06:00'\nGROUP BY \n    city\nORDER BY \n    night_shift_incident_count DESC;"
+    },
+    {
+      "type": "human",
+      "content": "In which branches are night shift incidents recorded in?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch\nFROM \n    unsafe_events_srs\nWHERE \n    shift_timings = '22:00 - 06:00'\nGROUP BY \n    branch;"
+    },
+    {
+      "type": "human",
+      "content": "Which incidents are reported after 10pm"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    *\nFROM \n    unsafe_events_srs\nWHERE \n    time_of_unsafe_event > '22:00:00';"
+    },
+    {
+      "type": "human",
+      "content": "What are the main causes of work stoppages?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    unsafe_act AS cause, \n    COUNT(*) AS stoppage_count\nFROM \n    unsafe_events_srs\nWHERE \n    work_stopped = 'Yes'\nGROUP BY \n    unsafe_act\nORDER BY \n    stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the main causes of work stoppages are operating without following adequate procedures (49 stoppages), lack or improper use of PPE (38 stoppages), failure to inform about unsafe situations (27 stoppages), and using defective equipment (15 stoppages). Other notable causes include uncontrolled electrical hazards, fall hazard exposure, and lack of control of elevators. There is also a significant number (555) of stoppages with an unspecified cause."
+    },
+    {
+      "type": "human",
+      "content": "Who are the top reporters of unsafe events"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    reporter_name, \n    COUNT(*) AS unsafe_event_count\nFROM \n    unsafe_events_srs\nGROUP BY \n    reporter_name\nORDER BY \n    unsafe_event_count DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "The top reporters of unsafe events in srs are Johndevanand with 63 reports, followed by JoyalFrank (54), AnkitKumar (42), KamleshPrasad (41), and PradeepKumar and AJagadeesan tied at 31 reports each."
+    },
+    {
+      "type": "human",
+      "content": "Show latest safety insights"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    event_id,\n    reported_date,\n    date_of_unsafe_event,\n    unsafe_event_type,\n    unsafe_act,\n    unsafe_condition,\n    reporter_name,\n    site_reference,\n    city,\n    branch,\n    region,\n    comments_remarks,\n    action_description_1,\n    work_stopped,\n    stop_work_duration,\n    db_uploaded_date\nFROM \n    unsafe_events_srs\nORDER BY \n    reported_date DESC,\n    db_uploaded_date DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "The latest safety insights from the srs system show 10 recent unsafe events reported between March and June 2025. Key findings include recurring pit access hazards at Raymond The Address and SCO 84 Ranjeet Avenue, falling objects and housekeeping issues reported at multiple sites, and unsafe acts such as uncontrolled lockout/tagout and open equipment covers primarily at 1 Vipin Garden and AIIMS Dental sites. Most events did not result in work stoppage, except one falling objects hazard incident in North Delhi which stopped work for less than a day. Actions taken included immediate hazard clearance, communication with customers, and material removal. These insights highlight persistent hazards like pit access, tripping, and electrical control that require ongoing attention to maintain compliance and improve safety."
+    },
+    {
+      "type": "human",
+      "content": "Which branches have the most number of unsafe events related to PPE non compliances?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch, \n    COUNT(*) AS unsafe_event_count\nFROM \n    unsafe_events_srs\nWHERE \n    unsafe_act ILIKE '%PPE%'\n    OR unsafe_act ILIKE '%Lack or improper use of PPE%'\nGROUP BY \n    branch\nORDER BY \n    unsafe_event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the branches with the highest number of unsafe events related to PPE non-compliance are North Delhi with 29 events, South Delhi with 26 events, and Bangalore 1 with 19 events. These branches show significantly higher counts compared to others like Mumbai 1 (11 events) and RoN (10 events)."
+    },
+    {
+      "type": "human",
+      "content": "show me a pie chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch, \n    COUNT(*) AS unsafe_event_count\nFROM \n    unsafe_events_srs\nWHERE \n    unsafe_act ILIKE '%PPE%'\n    OR unsafe_act ILIKE '%Lack or improper use of PPE%'\nGROUP BY \n    branch\nORDER BY \n    unsafe_event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "Here is the distribution of unsafe events related to PPE issues across branches in the srs system: North Delhi leads with 29 events, followed by South Delhi (26), Bangalore 1 (19), Mumbai 1 (11), and RoN (10). The remaining branches report fewer than 10 events each, with several branches having just 1 event."
+    },
+    {
+      "type": "human",
+      "content": "show bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch, \n    COUNT(*) AS unsafe_event_count\nFROM \n    unsafe_events_srs\nWHERE \n    unsafe_act ILIKE '%PPE%'\n    OR unsafe_act ILIKE '%Lack or improper use of PPE%'\nGROUP BY \n    branch\nORDER BY \n    unsafe_event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The bar chart shows the count of unsafe events related to PPE issues across branches in the srs system. North Delhi has the highest number with 29 events, followed by South Delhi with 26, and Bangalore 1 with 19. Other branches report fewer incidents, with many branches having fewer than 5 events each. This highlights key locations requiring focused PPE compliance and safety reinforcement."
+    },
+    {
+      "type": "human",
+      "content": "For incidents reported, how many employees had expired trainings"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    COUNT(DISTINCT employee_id) AS employees_with_expired_training\nFROM \n    unsafe_events_srs\nWHERE \n    training_expiry_date IS NOT NULL\n    AND training_expiry_date < reported_date\n    AND employee_id IS NOT NULL;"
+    },
+    {
+      "type": "human",
+      "content": "\u2060Which branches have the most number of unsafe events related to PPE non compliances?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch, \n    COUNT(*) AS unsafe_event_count\nFROM \n    unsafe_events_srs\nWHERE \n    unsafe_act ILIKE '%PPE%'\nGROUP BY \n    branch\nORDER BY \n    unsafe_event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the branches with the highest number of unsafe events related to PPE non-compliances are North Delhi (29 events), South Delhi (26 events), and Bangalore 1 (19 events). These branches lead in reported PPE-related unsafe acts compared to others."
+    },
+    {
+      "type": "human",
+      "content": "Which branches in WR2 have the most number of unsafe events related to PPE non compliances?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    branch, \n    COUNT(*) AS unsafe_event_count\nFROM \n    unsafe_events_srs\nWHERE \n    region = 'WR 2'\n    AND unsafe_act ILIKE '%PPE%'\nGROUP BY \n    branch\nORDER BY \n    unsafe_event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system for WR2, the branches Ahmedabad & MP and Chhattisgarh & Nagpur have the highest number of unsafe events related to PPE non-compliances, each with 4 events, followed by Pune 1 and Surat with 3 events each."
+    },
+    {
+      "type": "human",
+      "content": "What are the main reasons for the work stoppages observed"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    unsafe_act AS main_reason, \n    COUNT(*) AS stoppage_count\nFROM \n    unsafe_events_srs\nWHERE \n    work_stopped = 'Yes'\nGROUP BY \n    unsafe_act\nORDER BY \n    stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The main reasons for work stoppages in the srs system are predominantly categorized as \"NaN\" with 555 stoppages, followed by operating without following adequate procedure (49 stoppages), other unspecified reasons (42), lack or improper use of PPE (38), and failure to inform about unsafe situations (27). Additional causes include using defective equipment, uncontrolled electrical hazards (lockout/tag), fall hazard exposure, and lack of control of elevator, each contributing fewer stoppages."
+    },
+    {
+      "type": "human",
+      "content": "What are the main causes of work stoppages?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    unsafe_act AS main_cause, \n    COUNT(*) AS stoppage_count\nFROM \n    unsafe_events_srs\nWHERE \n    work_stopped = 'Yes'\nGROUP BY \n    unsafe_act\nORDER BY \n    stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the main causes of work stoppages are primarily attributed to \"Operating without following adequate procedure\" (49 stoppages), followed by \"Lack or improper use of PPE\" (38 stoppages), \"Failure to inform about unsafe situation\" (27 stoppages), and \"Using defective equipment\" and \"Uncontrolled electrical (Lockout/tag)\" each with 15 stoppages. Other notable causes include fall hazard exposure and lack of control of elevator, with several stoppages also recorded under combined or multiple causes. The largest count (555) is listed as undefined or NaN."
+    },
+    {
+      "type": "human",
+      "content": "give me work stoppage analysis"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    unsafe_act AS reason, \n    COUNT(*) AS stoppage_count,\n    stop_work_duration\nFROM \n    unsafe_events_srs\nWHERE \n    work_stopped = 'Yes'\nGROUP BY \n    unsafe_act,\n    stop_work_duration\nORDER BY \n    stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the majority of work stoppages (521 incidents) lasted one day or less with unspecified reasons. Key identified causes for stoppages of one day or less include operating without following adequate procedure (49), lack or improper use of PPE (38), failure to inform about unsafe situations (27), using defective equipment (15), and uncontrolled electrical lockout/tag (15). Longer stoppages (more than one day) were fewer, with 34 events having unspecified reasons and 1 associated with hoisting/rigging failure. Overall, most stoppages were short-duration and linked to procedural non-compliance, PPE issues, and communication failures."
+    },
+    {
+      "type": "human",
+      "content": "what is the reason for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    unsafe_act AS reason_for_work_stoppage,\n    COUNT(*) AS stoppage_count\nFROM \n    unsafe_events_srs\nWHERE \n    work_stopped = 'Yes'\nGROUP BY \n    unsafe_act\nORDER BY \n    stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the leading reason for work stoppage is unknown or not specified (555 instances). Among known causes, the most frequent are operating without following adequate procedures (49 stoppages), general or other reasons (42), lack or improper use of PPE (38), and failure to inform about unsafe situations (27). Other notable reasons include using defective equipment and uncontrolled electrical hazards, each causing 15 stoppages."
+    },
+    {
+      "type": "human",
+      "content": "what are the reasons for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    unsafe_act AS reason_for_work_stoppage,\n    COUNT(*) AS stoppage_count\nFROM \n    unsafe_events_srs\nWHERE \n    work_stopped = 'Yes'\nGROUP BY \n    unsafe_act\nORDER BY \n    stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, work stoppages primarily occur due to operating without following adequate procedure (49 instances), lack or improper use of PPE (38), failure to inform about unsafe situations (27), using defective equipment (15), and uncontrolled electrical hazards (15). Other reasons include fall hazard exposure, lack of control of elevator, and hoisting/rigging failures. Notably, there are 555 instances with unspecified reasons (NaN). These insights highlight key areas to focus on for improving compliance and safety practices."
+    },
+    {
+      "type": "human",
+      "content": "What about no work happening in delhi region"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    unsafe_act AS reason_for_work_stoppage,\n    COUNT(*) AS stoppage_count\nFROM \n    unsafe_events_srs\nWHERE \n    work_stopped = 'Yes'\n    AND subcontractor_city LIKE '%Delhi%'\nGROUP BY \n    unsafe_act\nORDER BY \n    stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, work stoppages in the Delhi region occurred 38 times due to various unsafe acts. The most frequent reason, with 19 instances, was unspecified (\"NaN\"). Other common causes included operating without following adequate procedure (6 times), failure to inform about unsafe situations (5 times), and lack or improper use of PPE (4 times). Additional causes involved fall hazard exposure, lack of control of elevator, and unsafe positioning in hoistways."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    date_of_unsafe_event,\n    COUNT(*) AS incident_count\nFROM \n    unsafe_events_srs\nGROUP BY \n    date_of_unsafe_event\nORDER BY \n    date_of_unsafe_event;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, incident counts started low in early January 2025 but showed a sharp increase mid-January, peaking multiple times with counts above 100 around late January and February. After February, incident counts fluctuate but generally remain elevated compared to early January, with occasional dips in March and April. This indicates a notable upward trend in unsafe events over the reported period."
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    unsafe_act AS reason_for_work_stoppage,\n    COUNT(*) AS stoppage_count\nFROM \n    unsafe_events_srs\nWHERE \n    work_stopped = 'Yes'\nGROUP BY \n    unsafe_act\nORDER BY \n    stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The Work Stoppage Rate data from the srs system shows that the highest number of stoppages (555) have an unspecified reason (NaN). Among specified reasons, the most frequent causes are operating without following adequate procedure (49 stoppages), followed by \"Other\" reasons (42), and lack or improper use of PPE (38). Additional common causes include failure to inform about unsafe situations (27), using defective equipment (15), uncontrolled electrical hazards (15), and fall hazard exposure (11). Multiple entries reflect combined causes, indicating recurring issues with procedural adherence, communication of unsafe conditions, and PPE usage."
+    },
+    {
+      "type": "human",
+      "content": "Serious Near Miss Rate bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    date_of_unsafe_event::date AS event_date,\n    COUNT(*) FILTER (WHERE serious_near_miss = 'Yes') AS serious_near_miss_count,\n    COUNT(*) AS total_events,\n    ROUND(\n        100.0 * COUNT(*) FILTER (WHERE serious_near_miss = 'Yes') / NULLIF(COUNT(*),0), 2\n    ) AS serious_near_miss_rate_percent\nFROM \n    unsafe_events_srs\nGROUP BY \n    event_date\nORDER BY \n    event_date;"
+    },
+    {
+      "type": "ai",
+      "content": "The Serious Near Miss Rate in srs shows a consistently low rate, with most days reporting 0% serious near misses despite varying total event counts. Notable exceptions include a few dates with a slight increase: January 6 (1.79%), February 10 (1.82%), February 14 (1.69%), March 7 (3.23%), and March 11 (2.50%). Overall, serious near misses are rare across the monitored period."
+    },
+    {
+      "type": "human",
+      "content": "Avg Response Time bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    date_of_unsafe_event::date AS event_date,\n    AVG(EXTRACT(EPOCH FROM (reported_date - date_of_unsafe_event))) / 60 AS avg_response_time_minutes\nFROM \n    unsafe_events_srs\nWHERE \n    reported_date IS NOT NULL \n    AND date_of_unsafe_event IS NOT NULL\nGROUP BY \n    event_date\nORDER BY \n    event_date;"
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS unsafe_events_without_actions\nFROM unsafe_events_srs\nWHERE (unsafe_event_type LIKE '%Unsafe%')\n  AND (action_description_1 IS NULL OR TRIM(action_description_1) = '');"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there are currently no unsafe events without actions created."
+    },
+    {
+      "type": "human",
+      "content": "show me chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    date_of_unsafe_event::date AS event_date,\n    COUNT(*) AS total_events,\n    SUM(CASE WHEN serious_near_miss = 'Yes' THEN 1 ELSE 0 END) AS serious_near_miss_count,\n    ROUND(\n        CASE \n            WHEN COUNT(*) = 0 THEN 0\n            ELSE SUM(CASE WHEN serious_near_miss = 'Yes' THEN 1 ELSE 0 END)::decimal / COUNT(*) * 100\n        END, 2\n    ) AS serious_near_miss_rate_percent\nFROM \n    unsafe_events_srs\nWHERE \n    date_of_unsafe_event IS NOT NULL\nGROUP BY \n    event_date\nORDER BY \n    event_date;"
+    },
+    {
+      "type": "ai",
+      "content": "Here is the summary of unsafe events in the srs system by date from January to April 2025: daily total events range from 1 to 122, with most days having no serious near misses. Serious near miss counts are very low, only occurring on a few dates with rates between 1.69% and 3.23%. The highest event volume days (e.g., January 23 with 107 events, February 25 with 122 events) show zero serious near misses. Overall, serious near misses remain rare despite fluctuations in total event counts."
+    },
+    {
+      "type": "human",
+      "content": "5 serious incidents out of 4000 total bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    'Serious' AS incident_type,\n    5 AS count\nUNION ALL\nSELECT \n    'Total',\n    4000;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there were 5 serious incidents out of a total of 4,000 unsafe events, as shown in the bar chart."
+    },
+    {
+      "type": "human",
+      "content": "show me visualizztion chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    'Serious' AS incident_type,\n    5 AS count\nUNION ALL\nSELECT \n    'Total',\n    4000;"
+    },
+    {
+      "type": "ai",
+      "content": "The visualization chart for unsafe_events_srs_enriched shows 5 serious incidents out of a total of 4,000 incidents recorded."
+    },
+    {
+      "type": "human",
+      "content": "5 serious incidents out of 4000 total"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n    'Serious' AS incident_type, \n    COUNT(*) AS count\nFROM unsafe_events_srs_enriched\nWHERE serious_near_miss = 'Yes'\nUNION ALL\nSELECT \n    'Total' AS incident_type, \n    COUNT(*) AS count\nFROM unsafe_events_srs_enriched;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, there have been 5 serious incidents out of a total of 4,000 unsafe events reported."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS count_no_actions_created\nFROM unsafe_events_srs_enriched\nWHERE (action_description_1 IS NULL OR TRIM(action_description_1) = '')\n  AND (action_description_2 IS NULL OR TRIM(action_description_2) = '')\n  AND (action_description_3 IS NULL OR TRIM(action_description_3) = '')\n  AND (action_description_4 IS NULL OR TRIM(action_description_4) = '')\n  AND (action_description_5 IS NULL OR TRIM(action_description_5) = '');"
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events are related to PPE non compliance?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS count_unsafe_events_ppe_non_compliance\nFROM unsafe_events_srs_enriched\nWHERE unsafe_act ILIKE '%Lack or improper use of PPE%';"
+    },
+    {
+      "type": "ai",
+      "content": "There are 138 unsafe events related to PPE non-compliance recorded in the srs system."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events are related to PPE non compliance?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS count_unsafe_events_ppe_non_compliance\nFROM unsafe_events_srs_enriched\nWHERE unsafe_act ILIKE '%Lack or improper use of PPE%';"
+    },
+    {
+      "type": "ai",
+      "content": "There are 138 unsafe events related to PPE non-compliance recorded in the srs system."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events are related to PPE non compliance?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS count_unsafe_events_ppe_non_compliance\nFROM unsafe_events_srs_enriched\nWHERE unsafe_act ILIKE '%Lack or improper use of PPE%';"
+    },
+    {
+      "type": "ai",
+      "content": "There are 138 unsafe events related to PPE non-compliance recorded in the srs system."
+    },
+    {
+      "type": "human",
+      "content": "bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT unsafe_event_location, COUNT(*) AS event_count\nFROM unsafe_events_srs_enriched\nWHERE unsafe_act ILIKE '%Lack or improper use of PPE%'\nGROUP BY unsafe_event_location\nORDER BY event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the highest number of unsafe events due to lack or improper use of PPE occurred in the Hoistway (91 events), followed by the Landing (15), Others (14), Car top (8), Escalator (5), Warehouse/Logistic area (3), Pit (1), and Machine Room (1)."
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events are related to PPE non compliance?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS count_unsafe_events_ppe_non_compliance\nFROM unsafe_events_srs_enriched\nWHERE unsafe_act ILIKE '%Lack or improper use of PPE%';"
+    },
+    {
+      "type": "ai",
+      "content": "There are 138 unsafe events related to PPE non-compliance reported in the srs system."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT date_of_unsafe_event, COUNT(*) AS incident_count\nFROM unsafe_events_srs_enriched\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event;"
+    },
+    {
+      "type": "ai",
+      "content": "The incident trends for the srs system show a significant increase in unsafe events starting around early January 2025, with daily counts rising from single digits to peaks above 100 incidents by late January and February. After February, incidents remain relatively high but fluctuate, gradually declining toward March and April, though occasional spikes still occur. This indicates a period of heightened safety risks in early 2025 within srs that may require focused attention."
+    },
+    {
+      "type": "human",
+      "content": "Before heavy vehicle entry?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS count_unsafe_events_before_heavy_vehicle_entry\nFROM unsafe_events_srs_enriched\nWHERE (unsafe_act ILIKE '%heavy vehicle entry%' OR comments/remarks ILIKE '%heavy vehicle entry%' OR unsafe_act_other ILIKE '%heavy vehicle entry%' OR other_safety_issues ILIKE '%heavy vehicle entry%' OR action_description_1 ILIKE '%heavy vehicle entry%');"
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events have no actions created?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS count_unsafe_events_no_actions\nFROM unsafe_events_srs_enriched\nWHERE action_description_1 IS NULL\n  AND action_description_2 IS NULL\n  AND action_description_3 IS NULL\n  AND action_description_4 IS NULL\n  AND action_description_5 IS NULL;"
+    },
+    {
+      "type": "human",
+      "content": "How many unsafe events are related to PPE non compliance?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS count_unsafe_events_ppe_non_compliance\nFROM unsafe_events_srs_enriched\nWHERE unsafe_act ILIKE '%PPE non compliance%'\n   OR unsafe_act ILIKE '%Lack or improper use of PPE%'\n   OR unsafe_act_other ILIKE '%PPE non compliance%'\n   OR unsafe_act_other ILIKE '%Lack or improper use of PPE%'\n   OR other_safety_issues ILIKE '%PPE non compliance%'\n   OR other_safety_issues ILIKE '%Lack or improper use of PPE%'\n   OR comments_remarks ILIKE '%PPE non compliance%'\n   OR comments_remarks ILIKE '%Lack or improper use of PPE%'\n   OR action_description_1 ILIKE '%PPE non compliance%'\n   OR action_description_1 ILIKE '%Lack or improper use of PPE%'\n   OR action_description_2 ILIKE '%PPE non compliance%'\n   OR action_description_2 ILIKE '%Lack or improper use of PPE%'\n   OR action_description_3 ILIKE '%PPE non compliance%'\n   OR action_description_3 ILIKE '%Lack or improper use of PPE%'\n   OR action_description_4 ILIKE '%PPE non compliance%'\n   OR action_description_4 ILIKE '%Lack or improper use of PPE%'\n   OR action_description_5 ILIKE '%PPE non compliance%'\n   OR action_description_5 ILIKE '%Lack or improper use of PPE%';"
+    },
+    {
+      "type": "human",
+      "content": "Work Stoppage Rate"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  COUNT(*) FILTER (WHERE work_stopped = 'Yes')::float / NULLIF(COUNT(*),0) AS work_stoppage_rate\nFROM unsafe_events_srs_enriched;"
+    },
+    {
+      "type": "ai",
+      "content": "The work stoppage rate in the srs system is 0.2005, indicating that about 20.05% of unsafe events led to work being stopped."
+    },
+    {
+      "type": "human",
+      "content": "what are the main causes of work stoppages"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_act AS cause,\n  COUNT(*) AS occurrence_count\nFROM unsafe_events_srs_enriched\nWHERE work_stopped = 'Yes'\nGROUP BY unsafe_act\nORDER BY occurrence_count DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the main causes of work stoppages are primarily due to using makeshift tools (555 occurrences), followed by operating without adequate procedure (49), bypassing safety interlocks (42), and lack or improper use of PPE (38). Other notable causes include failure to report unsafe situations (27), uncontrolled electrical lockout/tag procedures (15), using defective equipment (15), fall hazard exposure (11), and lack of control of elevators (10). These causes highlight critical areas to address for reducing work stoppages and improving safety compliance."
+    },
+    {
+      "type": "human",
+      "content": "what are the main causes of work stoppages"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_act AS cause,\n  COUNT(*) AS occurrence_count\nFROM unsafe_events_srs_enriched\nWHERE work_stopped = 'Yes'\nGROUP BY unsafe_act\nORDER BY occurrence_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The main causes of work stoppages in the srs system are predominantly due to unsafe acts such as using makeshift tools (555 occurrences), operating without following adequate procedures (49 occurrences), bypassing safety interlocks (42 occurrences), and lack or improper use of PPE (38 occurrences). Other notable causes include failure to inform about unsafe situations (27 occurrences), using defective equipment (15 occurrences), and uncontrolled electrical hazards like lockout/tagout failures (15 occurrences). These findings highlight key behavioral and equipment-related risks that should be prioritized to reduce work stoppages."
+    },
+    {
+      "type": "human",
+      "content": "what are the reasons for work stoppage"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_act AS reason_for_work_stoppage,\n  COUNT(*) AS occurrence_count\nFROM unsafe_events_srs_enriched\nWHERE work_stopped = 'Yes'\nGROUP BY unsafe_act\nORDER BY occurrence_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the primary reasons for work stoppage are predominantly due to unsafe acts such as using makeshift tools (555 occurrences), operating without following adequate procedure (49 occurrences), bypassing safety interlocks (42 occurrences), and lack or improper use of PPE (38 occurrences). Other notable causes include failure to inform about unsafe situations (27), using defective equipment (15), uncontrolled electrical hazards (15), and fall hazard exposures (11). These findings highlight critical areas to target for improving safety compliance and minimizing interruptions."
+    },
+    {
+      "type": "human",
+      "content": "show me the bar chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_act AS cause,\n  COUNT(*) AS occurrence_count\nFROM unsafe_events_srs_enriched\nWHERE work_stopped = 'Yes'\nGROUP BY unsafe_act\nORDER BY occurrence_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The bar chart for unsafe acts in the srs system where work was stopped shows \"Using makeshift tools\" as the leading cause with 555 occurrences, significantly higher than others. Following causes include \"Operating without following adequate procedure\" (49 occurrences), \"Bypassing safety interlocks\" (42), and \"Lack or improper use of PPE\" (38). Other causes have notably fewer occurrences, mostly below 30. This highlights the critical risk areas to address in safety protocols and training."
+    },
+    {
+      "type": "human",
+      "content": "where is the chart?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT \n  unsafe_act AS cause,\n  COUNT(*) AS occurrence_count\nFROM unsafe_events_srs_enriched\nWHERE work_stopped = 'Yes'\nGROUP BY unsafe_act\nORDER BY occurrence_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The chart showing causes of unsafe acts leading to work stoppage in the srs system is not included here. However, the data lists top causes with occurrence counts, such as \"Using makeshift tools\" (555 occurrences), \"Operating without following adequate procedure\" (49), and \"Bypassing safety interlocks\" (42), among others. If you need the chart visualization, please specify so it can be generated or located."
+    },
+    {
+      "type": "human",
+      "content": "show the unsafe incidents"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT * FROM unsafe_events_srs_enriched;"
+    },
+    {
+      "type": "human",
+      "content": "try again"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT * FROM unsafe_events_srs_enriched;"
+    },
+    {
+      "type": "human",
+      "content": "how many safety incidents breach did i have in March 1 2025"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT COUNT(*) AS safety_incident_breach_count\nFROM unsafe_events_srs_enriched\nWHERE reported_date = '2025-03-01';"
+    },
+    {
+      "type": "ai",
+      "content": "On March 1, 2025, there were 118 safety incident breaches recorded in the srs system."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  date_of_unsafe_event,\n  COUNT(*) AS incident_count\nFROM unsafe_events_srs_enriched\nGROUP BY date_of_unsafe_event\nORDER BY date_of_unsafe_event;"
+    },
+    {
+      "type": "ai",
+      "content": "The incident trend for srs shows a general increase over time, starting with low daily counts (2-7 incidents) in early January 2025, followed by significant spikes reaching over 100 incidents on multiple days later in January and February. After February, incident counts fluctuate between moderate levels (around 30-80 incidents) with occasional drops to very low numbers. The trend indicates periods of heightened incident frequency, especially around late January and late February, signaling areas requiring focused safety interventions."
+    },
+    {
+      "type": "human",
+      "content": "what is the general industry figures ?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  COUNT(*) AS total_incidents,\n  COUNT(DISTINCT reporter_id) AS total_reporters,\n  COUNT(DISTINCT employee_id) AS total_employees_involved,\n  COUNT(DISTINCT subcontractor_id) AS total_subcontractors,\n  COUNT(DISTINCT site_reference) AS total_sites,\n  MIN(date_of_unsafe_event) AS first_incident_date,\n  MAX(date_of_unsafe_event) AS latest_incident_date\nFROM unsafe_events_srs_enriched;"
+    },
+    {
+      "type": "human",
+      "content": "general safety incidenta"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  COUNT(*) AS incident_count\nFROM unsafe_events_srs_enriched\nGROUP BY unsafe_event_type\nORDER BY incident_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the majority of safety incidents are Unsafe Conditions with 3,181 reported cases, followed by Unsafe Acts at 633 incidents. Near Misses are significantly fewer, totaling 94. There are also combined event types involving Unsafe Acts, Unsafe Conditions, and Near Misses, but these occur less frequently."
     }
   ],
-  "question": "Which branches are most likely to have accidents?",
-  "intent": "system_query",
+  "question": "hi",
+  "intent": "general",
   "database_ddl": "unsafe_events_srs(event_id VARCHAR(100), reporter_name VARCHAR(255), reported_date DATE, reporter_id VARCHAR(100), date_of_unsafe_event DATE, time_of_unsafe_event VARCHAR(50), unsafe_event_type VARCHAR(255), business_details VARCHAR(255), site_reference TEXT, unsafe_event_location VARCHAR(255), product_type VARCHAR(255), employee_id VARCHAR(100), employee_name VARCHAR(255), subcontractor_company_name VARCHAR(255), subcontractor_id VARCHAR(100), subcontractor_city VARCHAR(255), subcontractor_name VARCHAR(255), kg_name VARCHAR(100), country_name VARCHAR(100), division VARCHAR(255), department VARCHAR(255), city VARCHAR(255), sub_area VARCHAR(100), district VARCHAR(255), zone VARCHAR(255), serious_near_miss VARCHAR(10), unsafe_act TEXT, unsafe_act_other TEXT, unsafe_condition TEXT, unsafe_condition_other TEXT, work_stopped VARCHAR(10), stop_work_nogo_violation VARCHAR(10), nogo_violation_detail TEXT, stop_work_duration VARCHAR(255), other_safety_issues TEXT, comments_remarks TEXT, event_requires_sanction VARCHAR(10), action_description_1 TEXT, action_description_2 TEXT, action_description_3 TEXT, action_description_4 TEXT, action_description_5 TEXT, branch VARCHAR(255), region VARCHAR(100), db_uploaded_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP);unsafe_events_ei_tech (event_id INTEGER, reporter_name VARCHAR(255), manager_name VARCHAR(255), branch VARCHAR(255), reported_date DATE, reporter_id VARCHAR(100), date_of_unsafe_event DATE, time VARCHAR(50), time_of_unsafe_event VARCHAR(50), unsafe_event_type VARCHAR(255), business_details VARCHAR(255), site_reference TEXT, unsafe_event_location VARCHAR(255), product_type VARCHAR(255), employee_id VARCHAR(100), employee_name VARCHAR(255), subcontractor_company_name VARCHAR(255), subcontractor_id VARCHAR(100), subcontractor_city VARCHAR(255), subcontractor_name VARCHAR(255), kg_name VARCHAR(100), country_name VARCHAR(100), division VARCHAR(255), department VARCHAR(255), city VARCHAR(255), sub_area VARCHAR(100), district VARCHAR(255), zone VARCHAR(255), serious_near_miss VARCHAR(10), unsafe_act VARCHAR(255), unsafe_act_other TEXT, unsafe_condition TEXT, unsafe_condition_other TEXT, work_stopped VARCHAR(10), stop_work_nogo_violation VARCHAR(255), nogo_violation_detail TEXT, stop_work_duration VARCHAR(255), other_safety_issues TEXT, comments_remarks TEXT, event_requires_sanction VARCHAR(10), action_description_1 TEXT, action_description_2 TEXT, action_description_3 TEXT, action_description_4 TEXT, action_description_5 TEXT, image VARCHAR(500), status VARCHAR(50), region VARCHAR(100), db_uploaded_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP); unsafe_events_ni_tct (reporting_id INTEGER, status_key VARCHAR(50), status VARCHAR(50), location_key INTEGER, location VARCHAR(255), branch_key INTEGER, no INTEGER, branch_name VARCHAR(255), region_key VARCHAR(100), region VARCHAR(100), reporter_sap_id VARCHAR(100), reporter_name VARCHAR(255), designation_key VARCHAR(50), designation VARCHAR(255), gl_id_key VARCHAR(100), gl_id VARCHAR(255), pe_id_key VARCHAR(100), pe_id VARCHAR(255), created_on TIMESTAMP, date_and_time_of_unsafe_event TIMESTAMP, type_of_unsafe_event_key VARCHAR(50), type_of_unsafe_event VARCHAR(255), unsafe_event_details_key VARCHAR(50), unsafe_event_details TEXT, action_related_to_high_risk_situation_key VARCHAR(10), action_related_to_high_risk_situation VARCHAR(10), business_details_key VARCHAR(50), business_details VARCHAR(255), site_name TEXT, site_reference_key VARCHAR(50), site_reference VARCHAR(255), product_type_key VARCHAR(50), product_type VARCHAR(255), persons_involved TEXT, work_was_stopped_key VARCHAR(10), work_was_stopped VARCHAR(10), work_stopped_hours VARCHAR(50), no_go_violation_key VARCHAR(50), no_go_violation VARCHAR(255), job_no VARCHAR(100), additional_comments TEXT, has_attachment BOOLEAN, attachment VARCHAR(500), db_uploaded_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP);",
   "total_database_semantics": {
     "unsafe_events_srs": {
