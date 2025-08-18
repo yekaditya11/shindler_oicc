@@ -217,49 +217,39 @@ class NITCTKPIQueries:
         """Categorize work stoppage duration into One Day or Less vs More than one day, including NO cases."""
         query = f"""
         SELECT
-            work_was_stopped,
             duration_category,
             COUNT(*) as event_count
         FROM (
             SELECT
                 reporting_id,
-                CASE 
-                    WHEN UPPER(TRIM(COALESCE(work_was_stopped, ''))) = 'YES' THEN 'YES'
-                    WHEN UPPER(TRIM(COALESCE(work_was_stopped, ''))) = 'NO' THEN 'NO'
-                    ELSE COALESCE(work_was_stopped, 'Unknown')
-                END as work_was_stopped,
                 work_stopped_hours,
                 CASE
+                    WHEN UPPER(TRIM(COALESCE(work_was_stopped, ''))) != 'YES' THEN 'No Work Stoppage'
                     WHEN UPPER(TRIM(COALESCE(work_was_stopped, ''))) = 'YES' THEN
                         CASE
-                            WHEN work_stopped_hours IS NULL OR TRIM(CAST(work_stopped_hours AS TEXT)) = '' THEN ''
+                            WHEN work_stopped_hours IS NULL OR TRIM(CAST(work_stopped_hours AS TEXT)) = '' THEN 'No Work Stoppage'
                             WHEN CAST(work_stopped_hours AS TEXT) ~ '^[0-9]+\.?[0-9]*$' THEN
                                 CASE
                                     WHEN CAST(work_stopped_hours AS NUMERIC) <= 24 THEN 'One Day or Less'
-                                    WHEN CAST(work_stopped_hours AS NUMERIC) > 24 THEN 'More than one day'
+                                    WHEN CAST(work_stopped_hours AS NUMERIC) > 24 THEN 'More than One Day'
                                     ELSE 'Other Duration'
                                 END
                             ELSE 'Other Duration'
                         END
-                    WHEN UPPER(TRIM(COALESCE(work_was_stopped, ''))) = 'NO' THEN ''
-                    ELSE ''
+                    ELSE 'Work Stoppage Status Unknown'
                 END as duration_category
             FROM {self.table_name}
             WHERE reporting_id IS NOT NULL
             {self.date_filter}
         ) categorized_events
-        GROUP BY work_was_stopped, duration_category
+        GROUP BY duration_category
         ORDER BY
-            CASE work_was_stopped
-                WHEN 'NO' THEN 1
-                WHEN 'YES' THEN 2
-                ELSE 3
-            END,
             CASE duration_category
-                WHEN '' THEN 1
+                WHEN 'No Work Stoppage' THEN 1
                 WHEN 'One Day or Less' THEN 2
-                WHEN 'More than one day' THEN 3
-                ELSE 4
+                WHEN 'More than One Day' THEN 3
+                WHEN 'Other Duration' THEN 4
+                ELSE 5
             END
         """
         return self.execute_query(query, {}, session)

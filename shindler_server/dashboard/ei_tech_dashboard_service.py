@@ -465,42 +465,36 @@ class EITechDashboardService:
 
             query = f"""
             SELECT
-                work_was_stopped,
                 duration_category,
                 COUNT(*) as event_count
             FROM (
                 SELECT
                     {config['primary_key']},
-                    {config['work_stopped_field']} as work_was_stopped,
                     stop_work_duration,
                     CASE
-                        WHEN LOWER(COALESCE({config['work_stopped_field']}, '')) != 'yes' THEN 'NO'
+                        WHEN LOWER(COALESCE({config['work_stopped_field']}, '')) != 'yes' THEN 'No Work Stoppage'
                         WHEN LOWER(COALESCE({config['work_stopped_field']}, '')) = 'yes' THEN
                             CASE
                                 WHEN LOWER(TRIM(COALESCE(stop_work_duration, ''))) = 'one day or less' THEN 'One Day or Less'
-                                WHEN LOWER(TRIM(COALESCE(stop_work_duration, ''))) = 'more than one day' THEN 'More than one day'
-                                WHEN stop_work_duration IS NULL OR TRIM(stop_work_duration) = '' THEN ''
+                                WHEN LOWER(TRIM(COALESCE(stop_work_duration, ''))) = 'more than one day' THEN 'More than One Day'
+                                WHEN stop_work_duration IS NULL OR TRIM(stop_work_duration) = '' THEN 'No Work Stoppage'
                                 ELSE 'Other Duration'
                             END
-                        ELSE 'Unknown'
+                        ELSE 'Work Stoppage Status Unknown'
                     END as duration_category
                 FROM {config['table_name']}
                 WHERE {config['primary_key']} IS NOT NULL
                     AND {config['event_date_field']} BETWEEN :start_date AND :end_date
                     {region_filter}
             ) categorized_events
-            GROUP BY work_was_stopped, duration_category
+            GROUP BY duration_category
             ORDER BY
-                CASE work_was_stopped
-                    WHEN 'NO' THEN 1
-                    WHEN 'YES' THEN 2
-                    ELSE 3
-                END,
                 CASE duration_category
-                    WHEN '' THEN 1
+                    WHEN 'No Work Stoppage' THEN 1
                     WHEN 'One Day or Less' THEN 2
-                    WHEN 'More than one day' THEN 3
-                    ELSE 4
+                    WHEN 'More than One Day' THEN 3
+                    WHEN 'Other Duration' THEN 4
+                    ELSE 5
                 END
             """
 
