@@ -79,14 +79,53 @@ class TextToSQLWorkflow:
             openai_api_version=os.environ["AZURE_OPENAI_API_VERSION"],
             api_key=os.environ["AZURE_OPENAI_API_KEY"]
         )
-        # Create individual handlers for each agent
-        self.intent_handler = CallbackHandler()
-        self.greeting_handler = CallbackHandler()
-        self.table_id_handler = CallbackHandler()
-        self.text_to_sql_handler = CallbackHandler()
-        self.summarizer_handler = CallbackHandler()
-        self.clarification_handler = CallbackHandler()
-        self.visualization_handler = CallbackHandler()
+        
+        # Create individual handlers for each agent with proper Langfuse configuration
+        if LANGFUSE_AVAILABLE:
+            # Create Langfuse client for handlers
+            import langfuse
+            langfuse_client = langfuse.Langfuse()
+            
+            # Create handlers with proper configuration
+            self.intent_handler = CallbackHandler(
+                langfuse=langfuse_client,
+                trace_name="intent_classification_agent"
+            )
+            self.greeting_handler = CallbackHandler(
+                langfuse=langfuse_client,
+                trace_name="greeting_agent"
+            )
+            self.table_id_handler = CallbackHandler(
+                langfuse=langfuse_client,
+                trace_name="table_identification_agent"
+            )
+            self.text_to_sql_handler = CallbackHandler(
+                langfuse=langfuse_client,
+                trace_name="text_to_sql_agent"
+            )
+            self.summarizer_handler = CallbackHandler(
+                langfuse=langfuse_client,
+                trace_name="summarizer_agent"
+            )
+            self.clarification_handler = CallbackHandler(
+                langfuse=langfuse_client,
+                trace_name="clarification_agent"
+            )
+            self.visualization_handler = CallbackHandler(
+                langfuse=langfuse_client,
+                trace_name="visualization_agent"
+            )
+            print("✅ Langfuse CallbackHandlers configured with trace names")
+        else:
+            # Fallback handlers
+            self.intent_handler = CallbackHandler()
+            self.greeting_handler = CallbackHandler()
+            self.table_id_handler = CallbackHandler()
+            self.text_to_sql_handler = CallbackHandler()
+            self.summarizer_handler = CallbackHandler()
+            self.clarification_handler = CallbackHandler()
+            self.visualization_handler = CallbackHandler()
+            print("⚠️  Using fallback CallbackHandlers (no Langfuse)")
     
     
     def _serialize_state_for_json(self, state: WorkflowState) -> Dict[str, Any]:
@@ -108,6 +147,29 @@ class TextToSQLWorkflow:
             else:
                 serializable_state[key] = value
         return serializable_state
+
+    def _create_agent_trace(self, agent_name: str, state: WorkflowState):
+        """Create a custom trace for each agent"""
+        if LANGFUSE_AVAILABLE:
+            try:
+                import langfuse
+                langfuse_client = langfuse.Langfuse()
+                
+                trace = langfuse_client.trace(
+                    name=f"{agent_name}_agent",
+                    metadata={
+                        "agent": agent_name,
+                        "workflow": "text_to_sql_workflow",
+                        "question": state["question"][:100] if state.get("question") else "",
+                        "timestamp": datetime.now().isoformat()
+                    }
+                )
+                print(f"🔍 Created trace for {agent_name}_agent")
+                return trace
+            except Exception as e:
+                print(f"⚠️  Failed to create trace for {agent_name}: {e}")
+                return None
+        return None
 
     def _build_workflow(self)->StateGraph[WorkflowState]:
         graph_builder=StateGraph(WorkflowState)
@@ -145,16 +207,19 @@ class TextToSQLWorkflow:
 
         return graph_builder
     
-    def _intent_classification_agent(self,state:WorkflowState)->WorkflowState:
+        def _intent_classification_agent(self,state:WorkflowState)->WorkflowState:
+        # Create custom trace for this agent
+        trace = self._create_agent_trace("intent_classification", state)
+        
         prompt=ChatPromptTemplate.from_messages(intent_prompt)
-
         prev_conv=state["history"][-6:] if state["history"] else []
-
-        chain=prompt|self.llm 
+        chain=prompt|self.llm
+        
         # Prepare config with conditional Langfuse metadata
         config = {"callbacks": [self.intent_handler]}
         if LANGFUSE_AVAILABLE:
             config["metadata"] = {"langfuse_tags": ["intent_classification_agent", "text_to_sql_workflow"]}
+            config["tags"] = ["intent_classification_agent", "text_to_sql_workflow"]
             print("🔍 Intent agent: Langfuse tracing enabled")
         else:
             print("⚠️  Intent agent: Langfuse tracing disabled")
@@ -174,6 +239,14 @@ class TextToSQLWorkflow:
                 json.dump(serializable_state, intent_json, indent=2)
         except Exception as e:
             print(f"Warning: Could not save intent.json: {e}")
+
+        # End the trace if it was created
+        if trace:
+            try:
+                trace.end()
+                print(f"🔍 Ended trace for intent_classification_agent")
+            except Exception as e:
+                print(f"⚠️  Failed to end trace: {e}")
 
         return state
     
