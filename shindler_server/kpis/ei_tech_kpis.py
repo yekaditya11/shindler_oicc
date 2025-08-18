@@ -763,9 +763,9 @@ class EITechKPIQueries:
             COUNT(CASE WHEN UPPER(work_stopped) = 'YES' THEN 1 END) as work_stoppages,
             COUNT(CASE WHEN UPPER(serious_near_miss) = 'YES' THEN 1 END) as serious_incidents,
             SUM(CASE
-                WHEN stop_work_duration LIKE '%hour%' THEN
+                WHEN stop_work_duration LIKE '%hour%' AND stop_work_duration IS NOT NULL AND stop_work_duration != '' AND LENGTH(TRIM(stop_work_duration)) > 0 THEN
                     CAST(REGEXP_REPLACE(stop_work_duration, '[^0-9.]', '', 'g') AS FLOAT)
-                WHEN stop_work_duration LIKE '%day%' THEN
+                WHEN stop_work_duration LIKE '%day%' AND stop_work_duration IS NOT NULL AND stop_work_duration != '' AND LENGTH(TRIM(stop_work_duration)) > 0 THEN
                     CAST(REGEXP_REPLACE(stop_work_duration, '[^0-9.]', '', 'g') AS FLOAT) * 8
                 ELSE 0
             END) as total_work_hours_lost,

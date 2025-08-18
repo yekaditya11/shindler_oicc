@@ -820,7 +820,7 @@ class NITCTKPIQueries:
             COUNT(CASE WHEN UPPER(work_was_stopped) = 'YES' THEN 1 END) as work_stoppages,
             COUNT(CASE WHEN UPPER(action_related_to_high_risk_situation) = 'YES' THEN 1 END) as high_risk_actions,
             SUM(CASE
-                WHEN work_stopped_hours IS NOT NULL AND work_stopped_hours != ''
+                WHEN work_stopped_hours IS NOT NULL AND work_stopped_hours != '' AND LENGTH(TRIM(work_stopped_hours)) > 0
                 THEN CAST(REGEXP_REPLACE(work_stopped_hours, '[^0-9.]', '', 'g') AS FLOAT)
                 ELSE 0
             END) as total_hours_lost,
@@ -836,7 +836,7 @@ class NITCTKPIQueries:
             CASE
                 WHEN COUNT(CASE WHEN UPPER(work_was_stopped) = 'YES' THEN 1 END) = 0 THEN 'EXCELLENT_JOB'
                 WHEN COUNT(CASE WHEN UPPER(work_was_stopped) = 'YES' THEN 1 END) * 100.0 / NULLIF(COUNT(*), 0) < 20 THEN 'GOOD_JOB'
-                WHEN SUM(CASE WHEN work_stopped_hours IS NOT NULL THEN CAST(REGEXP_REPLACE(work_stopped_hours, '[^0-9.]', '', 'g') AS FLOAT) ELSE 0 END) > 8 THEN 'DELAYED_JOB'
+                WHEN SUM(CASE WHEN work_stopped_hours IS NOT NULL AND work_stopped_hours != '' AND LENGTH(TRIM(work_stopped_hours)) > 0 THEN CAST(REGEXP_REPLACE(work_stopped_hours, '[^0-9.]', '', 'g') AS FLOAT) ELSE 0 END) > 8 THEN 'DELAYED_JOB'
                 ELSE 'STANDARD_JOB'
             END as job_performance_category
         FROM {self.table_name}
@@ -860,7 +860,7 @@ class NITCTKPIQueries:
             COUNT(CASE WHEN UPPER(work_was_stopped) = 'YES' THEN 1 END) as work_stoppages,
             COUNT(CASE WHEN UPPER(action_related_to_high_risk_situation) = 'YES' THEN 1 END) as high_risk_actions,
             SUM(CASE
-                WHEN work_stopped_hours IS NOT NULL AND work_stopped_hours != ''
+                WHEN work_stopped_hours IS NOT NULL AND work_stopped_hours != '' AND LENGTH(TRIM(work_stopped_hours)) > 0
                 THEN CAST(REGEXP_REPLACE(work_stopped_hours, '[^0-9.]', '', 'g') AS FLOAT)
                 ELSE 0
             END) as total_hours_lost,
@@ -898,7 +898,7 @@ class NITCTKPIQueries:
                 COUNT(CASE WHEN UPPER(work_was_stopped) = 'YES' THEN 1 END) as work_stoppages,
                 COUNT(DISTINCT job_no) as jobs_affected,
                 SUM(CASE
-                    WHEN work_stopped_hours IS NOT NULL AND work_stopped_hours != ''
+                    WHEN work_stopped_hours IS NOT NULL AND work_stopped_hours != '' AND LENGTH(TRIM(work_stopped_hours)) > 0
                     THEN CAST(REGEXP_REPLACE(work_stopped_hours, '[^0-9.]', '', 'g') AS FLOAT)
                     ELSE 0
                 END) as total_hours_lost,
