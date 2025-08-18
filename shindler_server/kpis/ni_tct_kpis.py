@@ -565,6 +565,117 @@ class NITCTKPIQueries:
 
         return result
 
+    def get_regional_unsafe_acts_conditions_analysis(self, session: Session = None) -> List[Dict]:
+        """Regional Unsafe Acts and Conditions Analysis for NI TCT using type and details, with date filtering"""
+        query = f"""
+        WITH unsafe_events_processed AS (
+            SELECT 
+                region,
+                type_of_unsafe_event as unsafe_event_type,
+                unsafe_event_details,
+                CASE 
+                    WHEN type_of_unsafe_event ILIKE '%unsafe act%' OR type_of_unsafe_event ILIKE '%act%' THEN 1 
+                    ELSE 0 
+                END as has_unsafe_act_type,
+                CASE 
+                    WHEN type_of_unsafe_event ILIKE '%unsafe condition%' OR type_of_unsafe_event ILIKE '%condition%' THEN 1 
+                    ELSE 0 
+                END as has_unsafe_condition_type
+            FROM {self.table_name}
+            WHERE region IS NOT NULL AND region != '' {self.date_filter}
+        ),
+        unsafe_acts_extracted AS (
+            SELECT 
+                region,
+                'Unsafe Act' as category,
+                CASE 
+                    WHEN has_unsafe_act_type = 1 AND unsafe_event_details IS NOT NULL AND TRIM(unsafe_event_details) != '' 
+                        THEN TRIM(unsafe_event_details)
+                    WHEN has_unsafe_act_type = 1 AND (unsafe_event_details IS NULL OR TRIM(unsafe_event_details) = '')
+                        THEN TRIM(unsafe_event_type)
+                    ELSE NULL
+                END AS description
+            FROM unsafe_events_processed
+            WHERE has_unsafe_act_type = 1
+            
+            UNION ALL
+            
+            SELECT 
+                region,
+                'Unsafe Condition' as category,
+                CASE 
+                    WHEN has_unsafe_condition_type = 1 AND unsafe_event_details IS NOT NULL AND TRIM(unsafe_event_details) != '' 
+                        THEN TRIM(unsafe_event_details)
+                    WHEN has_unsafe_condition_type = 1 AND (unsafe_event_details IS NULL OR TRIM(unsafe_event_details) = '')
+                        THEN TRIM(unsafe_event_type)
+                    ELSE NULL
+                END AS description
+            FROM unsafe_events_processed
+            WHERE has_unsafe_condition_type = 1
+        ),
+        all_items_counts AS (
+            SELECT 
+                region,
+                category,
+                description,
+                COUNT(*) as item_count
+            FROM unsafe_acts_extracted
+            WHERE description IS NOT NULL AND description != ''
+            GROUP BY region, category, description
+        ),
+        region_category_totals AS (
+            SELECT 
+                region,
+                category,
+                SUM(item_count) as total_items_in_region_category
+            FROM all_items_counts
+            GROUP BY region, category
+        ),
+        region_totals AS (
+            SELECT 
+                region,
+                SUM(item_count) as total_items_in_region
+            FROM all_items_counts
+            GROUP BY region
+        ),
+        most_common_items AS (
+            SELECT 
+                region,
+                category,
+                description as most_common_item,
+                item_count as most_common_count,
+                ROW_NUMBER() OVER (PARTITION BY region, category ORDER BY item_count DESC) as rn
+            FROM all_items_counts
+        )
+        SELECT 
+            rt.region,
+            rt.total_items_in_region as total_unsafe_items,
+            COALESCE(rct_act.total_items_in_region_category, 0) as total_unsafe_acts,
+            COALESCE(mci_act.most_common_item, 'None recorded') as most_common_unsafe_act,
+            COALESCE(mci_act.most_common_count, 0) as most_common_act_count,
+            CASE 
+                WHEN mci_act.most_common_count IS NOT NULL AND rt.total_items_in_region > 0
+                THEN ROUND((mci_act.most_common_count * 100.0 / rt.total_items_in_region), 2) 
+                ELSE 0 
+            END as act_percentage_of_region_total,
+            COALESCE(rct_cond.total_items_in_region_category, 0) as total_unsafe_conditions,
+            COALESCE(mci_cond.most_common_item, 'None recorded') as most_common_unsafe_condition,
+            COALESCE(mci_cond.most_common_count, 0) as most_common_condition_count,
+            CASE 
+                WHEN mci_cond.most_common_count IS NOT NULL AND rt.total_items_in_region > 0
+                THEN ROUND((mci_cond.most_common_count * 100.0 / rt.total_items_in_region), 2) 
+                ELSE 0 
+            END as condition_percentage_of_region_total
+
+        FROM region_totals rt
+        LEFT JOIN region_category_totals rct_act ON rt.region = rct_act.region AND rct_act.category = 'Unsafe Act'
+        LEFT JOIN region_category_totals rct_cond ON rt.region = rct_cond.region AND rct_cond.category = 'Unsafe Condition'
+        LEFT JOIN most_common_items mci_act ON rt.region = mci_act.region AND mci_act.category = 'Unsafe Act' AND mci_act.rn = 1
+        LEFT JOIN most_common_items mci_cond ON rt.region = mci_cond.region AND mci_cond.category = 'Unsafe Condition' AND mci_cond.rn = 1
+        ORDER BY rt.total_items_in_region DESC
+        """
+        return self.execute_query(query, {}, session)
+
     def get_seasonal_trend_analysis(self, session: Session = None) -> List[Dict]:
         """Analyze seasonal trends in safety incidents"""
         query = f"""
@@ -899,6 +1010,7 @@ class NITCTKPIQueries:
                     "hourly_incident_distribution": self.get_hourly_incident_distribution(session),
                     "time_based_incident_trends": self.get_time_based_incident_trends(session),
                     "peak_incident_hours_analysis": self.get_peak_incident_hours_analysis(session),
+                    "regional_unsafe_acts_conditions_analysis": self.get_regional_unsafe_acts_conditions_analysis(session),
                 }
 
                 logger.info("All NI TCT KPI queries executed successfully")

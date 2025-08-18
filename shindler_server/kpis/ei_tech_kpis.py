@@ -882,6 +882,140 @@ class EITechKPIQueries:
         """
         return self.execute_query(query, {}, session)
 
+    def get_regional_unsafe_acts_conditions_analysis(self, session: Session = None) -> List[Dict]:
+        """Regional Unsafe Acts and Conditions Analysis (by region with most common items) with date filtering"""
+        query = f"""
+        WITH unsafe_events_processed AS (
+            SELECT 
+                region,
+                unsafe_event_type,
+                unsafe_act,
+                unsafe_act_other,
+                unsafe_condition,
+                unsafe_condition_other,
+                CASE 
+                    WHEN unsafe_event_type ILIKE '%unsafe act%' THEN 1 
+                    ELSE 0 
+                END as has_unsafe_act_type,
+                CASE 
+                    WHEN unsafe_event_type ILIKE '%unsafe condition%' THEN 1 
+                    ELSE 0 
+                END as has_unsafe_condition_type
+            FROM {self.table_name}
+            WHERE region IS NOT NULL AND region != '' {self.date_filter}
+        ),
+        unsafe_acts_extracted AS (
+            SELECT 
+                region,
+                'Unsafe Act' as category,
+                CASE 
+                    WHEN has_unsafe_act_type = 1 AND unsafe_act IS NOT NULL AND TRIM(unsafe_act) != '' 
+                        THEN TRIM(unsafe_act)
+                    WHEN has_unsafe_act_type = 1 AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '') 
+                         AND unsafe_act_other IS NOT NULL AND TRIM(unsafe_act_other) != ''
+                        THEN TRIM(unsafe_act_other)
+                    WHEN has_unsafe_act_type = 1 AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '') 
+                         AND (unsafe_act_other IS NULL OR TRIM(unsafe_act_other) = '')
+                         AND unsafe_condition IS NOT NULL AND TRIM(unsafe_condition) != ''
+                        THEN TRIM(unsafe_condition)
+                    WHEN has_unsafe_act_type = 1 AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '') 
+                         AND (unsafe_act_other IS NULL OR TRIM(unsafe_act_other) = '')
+                         AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '')
+                         AND unsafe_condition_other IS NOT NULL AND TRIM(unsafe_condition_other) != ''
+                        THEN TRIM(unsafe_condition_other)
+                    ELSE NULL
+                END AS description
+            FROM unsafe_events_processed
+            WHERE has_unsafe_act_type = 1
+            
+            UNION ALL
+            
+            SELECT 
+                region,
+                'Unsafe Condition' as category,
+                CASE 
+                    WHEN has_unsafe_condition_type = 1 AND unsafe_condition IS NOT NULL AND TRIM(unsafe_condition) != '' 
+                        THEN TRIM(unsafe_condition)
+                    WHEN has_unsafe_condition_type = 1 AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '') 
+                         AND unsafe_condition_other IS NOT NULL AND TRIM(unsafe_condition_other) != ''
+                        THEN TRIM(unsafe_condition_other)
+                    WHEN has_unsafe_condition_type = 1 AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '') 
+                         AND (unsafe_condition_other IS NULL OR TRIM(unsafe_condition_other) = '')
+                         AND unsafe_act IS NOT NULL AND TRIM(unsafe_act) != ''
+                        THEN TRIM(unsafe_act)
+                    WHEN has_unsafe_condition_type = 1 AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '') 
+                         AND (unsafe_condition_other IS NULL OR TRIM(unsafe_condition_other) = '')
+                         AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '')
+                         AND unsafe_act_other IS NOT NULL AND TRIM(unsafe_act_other) != ''
+                        THEN TRIM(unsafe_act_other)
+                    ELSE NULL
+                END AS description
+            FROM unsafe_events_processed
+            WHERE has_unsafe_condition_type = 1
+        ),
+        all_items_counts AS (
+            SELECT 
+                region,
+                category,
+                description,
+                COUNT(*) as item_count
+            FROM unsafe_acts_extracted
+            WHERE description IS NOT NULL AND description != ''
+            GROUP BY region, category, description
+        ),
+        region_category_totals AS (
+            SELECT 
+                region,
+                category,
+                SUM(item_count) as total_items_in_region_category
+            FROM all_items_counts
+            GROUP BY region, category
+        ),
+        region_totals AS (
+            SELECT 
+                region,
+                SUM(item_count) as total_items_in_region
+            FROM all_items_counts
+            GROUP BY region
+        ),
+        most_common_items AS (
+            SELECT 
+                region,
+                category,
+                description as most_common_item,
+                item_count as most_common_count,
+                ROW_NUMBER() OVER (PARTITION BY region, category ORDER BY item_count DESC) as rn
+            FROM all_items_counts
+        )
+        SELECT 
+            rt.region,
+            rt.total_items_in_region as total_unsafe_items,
+            COALESCE(rct_act.total_items_in_region_category, 0) as total_unsafe_acts,
+            COALESCE(mci_act.most_common_item, 'None recorded') as most_common_unsafe_act,
+            COALESCE(mci_act.most_common_count, 0) as most_common_act_count,
+            CASE 
+                WHEN mci_act.most_common_count IS NOT NULL AND rt.total_items_in_region > 0
+                THEN ROUND((mci_act.most_common_count * 100.0 / rt.total_items_in_region), 2) 
+                ELSE 0 
+            END as act_percentage_of_region_total,
+            COALESCE(rct_cond.total_items_in_region_category, 0) as total_unsafe_conditions,
+            COALESCE(mci_cond.most_common_item, 'None recorded') as most_common_unsafe_condition,
+            COALESCE(mci_cond.most_common_count, 0) as most_common_condition_count,
+            CASE 
+                WHEN mci_cond.most_common_count IS NOT NULL AND rt.total_items_in_region > 0
+                THEN ROUND((mci_cond.most_common_count * 100.0 / rt.total_items_in_region), 2) 
+                ELSE 0 
+            END as condition_percentage_of_region_total
+
+        FROM region_totals rt
+        LEFT JOIN region_category_totals rct_act ON rt.region = rct_act.region AND rct_act.category = 'Unsafe Act'
+        LEFT JOIN region_category_totals rct_cond ON rt.region = rct_cond.region AND rct_cond.category = 'Unsafe Condition'
+        LEFT JOIN most_common_items mci_act ON rt.region = mci_act.region AND mci_act.category = 'Unsafe Act' AND mci_act.rn = 1
+        LEFT JOIN most_common_items mci_cond ON rt.region = mci_cond.region AND mci_cond.category = 'Unsafe Condition' AND mci_cond.rn = 1
+        ORDER BY rt.total_items_in_region DESC
+        """
+        return self.execute_query(query, {}, session)
+
     # ==================== ESSENTIAL KPI EXECUTION ====================
 
     def get_all_kpis(self, session: Session = None) -> Dict[str, Any]:
@@ -928,6 +1062,7 @@ class EITechKPIQueries:
                     "unsafe_events_by_time_of_day": self.get_time_of_day_incident_patterns(session),
                     "unsafe_event_distribution_by_business_type": self.get_events_by_business_details(session),
                     "nogo_violation_trends_by_regions_branches": self.get_regional_safety_performance(session),
+                    "regional_unsafe_acts_conditions_analysis": self.get_regional_unsafe_acts_conditions_analysis(session),
                 }
             finally:
                 # Only close session if we created it

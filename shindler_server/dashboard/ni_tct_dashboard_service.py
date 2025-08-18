@@ -151,6 +151,7 @@ class NITCTDashboardService:
             incident_severity = self._get_incident_severity_distribution(config, start_date, end_date, region, session)
             operational_impact = self._get_operational_impact_analysis(config, start_date, end_date, region, session)
             time_based_analysis = self._get_time_based_analysis(config, start_date, end_date, region, session)
+            regional_unsafe_acts_conditions = self._get_regional_unsafe_acts_conditions_analysis(config, start_date, end_date, region, session)
 
             return {
                 "total_events": total_events,
@@ -188,7 +189,8 @@ class NITCTDashboardService:
                     "chart_type": "pie"
                 },
                 "operational_impact_analysis": operational_impact,
-                "time_based_analysis": time_based_analysis
+                "time_based_analysis": time_based_analysis,
+                "regional_unsafe_acts_conditions_analysis": regional_unsafe_acts_conditions
             }
 
         except Exception as e:
@@ -869,5 +871,140 @@ class NITCTDashboardService:
                 "chart_type": "bar",
                 "description": "No data available",
                 "data": []
+            },
+            "regional_unsafe_acts_conditions_analysis": {
+                "chart_type": "table",
+                "description": "No data available",
+                "data": []
             }
         } 
+
+    def _get_regional_unsafe_acts_conditions_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
+        """KPI: Regional Unsafe Acts and Conditions Analysis (NI TCT)"""
+        try:
+            region_filter = f"AND {config['region_field']} = :region" if region else ""
+
+            query = f"""
+            WITH unsafe_events_processed AS (
+                SELECT 
+                    {config['region_field']},
+                    {config['event_type_field']} as unsafe_event_type,
+                    unsafe_event_details,
+                    CASE 
+                        WHEN {config['event_type_field']} ILIKE '%unsafe act%' OR {config['event_type_field']} ILIKE '%act%' THEN 1 
+                        ELSE 0 
+                    END as has_unsafe_act_type,
+                    CASE 
+                        WHEN {config['event_type_field']} ILIKE '%unsafe condition%' OR {config['event_type_field']} ILIKE '%condition%' THEN 1 
+                        ELSE 0 
+                    END as has_unsafe_condition_type
+                FROM {config['table_name']}
+                WHERE {config['region_field']} IS NOT NULL AND {config['region_field']} != ''
+                    AND {config['event_date_field']}::date BETWEEN :start_date AND :end_date
+                    {region_filter}
+            ),
+            unsafe_acts_extracted AS (
+                SELECT 
+                    {config['region_field']},
+                    'Unsafe Act' as category,
+                    CASE 
+                        WHEN has_unsafe_act_type = 1 AND unsafe_event_details IS NOT NULL AND TRIM(unsafe_event_details) != '' 
+                            THEN TRIM(unsafe_event_details)
+                        WHEN has_unsafe_act_type = 1 AND (unsafe_event_details IS NULL OR TRIM(unsafe_event_details) = '')
+                            THEN TRIM(unsafe_event_type)
+                        ELSE NULL
+                    END AS description
+                FROM unsafe_events_processed
+                WHERE has_unsafe_act_type = 1
+                
+                UNION ALL
+                
+                SELECT 
+                    {config['region_field']},
+                    'Unsafe Condition' as category,
+                    CASE 
+                        WHEN has_unsafe_condition_type = 1 AND unsafe_event_details IS NOT NULL AND TRIM(unsafe_event_details) != '' 
+                            THEN TRIM(unsafe_event_details)
+                        WHEN has_unsafe_condition_type = 1 AND (unsafe_event_details IS NULL OR TRIM(unsafe_event_details) = '')
+                            THEN TRIM(unsafe_event_type)
+                        ELSE NULL
+                    END AS description
+                FROM unsafe_events_processed
+                WHERE has_unsafe_condition_type = 1
+            ),
+            all_items_counts AS (
+                SELECT 
+                    {config['region_field']},
+                    category,
+                    description,
+                    COUNT(*) as item_count
+                FROM unsafe_acts_extracted
+                WHERE description IS NOT NULL AND description != ''
+                GROUP BY {config['region_field']}, category, description
+            ),
+            region_category_totals AS (
+                SELECT 
+                    {config['region_field']},
+                    category,
+                    SUM(item_count) as total_items_in_region_category
+                FROM all_items_counts
+                GROUP BY {config['region_field']}, category
+            ),
+            region_totals AS (
+                SELECT 
+                    {config['region_field']},
+                    SUM(item_count) as total_items_in_region
+                FROM all_items_counts
+                GROUP BY {config['region_field']}
+            ),
+            most_common_items AS (
+                SELECT 
+                    {config['region_field']},
+                    category,
+                    description as most_common_item,
+                    item_count as most_common_count,
+                    ROW_NUMBER() OVER (PARTITION BY {config['region_field']}, category ORDER BY item_count DESC) as rn
+                FROM all_items_counts
+            )
+            SELECT 
+                rt.{config['region_field']},
+                rt.total_items_in_region as total_unsafe_items,
+                COALESCE(rct_act.total_items_in_region_category, 0) as total_unsafe_acts,
+                COALESCE(mci_act.most_common_item, 'None recorded') as most_common_unsafe_act,
+                COALESCE(mci_act.most_common_count, 0) as most_common_act_count,
+                CASE 
+                    WHEN mci_act.most_common_count IS NOT NULL AND rt.total_items_in_region > 0
+                    THEN ROUND((mci_act.most_common_count * 100.0 / rt.total_items_in_region), 2) 
+                    ELSE 0 
+                END as act_percentage_of_region_total,
+                COALESCE(rct_cond.total_items_in_region_category, 0) as total_unsafe_conditions,
+                COALESCE(mci_cond.most_common_item, 'None recorded') as most_common_unsafe_condition,
+                COALESCE(mci_cond.most_common_count, 0) as most_common_condition_count,
+                CASE 
+                    WHEN mci_cond.most_common_count IS NOT NULL AND rt.total_items_in_region > 0
+                    THEN ROUND((mci_cond.most_common_count * 100.0 / rt.total_items_in_region), 2) 
+                    ELSE 0 
+                END as condition_percentage_of_region_total
+
+            FROM region_totals rt
+            LEFT JOIN region_category_totals rct_act ON rt.{config['region_field']} = rct_act.{config['region_field']} AND rct_act.category = 'Unsafe Act'
+            LEFT JOIN region_category_totals rct_cond ON rt.{config['region_field']} = rct_cond.{config['region_field']} AND rct_cond.category = 'Unsafe Condition'
+            LEFT JOIN most_common_items mci_act ON rt.{config['region_field']} = mci_act.{config['region_field']} AND mci_act.category = 'Unsafe Act' AND mci_act.rn = 1
+            LEFT JOIN most_common_items mci_cond ON rt.{config['region_field']} = mci_cond.{config['region_field']} AND mci_cond.category = 'Unsafe Condition' AND mci_cond.rn = 1
+            ORDER BY rt.total_items_in_region DESC
+            """
+
+            params = {"start_date": start_date, "end_date": end_date}
+            if region:
+                params["region"] = region
+
+            data = self.execute_query(query, params, session)
+
+            return {
+                "chart_type": "table",
+                "description": "Regional analysis of unsafe acts and conditions with most common occurrences per region (NI TCT)",
+                "data": data
+            }
+        except Exception as e:
+            logger.error(f"Error getting regional unsafe acts and conditions analysis (NI TCT): {e}")
+            return {"chart_type": "table", "description": "Error retrieving data", "data": []}
