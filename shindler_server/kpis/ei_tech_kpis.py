@@ -222,6 +222,116 @@ class EITechKPIQueries:
         """
         return self.execute_query(query, {}, session)
 
+    def get_regional_work_stoppages_analysis(self, session: Session = None) -> List[Dict]:
+        """Work stoppages by region with most common causes (EI Tech) with date filtering"""
+        query = f"""
+        WITH work_stoppages_data AS (
+            SELECT 
+                region,
+                work_stopped,
+                unsafe_event_type,
+                unsafe_act,
+                unsafe_act_other,
+                unsafe_condition,
+                unsafe_condition_other,
+                CASE 
+                    WHEN unsafe_event_type ILIKE '%unsafe act%' THEN 1 
+                    ELSE 0 
+                END as has_unsafe_act_type,
+                CASE 
+                    WHEN unsafe_event_type ILIKE '%unsafe condition%' THEN 1 
+                    ELSE 0 
+                END as has_unsafe_condition_type
+            FROM {self.table_name}
+            WHERE region IS NOT NULL AND region != ''
+                AND work_stopped IS NOT NULL 
+                AND UPPER(TRIM(work_stopped)) IN ('YES', 'Y', '1', 'TRUE')
+                {self.date_filter}
+        ),
+        work_stoppage_causes AS (
+            SELECT 
+                region,
+                work_stopped,
+                CASE 
+                    WHEN has_unsafe_act_type = 1 AND unsafe_act IS NOT NULL AND TRIM(unsafe_act) != '' 
+                        THEN CONCAT('Unsafe Act: ', TRIM(unsafe_act))
+                    WHEN has_unsafe_act_type = 1 AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '') 
+                         AND unsafe_act_other IS NOT NULL AND TRIM(unsafe_act_other) != ''
+                        THEN CONCAT('Unsafe Act: ', TRIM(unsafe_act_other))
+                    WHEN has_unsafe_condition_type = 1 AND unsafe_condition IS NOT NULL AND TRIM(unsafe_condition) != '' 
+                        THEN CONCAT('Unsafe Condition: ', TRIM(unsafe_condition))
+                    WHEN has_unsafe_condition_type = 1 AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '') 
+                         AND unsafe_condition_other IS NOT NULL AND TRIM(unsafe_condition_other) != ''
+                        THEN CONCAT('Unsafe Condition: ', TRIM(unsafe_condition_other))
+                    WHEN has_unsafe_act_type = 1 AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '') 
+                         AND (unsafe_act_other IS NULL OR TRIM(unsafe_act_other) = '')
+                         AND unsafe_condition IS NOT NULL AND TRIM(unsafe_condition) != ''
+                        THEN CONCAT('Unsafe Condition: ', TRIM(unsafe_condition))
+                    WHEN has_unsafe_act_type = 1 AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '') 
+                         AND (unsafe_act_other IS NULL OR TRIM(unsafe_act_other) = '')
+                         AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '')
+                         AND unsafe_condition_other IS NOT NULL AND TRIM(unsafe_condition_other) != ''
+                        THEN CONCAT('Unsafe Condition: ', TRIM(unsafe_condition_other))
+                    WHEN has_unsafe_condition_type = 1 AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '') 
+                         AND (unsafe_condition_other IS NULL OR TRIM(unsafe_condition_other) = '')
+                         AND unsafe_act IS NOT NULL AND TRIM(unsafe_act) != ''
+                        THEN CONCAT('Unsafe Act: ', TRIM(unsafe_act))
+                    WHEN has_unsafe_condition_type = 1 AND (unsafe_condition IS NULL OR TRIM(unsafe_condition) = '') 
+                         AND (unsafe_condition_other IS NULL OR TRIM(unsafe_condition_other) = '')
+                         AND (unsafe_act IS NULL OR TRIM(unsafe_act) = '')
+                         AND unsafe_act_other IS NOT NULL AND TRIM(unsafe_act_other) != ''
+                        THEN CONCAT('Unsafe Act: ', TRIM(unsafe_act_other))
+                    WHEN unsafe_act IS NOT NULL AND TRIM(unsafe_act) != ''
+                        THEN CONCAT('Unsafe Act: ', TRIM(unsafe_act))
+                    WHEN unsafe_act_other IS NOT NULL AND TRIM(unsafe_act_other) != ''
+                        THEN CONCAT('Unsafe Act: ', TRIM(unsafe_act_other))
+                    WHEN unsafe_condition IS NOT NULL AND TRIM(unsafe_condition) != ''
+                        THEN CONCAT('Unsafe Condition: ', TRIM(unsafe_condition))
+                    WHEN unsafe_condition_other IS NOT NULL AND TRIM(unsafe_condition_other) != ''
+                        THEN CONCAT('Unsafe Condition: ', TRIM(unsafe_condition_other))
+                    ELSE 'Cause Not Specified'
+                END AS stoppage_cause
+            FROM work_stoppages_data
+        ),
+        cause_counts AS (
+            SELECT 
+                region,
+                stoppage_cause,
+                COUNT(*) as cause_count
+            FROM work_stoppage_causes
+            GROUP BY region, stoppage_cause
+        ),
+        region_totals AS (
+            SELECT 
+                region,
+                SUM(cause_count) as total_work_stoppages
+            FROM cause_counts
+            GROUP BY region
+        ),
+        most_common_causes AS (
+            SELECT 
+                region,
+                stoppage_cause as most_common_cause,
+                cause_count as most_common_count,
+                ROW_NUMBER() OVER (PARTITION BY region ORDER BY cause_count DESC) as rn
+            FROM cause_counts
+        )
+        SELECT 
+            rt.region,
+            rt.total_work_stoppages,
+            COALESCE(mcc.most_common_cause, 'No causes recorded') as most_common_stoppage_cause,
+            COALESCE(mcc.most_common_count, 0) as most_common_cause_count,
+            CASE 
+                WHEN mcc.most_common_count IS NOT NULL AND rt.total_work_stoppages > 0
+                THEN ROUND((mcc.most_common_count * 100.0 / rt.total_work_stoppages), 2) 
+                ELSE 0 
+            END as percentage_of_region_stoppages
+        FROM region_totals rt
+        LEFT JOIN most_common_causes mcc ON rt.region = mcc.region AND mcc.rn = 1
+        ORDER BY rt.total_work_stoppages DESC
+        """
+        return self.execute_query(query, {}, session)
+
     # ==================== RESPONSE & ACTIONS ====================
 
     def get_action_completion_rate(self, session: Session = None) -> Dict[str, Any]:
@@ -1052,6 +1162,7 @@ class EITechKPIQueries:
                     # ==================== OPERATIONAL IMPACT ====================
                     "number_of_nogo_violations": self.get_nogo_violations_count(session),
                     "work_hours_lost": self.get_stop_work_duration_analysis(session),
+                    "regional_work_stoppages_analysis": self.get_regional_work_stoppages_analysis(session),
                     "time_taken_to_report_incidents": self.get_reporting_delay_analysis(session),
 
                     # ==================== ACTION & COMPLIANCE ====================
