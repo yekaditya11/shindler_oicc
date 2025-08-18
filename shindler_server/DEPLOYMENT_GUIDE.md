@@ -40,7 +40,6 @@ If you want to use Langfuse observability in production, set these environment v
 LANGFUSE_SECRET_KEY=your_secret_key_here
 LANGFUSE_PUBLIC_KEY=your_public_key_here
 LANGFUSE_HOST=https://cloud.langfuse.com
-LANGFUSE_PROJECT_NAME=shindler-safety-analytics
 LANGFUSE_ENABLED=true
 ```
 

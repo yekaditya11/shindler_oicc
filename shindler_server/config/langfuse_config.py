@@ -29,12 +29,6 @@ class LangfuseConfig(BaseSettings):
         description="Langfuse host URL"
     )
     
-    # Langfuse project settings
-    langfuse_project_name: str = Field(
-        default="shindler-safety-analytics",
-        description="Langfuse project name"
-    )
-    
     # Enable/disable Langfuse
     langfuse_enabled: bool = Field(
         default=True,
@@ -64,19 +58,16 @@ def initialize_langfuse():
         if not langfuse_config.langfuse_secret_key:
             print("Langfuse secret key not provided - using default configuration")
             # Use default configuration (local development)
-            langfuse = Langfuse(
-                project_name=langfuse_config.langfuse_project_name
-            )
+            langfuse = Langfuse()
         else:
             # Use provided credentials
             langfuse = Langfuse(
                 secret_key=langfuse_config.langfuse_secret_key,
                 public_key=langfuse_config.langfuse_public_key,
-                host=langfuse_config.langfuse_host,
-                project_name=langfuse_config.langfuse_project_name
+                host=langfuse_config.langfuse_host
             )
         
-        print(f"Langfuse initialized successfully for project: {langfuse_config.langfuse_project_name}")
+        print("Langfuse initialized successfully")
         return langfuse
         
     except ImportError:
