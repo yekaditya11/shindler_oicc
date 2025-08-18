@@ -83,17 +83,31 @@ class TextToSQLWorkflow:
             api_key=os.environ["AZURE_OPENAI_API_KEY"]
         )
         
+        def create_langfuse_handler():
+            if not LANGFUSE_AVAILABLE:
+                return CallbackHandler()
+            public_key = os.getenv("LANGFUSE_PUBLIC_KEY")
+            secret_key = os.getenv("LANGFUSE_SECRET_KEY")
+            host = os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
+            try:
+                # Newer SDK (v3)
+                return CallbackHandler(public_key=public_key, secret_key=secret_key, host=host)
+            except TypeError:
+                # Older integration signature, fall back to no-arg
+                return CallbackHandler()
+
         # Create individual handlers for each agent with proper Langfuse configuration
         if LANGFUSE_AVAILABLE:
             # Create handlers (no unsupported kwargs)
-            self.root_handler = CallbackHandler()
-            self.intent_handler = CallbackHandler()
-            self.greeting_handler = CallbackHandler()
-            self.table_id_handler = CallbackHandler()
-            self.text_to_sql_handler = CallbackHandler()
-            self.summarizer_handler = CallbackHandler()
-            self.clarification_handler = CallbackHandler()
-            self.visualization_handler = CallbackHandler()
+            self.langfuse_handler = create_langfuse_handler()
+            self.root_handler = self.langfuse_handler
+            self.intent_handler = self.langfuse_handler
+            self.greeting_handler = self.langfuse_handler
+            self.table_id_handler = self.langfuse_handler
+            self.text_to_sql_handler = self.langfuse_handler
+            self.summarizer_handler = self.langfuse_handler
+            self.clarification_handler = self.langfuse_handler
+            self.visualization_handler = self.langfuse_handler
             print("✅ Langfuse CallbackHandlers configured")
         else:
             # Fallback handlers
