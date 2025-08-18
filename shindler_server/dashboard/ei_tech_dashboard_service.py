@@ -463,104 +463,61 @@ class EITechDashboardService:
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
 
-            detailed_query = f"""
+            query = f"""
             SELECT
+                work_was_stopped,
                 duration_category,
-                COUNT(*) as event_count,
-                ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(), 2) as percentage_of_stoppages,
-                ROUND(COUNT(*) * 100.0 / (
-                    SELECT COUNT(*) FROM {config['table_name']} WHERE {config['primary_key']} IS NOT NULL
-                        AND {config['event_date_field']} BETWEEN :start_date AND :end_date
-                        {region_filter}
-                ), 2) as percentage_of_total_events
+                COUNT(*) as event_count
             FROM (
                 SELECT
                     {config['primary_key']},
-                    {config['work_stopped_field']} as work_stopped,
+                    {config['work_stopped_field']} as work_was_stopped,
                     stop_work_duration,
                     CASE
-                        WHEN LOWER(COALESCE({config['work_stopped_field']}, '')) != 'yes' THEN 'No Work Stoppage'
+                        WHEN LOWER(COALESCE({config['work_stopped_field']}, '')) != 'yes' THEN 'NO'
                         WHEN LOWER(COALESCE({config['work_stopped_field']}, '')) = 'yes' THEN
                             CASE
                                 WHEN LOWER(TRIM(COALESCE(stop_work_duration, ''))) = 'one day or less' THEN 'One Day or Less'
-                                WHEN LOWER(TRIM(COALESCE(stop_work_duration, ''))) = 'more than one day' THEN 'More than One Day'
-                                WHEN stop_work_duration IS NULL OR TRIM(stop_work_duration) = '' THEN 'Duration Unknown'
+                                WHEN LOWER(TRIM(COALESCE(stop_work_duration, ''))) = 'more than one day' THEN 'More than one day'
+                                WHEN stop_work_duration IS NULL OR TRIM(stop_work_duration) = '' THEN ''
                                 ELSE 'Other Duration'
                             END
-                        ELSE 'Work Stoppage Status Unknown'
+                        ELSE 'Unknown'
                     END as duration_category
                 FROM {config['table_name']}
                 WHERE {config['primary_key']} IS NOT NULL
                     AND {config['event_date_field']} BETWEEN :start_date AND :end_date
                     {region_filter}
             ) categorized_events
-            GROUP BY duration_category
+            GROUP BY work_was_stopped, duration_category
             ORDER BY
+                CASE work_was_stopped
+                    WHEN 'NO' THEN 1
+                    WHEN 'YES' THEN 2
+                    ELSE 3
+                END,
                 CASE duration_category
-                    WHEN 'No Work Stoppage' THEN 1
+                    WHEN '' THEN 1
                     WHEN 'One Day or Less' THEN 2
-                    WHEN 'More than One Day' THEN 3
-                    WHEN 'Duration Unknown' THEN 4
-                    WHEN 'Other Duration' THEN 5
-                    ELSE 6
+                    WHEN 'More than one day' THEN 3
+                    ELSE 4
                 END
-            """
-
-            summary_query = f"""
-            SELECT
-                'Work Stoppages Only' as analysis_scope,
-                CASE
-                    WHEN LOWER(TRIM(stop_work_duration)) = 'one day or less' THEN 'One Day or Less'
-                    WHEN LOWER(TRIM(stop_work_duration)) = 'more than one day' THEN 'More than One Day'
-                    ELSE 'Other/Unknown'
-                END as duration_category,
-                COUNT(*) as stoppage_count,
-                ROUND(COUNT(*) * 100.0 / SUM(COUNT(*)) OVER(), 2) as percentage_of_work_stoppages
-            FROM {config['table_name']}
-            WHERE {config['primary_key']} IS NOT NULL
-                AND LOWER(COALESCE({config['work_stopped_field']}, '')) = 'yes'
-                AND stop_work_duration IS NOT NULL
-                AND TRIM(stop_work_duration) != ''
-                AND {config['event_date_field']} BETWEEN :start_date AND :end_date
-                {region_filter}
-            GROUP BY
-                CASE
-                    WHEN LOWER(TRIM(stop_work_duration)) = 'one day or less' THEN 'One Day or Less'
-                    WHEN LOWER(TRIM(stop_work_duration)) = 'more than one day' THEN 'More than One Day'
-                    ELSE 'Other/Unknown'
-                END
-            ORDER BY stoppage_count DESC
-            """
-
-            combos_query = f"""
-            SELECT
-                {config['work_stopped_field']} as work_stopped,
-                stop_work_duration,
-                COUNT(*) as frequency
-            FROM {config['table_name']}
-            WHERE {config['primary_key']} IS NOT NULL
-                AND {config['event_date_field']} BETWEEN :start_date AND :end_date
-                {region_filter}
-            GROUP BY {config['work_stopped_field']}, stop_work_duration
-            ORDER BY frequency DESC
             """
 
             params = {"start_date": start_date, "end_date": end_date}
             if region:
                 params["region"] = region
 
+            data = self.execute_query(query, params, session)
+
             return {
-                "chart_type": "table",
-                "description": "Categorized work stoppage duration analysis (EI Tech)",
-                "data": {
-                    "detailed_distribution": self.execute_query(detailed_query, params, session),
-                    "stoppages_summary": self.execute_query(summary_query, params, session),
-                    "raw_combinations": self.execute_query(combos_query, params, session)
-                }
+                "chart_type": "bar",
+                "description": "Work stoppage duration analysis categorized into duration buckets",
+                "data": data
             }
         except Exception as e:
             logger.error(f"Error getting work stoppage duration categorized analysis (EI Tech): {e}")
-            return {"chart_type": "table", "description": "Error retrieving data", "data": {"detailed_distribution": [], "stoppages_summary": [], "raw_combinations": []}}
+            return {"chart_type": "bar", "description": "Error retrieving data", "data": []}
 
     # ==================== KPI QUERY METHODS ====================
 
