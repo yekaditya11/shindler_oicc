@@ -16,3 +16,5 @@ langgraph
 langgraph-checkpoint-postgres
 langchain-openai
 python-multipart
+langfuse
+langfuse-langchain

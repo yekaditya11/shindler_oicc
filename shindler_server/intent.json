@@ -2615,10 +2615,222 @@
     {
       "type": "ai",
       "content": "In the srs system, North Delhi has the highest number of unsafe events, with a total of 470 reported incidents."
+    },
+    {
+      "type": "human",
+      "content": "highest unsafe events in a area"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  city,\n  unsafe_event_type,\n  COUNT(*) AS unsafe_event_count\nFROM unsafe_events_srs_enriched\nGROUP BY city, unsafe_event_type\nORDER BY unsafe_event_count DESC\nLIMIT 1;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the highest number of unsafe events is in North Delhi (5021), with 349 reported unsafe conditions."
+    },
+    {
+      "type": "human",
+      "content": "in ei tech"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  COUNT(*) AS unsafe_event_count\nFROM unsafe_events_ei_tech\nGROUP BY unsafe_event_type\nORDER BY unsafe_event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In ei tech, there have been 3,690 Unsafe Conditions, 174 Unsafe Acts, and 137 Near Miss events reported."
+    },
+    {
+      "type": "human",
+      "content": "in ni tct"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_details,\n  COUNT(*) AS unsafe_event_count\nFROM unsafe_events_ni_tct\nGROUP BY unsafe_event_details\nORDER BY unsafe_event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In ni tct, the most frequent unsafe conditions are \"Other Unsafe Condition\" with 3,463 events, followed by \"Housekeeping Issues\" (1,888), \"Electrical Hazards\" (1,770), \"Tripping Hazard\" (1,393), and \"Falling Objects Hazard\" (1,378). Other notable hazards include \"Pit Access Hazard\" (1,070) and \"Poor Lighting\" (552). Less frequent but critical issues such as lack of PPE, defective tools, fire hazards, and improper procedures also appear but with lower counts."
+    },
+    {
+      "type": "human",
+      "content": "Who are the top reporters of unsafe events"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  reporter_name,\n  COUNT(*) AS unsafe_event_count\nFROM unsafe_events_srs\nGROUP BY reporter_name\nORDER BY unsafe_event_count DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "In srs, the top reporters of unsafe events are Johndevanand with 63 reports, followed by JoyalFrank with 54, AnkitKumar with 42, and KamleshPrasad with 41. Others include PradeepKumar and AJagadeesan with 31 each, BiditMondal with 30, MetaigiriKowsar with 28, JeevanandhamMohan with 26, and JasbirDhanda with 25 reports."
+    },
+    {
+      "type": "human",
+      "content": "What are the main causes of the work stoppages"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_details,\n  COUNT(*) AS work_stoppage_count\nFROM unsafe_events_ni_tct\nWHERE work_was_stopped = 'Yes'\nGROUP BY unsafe_event_details\nORDER BY work_stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The main causes of work stoppages in the ni tct system are primarily \"Other Unsafe Condition\" (852 stoppages), followed by \"Pit Access Hazard\" (728), \"Electrical Hazards\" (532), and \"Housekeeping Issues\" (515). Other notable causes include \"Falling Objects Hazard\" (381), \"Tripping Hazard\" (358), and \"Poor Lighting\" (192). These categories represent the most frequent unsafe events leading to work interruptions."
+    },
+    {
+      "type": "human",
+      "content": "What are the main causes of work stoppages?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_details,\n  COUNT(*) AS work_stoppage_count\nFROM unsafe_events_ni_tct\nWHERE work_was_stopped = 'Yes'\nGROUP BY unsafe_event_details\nORDER BY work_stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The main causes of work stoppages in the ni tct system are predominantly \"Other Unsafe Condition\" (852 stoppages), followed by \"Pit Access Hazard\" (728), \"Electrical Hazards\" (532), and \"Housekeeping Issues\" (515). Other notable causes include \"Falling Objects Hazard\" (381), \"Tripping Hazard\" (358), and \"Poor Lighting\" (192). These top unsafe conditions contribute significantly to work interruptions and should be prioritized in risk mitigation efforts."
+    },
+    {
+      "type": "human",
+      "content": "Create a pie chart for this"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_details,\n  COUNT(*) AS work_stoppage_count\nFROM unsafe_events_ni_tct\nWHERE work_was_stopped = 'Yes'\nGROUP BY unsafe_event_details\nORDER BY work_stoppage_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The pie chart for the ni tct data would show the largest portion represented by \"Other Unsafe Condition\" with 852 work stoppages, followed by \"Pit Access Hazard\" at 728, \"Electrical Hazards\" at 532, \"Housekeeping Issues\" at 515, and \"Falling Objects Hazard\" at 381. Smaller segments include \"Tripping Hazard\" (358), \"Poor Lighting\" (192), \"Other Unsafe Act\" (164), and several other categories with lower counts. Some records have missing or blank unsafe_event_details but still account for 308 stoppages combined."
+    },
+    {
+      "type": "human",
+      "content": "Who are the top reporters of unsafe events?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  reporter_sap_id,\n  reporter_name,\n  COUNT(*) AS unsafe_event_count\nFROM unsafe_events_ni_tct\nGROUP BY reporter_sap_id, reporter_name\nORDER BY unsafe_event_count DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "The top reporters of unsafe events in ni tct are Manuji Thakor (126 events), Dheeraj Kumar (117), and Karan Pandey (110), followed by MILANKUMAR DALPATBHAI VASAVA (108) and Akshay Jagtap and Sachin Nimbalkar (93 each)."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_and_time_of_unsafe_event) AS event_month,\n  COUNT(*) AS incident_count\nFROM unsafe_events_ni_tct\nGROUP BY event_month\nORDER BY event_month ASC;"
+    },
+    {
+      "type": "ai",
+      "content": "In ni tct, incident counts remained low in late 2024 with 3 incidents each in November and December. However, starting January 2025, there was a sharp increase: 202 incidents in January, rising rapidly to a peak of 4,775 in May. After May, incidents decreased to 2,435 in June. The count drops again to 3 incidents reported in December 2025. This trend indicates a significant spike in unsafe events during the first half of 2025 that should be investigated for root causes and addressed with corrective actions."
+    },
+    {
+      "type": "human",
+      "content": "Which are the most commonly observed unsafe behaviours?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_details,\n  COUNT(*) AS occurrence_count\nFROM unsafe_events_ni_tct\nGROUP BY unsafe_event_details\nORDER BY occurrence_count DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "In the ni tct system, the most commonly observed unsafe behaviors are primarily categorized as \"Other Unsafe Condition\" with 3,463 occurrences, followed by housekeeping issues (1,888), electrical hazards (1,770), tripping hazards (1,393), and falling objects hazards (1,378). Other notable unsafe conditions include pit access hazards, poor lighting, inadequate barricades for falling hazards, and a general category of \"Other Unsafe Act.\""
+    },
+    {
+      "type": "human",
+      "content": "Which branches have the most number of unsafe events related to PPE non compliances?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  branch_name,\n  COUNT(*) AS unsafe_event_count\nFROM unsafe_events_ni_tct\nWHERE unsafe_event_details ILIKE '%PPE%'\nGROUP BY branch_name\nORDER BY unsafe_event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the ni tct system, the branches with the highest number of unsafe events related to PPE non-compliances are Mumbai 2 with 39 events, North Delhi with 36 events, followed by Pune 1 and Mumbai 1, each with 15 events."
+    },
+    {
+      "type": "human",
+      "content": "Which branches are most likely to have accidents?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  branch_name,\n  COUNT(*) AS accident_count\nFROM unsafe_events_ni_tct\nWHERE unsafe_event_details ILIKE '%accident%'\nGROUP BY branch_name\nORDER BY accident_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The query did not return any data for accident counts by branch in ni tct, so there is no information available to identify which branches are most likely to have accidents in that system."
+    },
+    {
+      "type": "human",
+      "content": "In SRS which branches are most likely to have accidents?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  branch,\n  COUNT(*) AS accident_count\nFROM unsafe_events_srs\nWHERE unsafe_event_details ILIKE '%accident%'\nGROUP BY branch\nORDER BY accident_count DESC;"
+    },
+    {
+      "type": "human",
+      "content": "In SRS which are the most commonly observed unsafe behaviours?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_act,\n  COUNT(*) AS occurrence_count\nFROM unsafe_events_srs\nGROUP BY unsafe_act\nORDER BY occurrence_count DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "In srs, the most commonly observed unsafe behaviours are predominantly unspecified (3,280 occurrences). Among the identified acts, the top ones include lack or improper use of PPE (120 occurrences), operating without following adequate procedure (114), failure to inform about unsafe situations (65), and using defective equipment (45). Other notable behaviours are fall hazard exposure, lack of control of elevator, uncontrolled electrical (lockout/tag), and inadequate jumper device or process, each with lower but significant occurrences."
+    },
+    {
+      "type": "human",
+      "content": "In SRS Which branches have the most number of unsafe events related to PPE non compliances?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  branch,\n  COUNT(*) AS unsafe_event_count\nFROM unsafe_events_srs\nWHERE unsafe_act ILIKE '%PPE%'\nGROUP BY branch\nORDER BY unsafe_event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In SRS, the branches with the highest number of unsafe events related to PPE non-compliance are North Delhi (29 events), South Delhi (26 events), and Bangalore 1 (19 events). These three lead significantly compared to other branches."
+    },
+    {
+      "type": "human",
+      "content": "What are the main causes of work stoppages?"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_act,\n  COUNT(*) AS stoppage_count\nFROM unsafe_events_srs\nWHERE work_stopped = 'Yes'\nGROUP BY unsafe_act\nORDER BY stoppage_count DESC\nLIMIT 10;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the main cause of work stoppages is unspecified unsafe acts, accounting for 555 stoppages. Other significant causes include operating without following adequate procedures (49 stoppages), lack or improper use of PPE (38), failure to inform about unsafe situations (27), uncontrolled electrical issues (15), using defective equipment (15), fall hazard exposure (11), and lack of elevator control (10). Some stoppages (5) involved both operating without procedures and failure to inform about unsafe situations."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS incident_count\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "For the srs system, incident counts show a high level in January (1,502) and February (1,553) 2025, a significant drop in March (926), followed by a sharp decline to 19 incidents in April and just 1 in June. This indicates a strong downward trend in reported unsafe events after February."
+    },
+    {
+      "type": "human",
+      "content": "Check incident trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS incident_count\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, incident counts showed a high level in January (1,502) and February (1,553) 2025, followed by a notable drop in March to 926 incidents. April and June show sharp declines with only 19 and 1 incident(s) respectively, indicating a significant downward trend after February."
     }
   ],
-  "question": "highest unsafe events in a area",
-  "intent": "system_query",
+  "question": "hi",
+  "intent": "general",
   "database_ddl": "unsafe_events_srs(event_id VARCHAR(100), reporter_name VARCHAR(255), reported_date DATE, reporter_id VARCHAR(100), date_of_unsafe_event DATE, time_of_unsafe_event VARCHAR(50), unsafe_event_type VARCHAR(255), business_details VARCHAR(255), site_reference TEXT, unsafe_event_location VARCHAR(255), product_type VARCHAR(255), employee_id VARCHAR(100), employee_name VARCHAR(255), subcontractor_company_name VARCHAR(255), subcontractor_id VARCHAR(100), subcontractor_city VARCHAR(255), subcontractor_name VARCHAR(255), kg_name VARCHAR(100), country_name VARCHAR(100), division VARCHAR(255), department VARCHAR(255), city VARCHAR(255), sub_area VARCHAR(100), district VARCHAR(255), zone VARCHAR(255), serious_near_miss VARCHAR(10), unsafe_act TEXT, unsafe_act_other TEXT, unsafe_condition TEXT, unsafe_condition_other TEXT, work_stopped VARCHAR(10), stop_work_nogo_violation VARCHAR(10), nogo_violation_detail TEXT, stop_work_duration VARCHAR(255), other_safety_issues TEXT, comments_remarks TEXT, event_requires_sanction VARCHAR(10), action_description_1 TEXT, action_description_2 TEXT, action_description_3 TEXT, action_description_4 TEXT, action_description_5 TEXT, branch VARCHAR(255), region VARCHAR(100), db_uploaded_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP);unsafe_events_ei_tech (event_id INTEGER, reporter_name VARCHAR(255), manager_name VARCHAR(255), branch VARCHAR(255), reported_date DATE, reporter_id VARCHAR(100), date_of_unsafe_event DATE, time VARCHAR(50), time_of_unsafe_event VARCHAR(50), unsafe_event_type VARCHAR(255), business_details VARCHAR(255), site_reference TEXT, unsafe_event_location VARCHAR(255), product_type VARCHAR(255), employee_id VARCHAR(100), employee_name VARCHAR(255), subcontractor_company_name VARCHAR(255), subcontractor_id VARCHAR(100), subcontractor_city VARCHAR(255), subcontractor_name VARCHAR(255), kg_name VARCHAR(100), country_name VARCHAR(100), division VARCHAR(255), department VARCHAR(255), city VARCHAR(255), sub_area VARCHAR(100), district VARCHAR(255), zone VARCHAR(255), serious_near_miss VARCHAR(10), unsafe_act VARCHAR(255), unsafe_act_other TEXT, unsafe_condition TEXT, unsafe_condition_other TEXT, work_stopped VARCHAR(10), stop_work_nogo_violation VARCHAR(255), nogo_violation_detail TEXT, stop_work_duration VARCHAR(255), other_safety_issues TEXT, comments_remarks TEXT, event_requires_sanction VARCHAR(10), action_description_1 TEXT, action_description_2 TEXT, action_description_3 TEXT, action_description_4 TEXT, action_description_5 TEXT, image VARCHAR(500), status VARCHAR(50), region VARCHAR(100), db_uploaded_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP); unsafe_events_ni_tct (reporting_id INTEGER, status_key VARCHAR(50), status VARCHAR(50), location_key INTEGER, location VARCHAR(255), branch_key INTEGER, no INTEGER, branch_name VARCHAR(255), region_key VARCHAR(100), region VARCHAR(100), reporter_sap_id VARCHAR(100), reporter_name VARCHAR(255), designation_key VARCHAR(50), designation VARCHAR(255), gl_id_key VARCHAR(100), gl_id VARCHAR(255), pe_id_key VARCHAR(100), pe_id VARCHAR(255), created_on TIMESTAMP, date_and_time_of_unsafe_event TIMESTAMP, type_of_unsafe_event_key VARCHAR(50), type_of_unsafe_event VARCHAR(255), unsafe_event_details_key VARCHAR(50), unsafe_event_details TEXT, action_related_to_high_risk_situation_key VARCHAR(10), action_related_to_high_risk_situation VARCHAR(10), business_details_key VARCHAR(50), business_details VARCHAR(255), site_name TEXT, site_reference_key VARCHAR(50), site_reference VARCHAR(255), product_type_key VARCHAR(50), product_type VARCHAR(255), persons_involved TEXT, work_was_stopped_key VARCHAR(10), work_was_stopped VARCHAR(10), work_stopped_hours VARCHAR(50), no_go_violation_key VARCHAR(50), no_go_violation VARCHAR(255), job_no VARCHAR(100), additional_comments TEXT, has_attachment BOOLEAN, attachment VARCHAR(500), db_uploaded_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP);",
   "total_database_semantics": {
     "unsafe_events_srs": {

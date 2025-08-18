@@ -9,7 +9,7 @@ from convBI.conversationalBI import TextToSQLWorkflow, ddl_extraction, semantics
 from dotenv import load_dotenv
 load_dotenv()
 # Create router instance
-router = APIRouter(prefix="/conversation", tags=["conversation"])
+router = APIRouter(prefix="/api/v1", tags=["conversation"])
 
 # Pydantic models for request/response
 class ConversationRequest(BaseModel):

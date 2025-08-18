@@ -4,7 +4,24 @@ load_dotenv()
 import os 
 
 
-from langfuse import observe
+# Import Langfuse with fallback for deployment environments
+try:
+    from langfuse import observe
+    from langfuse.langchain import CallbackHandler
+    LANGFUSE_AVAILABLE = True
+except ImportError:
+    print("Langfuse not available - using fallback observability")
+    LANGFUSE_AVAILABLE = False
+    # Create fallback classes
+    class CallbackHandler:
+        def __init__(self):
+            pass
+    
+    def observe(func):
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+        return wrapper
+
 from langgraph.graph import StateGraph,START,END 
 from langgraph.graph.message import add_messages
 from langchain_openai import AzureChatOpenAI
@@ -16,7 +33,6 @@ from typing import Annotated,Dict,Any,Optional
 from datetime import datetime
 from pydantic import BaseModel
 import asyncio
-from langfuse.langchain import CallbackHandler
 
  
 
@@ -134,13 +150,16 @@ class TextToSQLWorkflow:
         prev_conv=state["history"][-6:] if state["history"] else []
 
         chain=prompt|self.llm 
+        # Prepare config with conditional Langfuse metadata
+        config = {"callbacks": [self.intent_handler]}
+        if LANGFUSE_AVAILABLE:
+            config["metadata"] = {"langfuse_tags": ["intent_classification_agent", "text_to_sql_workflow"]}
+        
         result=chain.invoke({
             "question":state["question"],
             "history":prev_conv   
             }, 
-        config={"callbacks": [self.intent_handler],
-                "metadata": {"langfuse_tags": ["intent_classification_agent", "text_to_sql_workflow"]}
-                })
+        config=config)
         
         state["intent"]=result.content.strip().lower() # need to a validation for the ["general","system_query"]
         
@@ -157,11 +176,15 @@ class TextToSQLWorkflow:
     def _greeting_agent(self,state:WorkflowState)->WorkflowState:
         prompt=ChatPromptTemplate.from_messages(greeting_prompt)
         chain=prompt|self.llm 
+        # Prepare config with conditional Langfuse metadata
+        config = {"callbacks": [self.greeting_handler]}
+        if LANGFUSE_AVAILABLE:
+            config["metadata"] = {"langfuse_tags": ["greeting_agent", "text_to_sql_workflow"]}
+        
         result=chain.invoke({
             "question":state["question"]
         }, 
-        config={"callbacks": [self.greeting_handler],
-                "metadata": {"langfuse_tags": ["greeting_agent", "text_to_sql_workflow"]}})
+        config=config)
         state["final_answer"]=result.content.strip()
 
         return state
@@ -172,13 +195,17 @@ class TextToSQLWorkflow:
         prompt=ChatPromptTemplate.from_messages(table_identification_prompt)
         prev_conv=state["history"][-6:] if state["history"] else []
         chain=prompt|self.llm 
+        # Prepare config with conditional Langfuse metadata
+        config = {"callbacks": [self.table_id_handler]}
+        if LANGFUSE_AVAILABLE:
+            config["metadata"] = {"langfuse_tags": ["table_identification_agent", "text_to_sql_workflow"]}
+        
         result=chain.invoke({
             "question":state["question"],
             "history":prev_conv, 
             "ddl":state["database_ddl"]
         }, 
-        config={"callbacks": [self.table_id_handler],       
-                "metadata": {"langfuse_tags": ["table_identification_agent", "text_to_sql_workflow"]}})
+        config=config)
         state["tablename"]=result.content.strip()
         return state
     
@@ -202,13 +229,17 @@ class TextToSQLWorkflow:
         # print(prev_conv)
         # print("="*6)
         chain=prompt|self.llm
+        # Prepare config with conditional Langfuse metadata
+        config = {"callbacks": [self.text_to_sql_handler]}
+        if LANGFUSE_AVAILABLE:
+            config["metadata"] = {"langfuse_tags": ["text_to_sql_agent", "text_to_sql_workflow"]}
+        
         result=chain.invoke({
             "semantic_info":state["semantic_info"] ,
             "question":state["question"],
             "history":prev_conv
         }, 
-        config={"callbacks": [self.text_to_sql_handler],               
-                 "metadata": {"langfuse_tags": ["text_to_sql_agent", "text_to_sql_workflow"]}})
+        config=config)
 
         state["sql_query"]=result.content.strip()
 
@@ -266,14 +297,18 @@ class TextToSQLWorkflow:
         # Optimize history to reduce state size
         prez_conv = state["history"][-1:] if state["history"] else []
         chain = prompt | self.llm
+        # Prepare config with conditional Langfuse metadata
+        config = {"callbacks": [self.summarizer_handler]}
+        if LANGFUSE_AVAILABLE:
+            config["metadata"] = {"langfuse_tags": ["summarizer_agent", "text_to_sql_workflow"]}
+        
         result = chain.invoke({
             "question": state["question"],
             "history": prez_conv,
             "query_result": state["query_result"],
             "tablename": state["tablename"]
         }, 
-        config={"callbacks": [self.summarizer_handler],                
-                "metadata": {"langfuse_tags": ["summarizer_agent", "text_to_sql_workflow"]}})
+        config=config)
         state["final_answer"] = result.content.strip()
         state["history"] = [
             AIMessage(content=state["final_answer"])
@@ -288,13 +323,17 @@ class TextToSQLWorkflow:
         if len(state["history"])>2:
             prez_conv=state["history"][-2:]
         chain = prompt | self.llm
+        # Prepare config with conditional Langfuse metadata
+        config = {"callbacks": [self.clarification_handler]}
+        if LANGFUSE_AVAILABLE:
+            config["metadata"] = {"langfuse_tags": ["clarification_agent", "text_to_sql_workflow"]}
+        
         result = chain.invoke({
             "question": state["question"],
             "history": prez_conv,
             "error_message": state["error_message"]
         }, 
-        config={"callbacks": [self.clarification_handler],                
-                "metadata": {"langfuse_tags": ["clarification_agent", "text_to_sql_workflow"]}})
+        config=config)
         state["final_answer"] = result.content.strip()
         
         return state
@@ -335,13 +374,17 @@ class TextToSQLWorkflow:
             # Optimize history to reduce state size
             prez_conv = state["history"][-1:] if state["history"] else []
 
+            # Prepare config with conditional Langfuse metadata
+            config = {"callbacks": [self.visualization_handler]}
+            if LANGFUSE_AVAILABLE:
+                config["metadata"] = {"langfuse_tags": ["visualization_agent", "text_to_sql_workflow"]}
+            
             result = chain.invoke({
                 "question": question,
                 "query_result":results, # Pass the results as JSON string to GPT
                 "history": prez_conv
             }, 
-            config={"callbacks": [ self.visualization_handler],               
-                     "metadata": {"langfuse_tags": ["visualization_agent", "text_to_sql_workflow"]}})
+            config=config)
             # Parse the output and save the JSON to state
 
             state["visualization_data"] = json.loads(result.content.strip())  # Save the generated JSON

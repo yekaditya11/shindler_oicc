@@ -218,15 +218,22 @@ class AIInsightsGenerator:
         """
 
         try:
+            # Prepare metadata with conditional Langfuse tags
+            metadata = {}
+            try:
+                from convBI.conversationalBI import LANGFUSE_AVAILABLE
+                if LANGFUSE_AVAILABLE:
+                    metadata["langfuse_tags"] = ["additional_insights_agent", "insights_workflow"]
+            except ImportError:
+                pass  # Langfuse not available
+            
             response = self.client.chat.completions.create(
                 model=self.deployment_name,
                 messages=[
                     {"role": "system", "content": "You are a senior safety analyst expert at generating unique, analytical insights from safety data with accurate sentiment classification. Focus on event pattern analysis and statistical observations rather than recommendations. Always provide fresh analytical perspectives that complement existing analysis. Always respond with valid JSON format."},
                     {"role": "user", "content": prompt}
                 ],
-                metadata={
-                    "langfuse_tags": ["additional_insights_agent", "insights_workflow"]
-                },
+                metadata=metadata,
                 max_tokens=self.max_tokens,
                 temperature=0.8,  # Higher temperature for more creative/diverse insights
                 top_p=0.9
@@ -542,7 +549,7 @@ class AIInsightsGenerator:
                 ],
                 metadata={
                     "langfuse_tags": ["insights_agent", "insights_workflow"]
-                },
+                } if self._is_langfuse_available() else {},
                 max_tokens=self.max_tokens,
                 temperature=self.temperature,  # Consider lowering this to 0.1-0.3 for more consistent compliance
                 top_p=0.9,
@@ -645,6 +652,14 @@ class AIInsightsGenerator:
         
         return insights
     
+    def _is_langfuse_available(self) -> bool:
+        """Check if Langfuse is available for observability"""
+        try:
+            from convBI.conversationalBI import LANGFUSE_AVAILABLE
+            return LANGFUSE_AVAILABLE
+        except ImportError:
+            return False
+    
     def generate_executive_summary(self, kpi_data: Dict[str, Any]) -> str:
         """Generate a concise executive summary of the safety performance"""
         
@@ -681,7 +696,7 @@ class AIInsightsGenerator:
                 ],
                 metadata={
                     "langfuse_tags": ["insights_summary_agent", "insights_workflow"]
-                },
+                } if self._is_langfuse_available() else {},
                 
                 max_tokens=500,
                 temperature=0.5,

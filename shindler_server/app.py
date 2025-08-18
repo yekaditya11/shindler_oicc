@@ -17,6 +17,14 @@ logger = logging.getLogger(__name__)
 # Import Azure OpenAI configuration
 from config import azure_config, get_azure_openai_client
 
+# Import Langfuse configuration and initialize
+try:
+    from config.langfuse_config import langfuse_client, langfuse_config
+    logger.info(f"Langfuse configuration loaded. Enabled: {langfuse_config.langfuse_enabled}")
+except ImportError as e:
+    logger.warning(f"Langfuse configuration not available: {e}")
+    langfuse_client = None
+
 # Import route modules
 from routes.ei_tech_routes import router as ei_tech_router
 from routes.srs_routes import router as srs_router
@@ -77,6 +85,7 @@ class HealthResponse(BaseModel):
     message: str
     azure_openai_configured: bool
     database_connected: Optional[bool] = None
+    langfuse_configured: Optional[bool] = None
 
 # Health check endpoint
 @app.get("/")
@@ -96,7 +105,8 @@ async def health():
             status="healthy" if db_status else "partial",
             message="Shindler Safety Analytics API Server health check",
             azure_openai_configured=bool(azure_config.azure_openai_endpoint and azure_config.azure_openai_api_key),
-            database_connected=db_status
+            database_connected=db_status,
+            langfuse_configured=langfuse_client is not None
         )
     except Exception as e:
         logger.error(f"Health check error: {str(e)}")
