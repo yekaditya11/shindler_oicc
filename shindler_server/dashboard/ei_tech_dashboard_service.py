@@ -153,7 +153,7 @@ class EITechDashboardService:
             time_based_analysis = self._get_time_based_analysis(config, start_date, end_date, region, session)
             regional_unsafe_acts_conditions = self._get_regional_unsafe_acts_conditions_analysis(config, start_date, end_date, region, session)
             regional_work_stoppages = self._get_regional_work_stoppages_analysis(config, start_date, end_date, region, session)
-            stoppage_duration_categorized = self._get_work_stoppage_duration_categorized_analysis(config, start_date, end_date, region, session)
+            work_stoppage_duration_analysis = self._get_work_stoppage_duration_analysis(config, start_date, end_date, region, session)
 
             return {
                 "total_events": total_events,
@@ -170,7 +170,7 @@ class EITechDashboardService:
                 "time_based_analysis": time_based_analysis,
                 "regional_unsafe_acts_conditions_analysis": regional_unsafe_acts_conditions,
                 "regional_work_stoppages_analysis": regional_work_stoppages,
-                "work_stoppage_duration_categorized_analysis": stoppage_duration_categorized
+                "work_stoppage_duration_analysis": work_stoppage_duration_analysis
             }
 
         except Exception as e:
@@ -458,7 +458,7 @@ class EITechDashboardService:
             logger.error(f"Error getting regional work stoppages analysis (EI Tech): {e}")
             return {"chart_type": "table", "description": "Error retrieving data", "data": []}
 
-    def _get_work_stoppage_duration_categorized_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
+    def _get_work_stoppage_duration_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
         """KPI: Categorized work stoppage duration analysis aligned to EI Tech data"""
         try:
             region_filter = f"AND {config['region_field']} = :region" if region else ""
@@ -1243,7 +1243,7 @@ class EITechDashboardService:
                 "description": "No data available",
                 "data": []
             },
-            "work_stoppage_duration_categorized_analysis": {
+            "work_stoppage_duration_analysis": {
                 "chart_type": "table",
                 "description": "No data available",
                 "data": []

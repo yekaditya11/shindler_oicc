@@ -213,7 +213,7 @@ class NITCTKPIQueries:
         """
         return self.execute_query(query, {}, session)
 
-    def get_work_stoppage_duration_categorized_analysis(self, session: Session = None) -> List[Dict]:
+    def get_work_stoppage_duration_analysis(self, session: Session = None) -> List[Dict]:
         """Categorize work stoppage duration into One Day or Less vs More than one day, including NO cases."""
         query = f"""
         SELECT
@@ -1091,7 +1091,7 @@ class NITCTKPIQueries:
                     "work_stopped": self.get_work_stopped_incidents(session),
                     "nogo_violations": self.get_nogo_violations_count(session),
                     "work_stoppage_duration": self.get_work_stoppage_duration_analysis(session),
-                    "work_stoppage_duration_categorized_analysis": self.get_work_stoppage_duration_categorized_analysis(session),
+                    "work_stoppage_duration_analysis": self.get_work_stoppage_duration_analysis(session),
                     "regional_work_stoppages_analysis": self.get_regional_work_stoppages_analysis(session),
 
                     # Geographic Distribution
