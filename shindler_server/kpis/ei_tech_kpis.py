@@ -1162,6 +1162,7 @@ class EITechKPIQueries:
                     # ==================== OPERATIONAL IMPACT ====================
                     "number_of_nogo_violations": self.get_nogo_violations_count(session),
                     "work_hours_lost": self.get_stop_work_duration_analysis(session),
+                    "work_stoppage_duration_categorized_analysis": self.get_work_stoppage_duration_categorized_analysis(session),
                     "regional_work_stoppages_analysis": self.get_regional_work_stoppages_analysis(session),
                     "time_taken_to_report_incidents": self.get_reporting_delay_analysis(session),
 

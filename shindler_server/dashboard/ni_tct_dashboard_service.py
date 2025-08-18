@@ -153,6 +153,7 @@ class NITCTDashboardService:
             time_based_analysis = self._get_time_based_analysis(config, start_date, end_date, region, session)
             regional_unsafe_acts_conditions = self._get_regional_unsafe_acts_conditions_analysis(config, start_date, end_date, region, session)
             regional_work_stoppages = self._get_regional_work_stoppages_analysis(config, start_date, end_date, region, session)
+            stoppage_duration_categorized_analysis = self._get_work_stoppage_duration_categorized_analysis(config, start_date, end_date, region, session)
 
             return {
                 "total_events": total_events,
@@ -192,7 +193,8 @@ class NITCTDashboardService:
                 "operational_impact_analysis": operational_impact,
                 "time_based_analysis": time_based_analysis,
                 "regional_unsafe_acts_conditions_analysis": regional_unsafe_acts_conditions
-                ,"regional_work_stoppages_analysis": regional_work_stoppages
+                ,"regional_work_stoppages_analysis": regional_work_stoppages,
+                "work_stoppage_duration_categorized_analysis": stoppage_duration_categorized_analysis
             }
 
         except Exception as e:
@@ -884,6 +886,11 @@ class NITCTDashboardService:
                 "description": "No data available",
                 "data": []
             }
+            ,"work_stoppage_duration_categorized_analysis": {
+                "chart_type": "bar",
+                "description": "No data available",
+                "data": []
+            }
         } 
 
     def _get_regional_unsafe_acts_conditions_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
@@ -1101,3 +1108,72 @@ class NITCTDashboardService:
         except Exception as e:
             logger.error(f"Error getting regional work stoppages analysis (NI TCT): {e}")
             return {"chart_type": "table", "description": "Error retrieving data", "data": []}
+
+    def _get_work_stoppage_duration_categorized_analysis(self, config: Dict, start_date: str, end_date: str, region: str = None, session: Session = None) -> Dict[str, Any]:
+        """KPI: Work stoppage duration categorized into One Day or Less vs More than one day, including NO cases."""
+        try:
+            region_filter = f"AND {config['region_field']} = :region" if region else ""
+
+            query = f"""
+            SELECT
+                work_was_stopped,
+                duration_category,
+                COUNT(*) as event_count
+            FROM (
+                SELECT
+                    {config['primary_key']} as reporting_id,
+                    CASE 
+                        WHEN UPPER(TRIM(COALESCE({config['work_stopped_field']}, ''))) = 'YES' THEN 'YES'
+                        WHEN UPPER(TRIM(COALESCE({config['work_stopped_field']}, ''))) = 'NO' THEN 'NO'
+                        ELSE COALESCE({config['work_stopped_field']}, 'Unknown')
+                    END as work_was_stopped,
+                    work_stopped_hours,
+                    CASE
+                        WHEN UPPER(TRIM(COALESCE({config['work_stopped_field']}, ''))) = 'YES' THEN
+                            CASE
+                                WHEN work_stopped_hours IS NULL OR TRIM(CAST(work_stopped_hours AS TEXT)) = '' THEN ''
+                                WHEN CAST(work_stopped_hours AS TEXT) ~ '^[0-9]+\.?[0-9]*$' THEN
+                                    CASE
+                                        WHEN CAST(work_stopped_hours AS NUMERIC) <= 24 THEN 'One Day or Less'
+                                        WHEN CAST(work_stopped_hours AS NUMERIC) > 24 THEN 'More than one day'
+                                        ELSE 'Other Duration'
+                                    END
+                                ELSE 'Other Duration'
+                            END
+                        WHEN UPPER(TRIM(COALESCE({config['work_stopped_field']}, ''))) = 'NO' THEN ''
+                        ELSE ''
+                    END as duration_category
+                FROM {config['table_name']}
+                WHERE {config['primary_key']} IS NOT NULL
+                    AND {config['event_date_field']}::date BETWEEN :start_date AND :end_date
+                    {region_filter}
+            ) categorized_events
+            GROUP BY work_was_stopped, duration_category
+            ORDER BY
+                CASE work_was_stopped
+                    WHEN 'NO' THEN 1
+                    WHEN 'YES' THEN 2
+                    ELSE 3
+                END,
+                CASE duration_category
+                    WHEN '' THEN 1
+                    WHEN 'One Day or Less' THEN 2
+                    WHEN 'More than one day' THEN 3
+                    ELSE 4
+                END
+            """
+
+            params = {"start_date": start_date, "end_date": end_date}
+            if region:
+                params["region"] = region
+
+            data = self.execute_query(query, params, session)
+
+            return {
+                "chart_type": "bar",
+                "description": "Work stoppage duration analysis categorized into duration buckets",
+                "data": data
+            }
+        except Exception as e:
+            logger.error(f"Error getting work stoppage duration categorized (NI TCT): {e}")
+            return {"chart_type": "bar", "description": "Error retrieving data", "data": []}

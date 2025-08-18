@@ -213,6 +213,57 @@ class NITCTKPIQueries:
         """
         return self.execute_query(query, {}, session)
 
+    def get_work_stoppage_duration_categorized_analysis(self, session: Session = None) -> List[Dict]:
+        """Categorize work stoppage duration into One Day or Less vs More than one day, including NO cases."""
+        query = f"""
+        SELECT
+            work_was_stopped,
+            duration_category,
+            COUNT(*) as event_count
+        FROM (
+            SELECT
+                reporting_id,
+                CASE 
+                    WHEN UPPER(TRIM(COALESCE(work_was_stopped, ''))) = 'YES' THEN 'YES'
+                    WHEN UPPER(TRIM(COALESCE(work_was_stopped, ''))) = 'NO' THEN 'NO'
+                    ELSE COALESCE(work_was_stopped, 'Unknown')
+                END as work_was_stopped,
+                work_stopped_hours,
+                CASE
+                    WHEN UPPER(TRIM(COALESCE(work_was_stopped, ''))) = 'YES' THEN
+                        CASE
+                            WHEN work_stopped_hours IS NULL OR TRIM(CAST(work_stopped_hours AS TEXT)) = '' THEN ''
+                            WHEN CAST(work_stopped_hours AS TEXT) ~ '^[0-9]+\.?[0-9]*$' THEN
+                                CASE
+                                    WHEN CAST(work_stopped_hours AS NUMERIC) <= 24 THEN 'One Day or Less'
+                                    WHEN CAST(work_stopped_hours AS NUMERIC) > 24 THEN 'More than one day'
+                                    ELSE 'Other Duration'
+                                END
+                            ELSE 'Other Duration'
+                        END
+                    WHEN UPPER(TRIM(COALESCE(work_was_stopped, ''))) = 'NO' THEN ''
+                    ELSE ''
+                END as duration_category
+            FROM {self.table_name}
+            WHERE reporting_id IS NOT NULL
+            {self.date_filter}
+        ) categorized_events
+        GROUP BY work_was_stopped, duration_category
+        ORDER BY
+            CASE work_was_stopped
+                WHEN 'NO' THEN 1
+                WHEN 'YES' THEN 2
+                ELSE 3
+            END,
+            CASE duration_category
+                WHEN '' THEN 1
+                WHEN 'One Day or Less' THEN 2
+                WHEN 'More than one day' THEN 3
+                ELSE 4
+            END
+        """
+        return self.execute_query(query, {}, session)
+
     def get_regional_work_stoppages_analysis(self, session: Session = None) -> List[Dict]:
         """Work stoppages by region with most common causes (NI TCT) with date filtering"""
         query = f"""
@@ -1040,6 +1091,7 @@ class NITCTKPIQueries:
                     "work_stopped": self.get_work_stopped_incidents(session),
                     "nogo_violations": self.get_nogo_violations_count(session),
                     "work_stoppage_duration": self.get_work_stoppage_duration_analysis(session),
+                    "work_stoppage_duration_categorized_analysis": self.get_work_stoppage_duration_categorized_analysis(session),
                     "regional_work_stoppages_analysis": self.get_regional_work_stoppages_analysis(session),
 
                     # Geographic Distribution
