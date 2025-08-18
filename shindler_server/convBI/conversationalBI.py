@@ -89,31 +89,38 @@ class TextToSQLWorkflow:
             # Create handlers with proper configuration
             self.intent_handler = CallbackHandler(
                 langfuse=langfuse_client,
-                trace_name="intent_classification_agent"
+                trace_name="intent_classification_agent",
+                name="intent_classification_agent"
             )
             self.greeting_handler = CallbackHandler(
                 langfuse=langfuse_client,
-                trace_name="greeting_agent"
+                trace_name="greeting_agent",
+                name="greeting_agent"
             )
             self.table_id_handler = CallbackHandler(
                 langfuse=langfuse_client,
-                trace_name="table_identification_agent"
+                trace_name="table_identification_agent",
+                name="table_identification_agent"
             )
             self.text_to_sql_handler = CallbackHandler(
                 langfuse=langfuse_client,
-                trace_name="text_to_sql_agent"
+                trace_name="text_to_sql_agent",
+                name="text_to_sql_agent"
             )
             self.summarizer_handler = CallbackHandler(
                 langfuse=langfuse_client,
-                trace_name="summarizer_agent"
+                trace_name="summarizer_agent",
+                name="summarizer_agent"
             )
             self.clarification_handler = CallbackHandler(
                 langfuse=langfuse_client,
-                trace_name="clarification_agent"
+                trace_name="clarification_agent",
+                name="clarification_agent"
             )
             self.visualization_handler = CallbackHandler(
                 langfuse=langfuse_client,
-                trace_name="visualization_agent"
+                trace_name="visualization_agent",
+                name="visualization_agent"
             )
             print("✅ Langfuse CallbackHandlers configured with trace names")
         else:
@@ -207,10 +214,8 @@ class TextToSQLWorkflow:
 
         return graph_builder
     
-        def _intent_classification_agent(self,state:WorkflowState)->WorkflowState:
-        # Create custom trace for this agent
-        trace = self._create_agent_trace("intent_classification", state)
-        
+        @observe(name="intent_classification_agent")
+    def _intent_classification_agent(self,state:WorkflowState)->WorkflowState:
         prompt=ChatPromptTemplate.from_messages(intent_prompt)
         prev_conv=state["history"][-6:] if state["history"] else []
         chain=prompt|self.llm
@@ -220,6 +225,7 @@ class TextToSQLWorkflow:
         if LANGFUSE_AVAILABLE:
             config["metadata"] = {"langfuse_tags": ["intent_classification_agent", "text_to_sql_workflow"]}
             config["tags"] = ["intent_classification_agent", "text_to_sql_workflow"]
+            config["trace_name"] = "intent_classification_agent"
             print("🔍 Intent agent: Langfuse tracing enabled")
         else:
             print("⚠️  Intent agent: Langfuse tracing disabled")
@@ -240,16 +246,9 @@ class TextToSQLWorkflow:
         except Exception as e:
             print(f"Warning: Could not save intent.json: {e}")
 
-        # End the trace if it was created
-        if trace:
-            try:
-                trace.end()
-                print(f"🔍 Ended trace for intent_classification_agent")
-            except Exception as e:
-                print(f"⚠️  Failed to end trace: {e}")
-
         return state
     
+    @observe(name="greeting_agent")
     def _greeting_agent(self,state:WorkflowState)->WorkflowState:
         prompt=ChatPromptTemplate.from_messages(greeting_prompt)
         chain=prompt|self.llm 
@@ -268,6 +267,7 @@ class TextToSQLWorkflow:
     
 
     
+    @observe(name="table_identification_agent")
     def _table_identification_agent(self,state:WorkflowState)->WorkflowState: 
         prompt=ChatPromptTemplate.from_messages(table_identification_prompt)
         prev_conv=state["history"][-6:] if state["history"] else []
@@ -298,6 +298,7 @@ class TextToSQLWorkflow:
 
         return state
     
+    @observe(name="text_to_sql_agent")
     def _text_to_sql_agent(self,state:WorkflowState)->WorkflowState:
         prompt=ChatPromptTemplate.from_messages(text_to_sql_prompt)
 
@@ -367,6 +368,7 @@ class TextToSQLWorkflow:
         except psycopg.Error as e:
             return None  
     
+    @observe(name="summarizer_agent")
     def _summarizer_agent(self, state: WorkflowState) -> WorkflowState:
 
         
@@ -394,6 +396,7 @@ class TextToSQLWorkflow:
 
         return state
 
+    @observe(name="clarification_agent")
     def _clarification_agent(self, state: WorkflowState) -> WorkflowState:
         prompt = ChatPromptTemplate.from_messages(clarification_prompt)
         prez_conv=state["history"]
@@ -415,6 +418,7 @@ class TextToSQLWorkflow:
         
         return state
     
+    @observe(name="visualization_agent")
     def _visualization_agent(self, state: WorkflowState) -> WorkflowState:
         
         """
