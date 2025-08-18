@@ -108,3 +108,54 @@ async def stream_chat_endpoint(request: ConversationRequest):
             status_code=500,
             detail=f"Internal server error: {str(e)}",
         )
+
+@router.post("/test-trace")
+async def test_trace_endpoint():
+    """Test endpoint to manually create a Langfuse trace"""
+    try:
+        from convBI.conversationalBI import LANGFUSE_AVAILABLE
+        import langfuse
+        from datetime import datetime
+        
+        if not LANGFUSE_AVAILABLE:
+            return {"success": False, "message": "Langfuse not available"}
+        
+        # Create a test trace
+        langfuse_client = langfuse.Langfuse()
+        
+        trace = langfuse_client.trace(
+            name="test_conversational_bi_trace",
+            metadata={
+                "test": True,
+                "timestamp": datetime.now().isoformat(),
+                "source": "conversational_bi_test"
+            }
+        )
+        
+        # Create a span
+        span = trace.span(
+            name="test_agent_span",
+            metadata={"agent": "test_agent"}
+        )
+        
+        # Simulate some work
+        import time
+        time.sleep(0.1)
+        
+        # End the span and trace
+        span.end()
+        trace.end()
+        
+        return {
+            "success": True,
+            "message": "Test trace created successfully",
+            "trace_id": trace.id,
+            "langfuse_available": LANGFUSE_AVAILABLE
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "message": f"Error creating test trace: {str(e)}",
+            "langfuse_available": LANGFUSE_AVAILABLE if 'LANGFUSE_AVAILABLE' in locals() else False
+        }

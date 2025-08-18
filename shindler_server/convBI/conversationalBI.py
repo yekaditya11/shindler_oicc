@@ -9,8 +9,9 @@ try:
     from langfuse import observe
     from langfuse.langchain import CallbackHandler
     LANGFUSE_AVAILABLE = True
+    print("✅ Langfuse imported successfully for conversational BI")
 except ImportError:
-    print("Langfuse not available - using fallback observability")
+    print("❌ Langfuse not available - using fallback observability")
     LANGFUSE_AVAILABLE = False
     # Create fallback classes
     class CallbackHandler:
@@ -154,6 +155,9 @@ class TextToSQLWorkflow:
         config = {"callbacks": [self.intent_handler]}
         if LANGFUSE_AVAILABLE:
             config["metadata"] = {"langfuse_tags": ["intent_classification_agent", "text_to_sql_workflow"]}
+            print("🔍 Intent agent: Langfuse tracing enabled")
+        else:
+            print("⚠️  Intent agent: Langfuse tracing disabled")
         
         result=chain.invoke({
             "question":state["question"],
