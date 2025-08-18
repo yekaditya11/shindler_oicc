@@ -213,8 +213,8 @@ class TextToSQLWorkflow:
         # graph_builder.add_edge("text_to_sql",END)
 
         return graph_builder
-    
-        @observe(name="intent_classification_agent")
+
+    @observe(name="intent_classification_agent")
     def _intent_classification_agent(self,state:WorkflowState)->WorkflowState:
         prompt=ChatPromptTemplate.from_messages(intent_prompt)
         prev_conv=state["history"][-6:] if state["history"] else []
