@@ -82,47 +82,15 @@ class TextToSQLWorkflow:
         
         # Create individual handlers for each agent with proper Langfuse configuration
         if LANGFUSE_AVAILABLE:
-            # Create Langfuse client for handlers
-            import langfuse
-            langfuse_client = langfuse.Langfuse()
-            
-            # Create handlers with proper configuration
-            self.intent_handler = CallbackHandler(
-                langfuse=langfuse_client,
-                trace_name="intent_classification_agent",
-                name="intent_classification_agent"
-            )
-            self.greeting_handler = CallbackHandler(
-                langfuse=langfuse_client,
-                trace_name="greeting_agent",
-                name="greeting_agent"
-            )
-            self.table_id_handler = CallbackHandler(
-                langfuse=langfuse_client,
-                trace_name="table_identification_agent",
-                name="table_identification_agent"
-            )
-            self.text_to_sql_handler = CallbackHandler(
-                langfuse=langfuse_client,
-                trace_name="text_to_sql_agent",
-                name="text_to_sql_agent"
-            )
-            self.summarizer_handler = CallbackHandler(
-                langfuse=langfuse_client,
-                trace_name="summarizer_agent",
-                name="summarizer_agent"
-            )
-            self.clarification_handler = CallbackHandler(
-                langfuse=langfuse_client,
-                trace_name="clarification_agent",
-                name="clarification_agent"
-            )
-            self.visualization_handler = CallbackHandler(
-                langfuse=langfuse_client,
-                trace_name="visualization_agent",
-                name="visualization_agent"
-            )
-            print("✅ Langfuse CallbackHandlers configured with trace names")
+            # Create handlers (no unsupported kwargs)
+            self.intent_handler = CallbackHandler()
+            self.greeting_handler = CallbackHandler()
+            self.table_id_handler = CallbackHandler()
+            self.text_to_sql_handler = CallbackHandler()
+            self.summarizer_handler = CallbackHandler()
+            self.clarification_handler = CallbackHandler()
+            self.visualization_handler = CallbackHandler()
+            print("✅ Langfuse CallbackHandlers configured")
         else:
             # Fallback handlers
             self.intent_handler = CallbackHandler()
@@ -225,7 +193,7 @@ class TextToSQLWorkflow:
         if LANGFUSE_AVAILABLE:
             config["metadata"] = {"langfuse_tags": ["intent_classification_agent", "text_to_sql_workflow"]}
             config["tags"] = ["intent_classification_agent", "text_to_sql_workflow"]
-            config["trace_name"] = "intent_classification_agent"
+            config["run_name"] = "intent_classification_agent"
             print("🔍 Intent agent: Langfuse tracing enabled")
         else:
             print("⚠️  Intent agent: Langfuse tracing disabled")
@@ -276,6 +244,7 @@ class TextToSQLWorkflow:
         config = {"callbacks": [self.table_id_handler]}
         if LANGFUSE_AVAILABLE:
             config["metadata"] = {"langfuse_tags": ["table_identification_agent", "text_to_sql_workflow"]}
+            config["run_name"] = "table_identification_agent"
         
         result=chain.invoke({
             "question":state["question"],
@@ -311,6 +280,7 @@ class TextToSQLWorkflow:
         config = {"callbacks": [self.text_to_sql_handler]}
         if LANGFUSE_AVAILABLE:
             config["metadata"] = {"langfuse_tags": ["text_to_sql_agent", "text_to_sql_workflow"]}
+            config["run_name"] = "text_to_sql_agent"
         
         result=chain.invoke({
             "semantic_info":state["semantic_info"] ,
@@ -380,6 +350,7 @@ class TextToSQLWorkflow:
         config = {"callbacks": [self.summarizer_handler]}
         if LANGFUSE_AVAILABLE:
             config["metadata"] = {"langfuse_tags": ["summarizer_agent", "text_to_sql_workflow"]}
+            config["run_name"] = "summarizer_agent"
         
         result = chain.invoke({
             "question": state["question"],
@@ -407,6 +378,7 @@ class TextToSQLWorkflow:
         config = {"callbacks": [self.clarification_handler]}
         if LANGFUSE_AVAILABLE:
             config["metadata"] = {"langfuse_tags": ["clarification_agent", "text_to_sql_workflow"]}
+            config["run_name"] = "clarification_agent"
         
         result = chain.invoke({
             "question": state["question"],
@@ -459,6 +431,7 @@ class TextToSQLWorkflow:
             config = {"callbacks": [self.visualization_handler]}
             if LANGFUSE_AVAILABLE:
                 config["metadata"] = {"langfuse_tags": ["visualization_agent", "text_to_sql_workflow"]}
+                config["run_name"] = "visualization_agent"
             
             result = chain.invoke({
                 "question": question,

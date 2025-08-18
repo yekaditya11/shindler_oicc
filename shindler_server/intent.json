@@ -2827,6 +2827,54 @@
     {
       "type": "ai",
       "content": "In the srs system, incident counts showed a high level in January (1,502) and February (1,553) 2025, followed by a notable drop in March to 926 incidents. April and June show sharp declines with only 19 and 1 incident(s) respectively, indicating a significant downward trend after February."
+    },
+    {
+      "type": "human",
+      "content": "what is the highest unsafe events count in a area"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  city,\n  COUNT(*) AS unsafe_events_count\nFROM unsafe_events_srs\nGROUP BY city\nORDER BY unsafe_events_count DESC\nLIMIT 1;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, North Delhi has the highest count of unsafe events with 447 recorded incidents."
+    },
+    {
+      "type": "human",
+      "content": "give me bar chart  for Safety Performance Trends"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  DATE_TRUNC('month', date_of_unsafe_event) AS month,\n  COUNT(*) AS incident_count\nFROM unsafe_events_srs\nGROUP BY month\nORDER BY month;"
+    },
+    {
+      "type": "ai",
+      "content": "The safety performance trend in the srs system shows a high number of incidents in January (1502) and February (1553) 2025, followed by a significant drop in March (926), and a sharp decline to very low incident counts in April (19) and June (1). This indicates a strong improvement in incident reduction over the months."
+    },
+    {
+      "type": "human",
+      "content": "give me a pie chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  unsafe_event_type,\n  COUNT(*) AS event_count\nFROM unsafe_events_srs\nGROUP BY unsafe_event_type\nORDER BY event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "The pie chart for unsafe events in the srs system would show the majority are Unsafe Conditions (3,182 events), followed by Unsafe Acts (633 events). Near Misses are less frequent (94 events), with smaller portions representing combined categories like Unsafe Act and Unsafe Condition together (54 and 26 events), and minimal counts for other mixed event types."
+    },
+    {
+      "type": "human",
+      "content": "Regional Unsafe Acts & Conditions Analysis pie chart"
+    },
+    {
+      "type": "ai",
+      "content": "SELECT\n  region,\n  CASE\n    WHEN unsafe_event_type LIKE '%Unsafe Act%' AND unsafe_event_type LIKE '%Unsafe Condition%' THEN 'Unsafe Act and Unsafe Condition'\n    WHEN unsafe_event_type LIKE '%Unsafe Act%' THEN 'Unsafe Act'\n    WHEN unsafe_event_type LIKE '%Unsafe Condition%' THEN 'Unsafe Condition'\n    ELSE 'Other'\n  END AS event_category,\n  COUNT(*) AS event_count\nFROM unsafe_events_srs\nGROUP BY region, event_category\nORDER BY region, event_count DESC;"
+    },
+    {
+      "type": "ai",
+      "content": "In the srs system, the analysis of unsafe acts and conditions by region shows the following key points: NR 1 and WR 2 regions report the highest counts of unsafe conditions (589 and 647 respectively) and unsafe acts (311 and 63 respectively). NR 1 also has a notable number of combined unsafe acts and conditions (9). INFRA / TRD has the lowest numbers overall, with 261 unsafe conditions and 28 unsafe acts. Other categories remain minimal across regions. This highlights NR 1 and WR 2 as priority areas for focused safety interventions."
     }
   ],
   "question": "hi",
