@@ -7,7 +7,10 @@ import os
 # Import Langfuse with fallback for deployment environments
 try:
     from langfuse import observe
-    from langfuse.langchain import CallbackHandler
+    try:
+        from langfuse.callback import CallbackHandler
+    except ImportError:
+        from langfuse.langchain import CallbackHandler
     LANGFUSE_AVAILABLE = True
     print("✅ Langfuse imported successfully for conversational BI")
 except ImportError:
@@ -83,6 +86,7 @@ class TextToSQLWorkflow:
         # Create individual handlers for each agent with proper Langfuse configuration
         if LANGFUSE_AVAILABLE:
             # Create handlers (no unsupported kwargs)
+            self.root_handler = CallbackHandler()
             self.intent_handler = CallbackHandler()
             self.greeting_handler = CallbackHandler()
             self.table_id_handler = CallbackHandler()
@@ -93,6 +97,7 @@ class TextToSQLWorkflow:
             print("✅ Langfuse CallbackHandlers configured")
         else:
             # Fallback handlers
+            self.root_handler = CallbackHandler()
             self.intent_handler = CallbackHandler()
             self.greeting_handler = CallbackHandler()
             self.table_id_handler = CallbackHandler()
@@ -476,6 +481,9 @@ class TextToSQLWorkflow:
             graph=workflow.compile(checkpointer=checkpointer)
 
             config = {"configurable": {"thread_id": "201"}}
+            if LANGFUSE_AVAILABLE:
+                config["callbacks"] = [self.root_handler]
+                config["run_name"] = "text_to_sql_workflow"
             result = graph.invoke(input_state, config=config)
             return result  # Return the result instead of None
         
@@ -505,6 +513,9 @@ class TextToSQLWorkflow:
             graph = workflow.compile(checkpointer=checkpointer)
 
             config = {"configurable": {"thread_id": "8080"}}
+            if LANGFUSE_AVAILABLE:
+                config["callbacks"] = [self.root_handler]
+                config["run_name"] = "text_to_sql_workflow_stream"
             for chunk in graph.stream(
                 input=input_state,
                 config=config,
