@@ -144,6 +144,7 @@ class AIInsightsGenerator:
             - Provide helpful suggestions without expressing opinions.
             - When you see "NaN" (missing information), change it to "unspecified"
             - Use everyday words instead of technical computer terms so everyone can easily understand
+            - use "unsafe events" insted of saying "incidents"
 
         CRITICAL DATA LIMITATION:
         - ONLY analyze data from January through March - this is the complete dataset available
@@ -161,8 +162,8 @@ class AIInsightsGenerator:
         ✅ CORRECT: "January shows 1502 unsafe events with 298 work stoppages"
         ❌ WRONG: "January shows 1502 unsafe events with 298 work stoppages, indicating operational disruptions"
         
-        ✅ CORRECT: "February reports 1553 incidents correlating with 329 work interruptions"  
-        ❌ WRONG: "February reports 1553 incidents correlating with 329 work interruptions, suggesting operational factors"
+        ✅ CORRECT: "February reports 1553 unsafe events correlating with 329 work interruptions"  
+        ❌ WRONG: "February reports 1553 unsafe events correlating with 329 work interruptions, suggesting operational factors"
 
         REPLACEMENT WORDS to use instead of "operational":
         - "workplace" instead of "operational"
@@ -197,7 +198,7 @@ class AIInsightsGenerator:
 
         SENTIMENT CLASSIFICATION GUIDELINES:
         - POSITIVE: Improvements, achievements, good performance, declining risks, successful interventions
-        - NEGATIVE: Deteriorating conditions, high risks, compliance failures, safety concerns, incidents increasing
+        - NEGATIVE: Deteriorating conditions, high risks, compliance failures, safety concerns, unsafe events increasing
         - NEUTRAL: Status updates, procedural information, data observations without clear positive/negative impact
 
         ANALYTICAL FOCUS (NO RECOMMENDATIONS):
@@ -416,7 +417,7 @@ class AIInsightsGenerator:
         
         MONTHLY TRENDS: {monthly_trends}
         
-        TOP BRANCHES BY INCIDENTS: {branch_data}
+        TOP BRANCHES BY unsafe events: {branch_data}
         
         REGIONAL BREAKDOWN: {region_data}
         
@@ -458,8 +459,8 @@ class AIInsightsGenerator:
         ✅ CORRECT: "January shows 1502 unsafe events with 298 work stoppages"
         ❌ WRONG: "January shows 1502 unsafe events with 298 work stoppages, indicating operational disruptions"
         
-        ✅ CORRECT: "February reports 1553 incidents correlating with 329 work interruptions"  
-        ❌ WRONG: "February reports 1553 incidents correlating with 329 work interruptions, suggesting operational factors"
+        ✅ CORRECT: "February reports 1553 unsafe events correlating with 329 work interruptions"  
+        ❌ WRONG: "February reports 1553 unsafe events correlating with 329 work interruptions, suggesting operational factors"
 
         REPLACEMENT WORDS to use instead of "operational":
         - "workplace" instead of "operational"
@@ -475,6 +476,7 @@ class AIInsightsGenerator:
         - When you see "NaN" (missing information), change it to "unspecified"
         - Use everyday words instead of technical terms
         - Complete data available: January-March only (ignore April-December)
+        - use "unsafe events" insted of "incidents"
 
         UNSAFE EVENT TYPES (3 types):
         1. Unsafe Condition
@@ -493,12 +495,12 @@ class AIInsightsGenerator:
         
         SENTIMENT GUIDELINES:
         - POSITIVE: Improvements, declining risks, better performance
-        - NEGATIVE: Increasing incidents, high risks, deteriorating conditions  
+        - NEGATIVE: Increasing unsafe events, high risks, deteriorating conditions  
         - NEUTRAL: Data observations without clear positive/negative impact
 
         EXAMPLE FORMAT:
         ✅ "Branch X reports 300% higher incident rate during morning shifts compared to afternoon periods"
-        ✅ "Near miss reporting declined 40% while actual incidents increased across all sites"
+        ✅ "Near miss reporting declined 40% while actual unsafe events increased across all sites"
         ❌ "Branch X shows concerning patterns indicating operational stress factors requiring attention"
 
         Data:

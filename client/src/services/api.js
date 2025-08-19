@@ -274,7 +274,8 @@ class ApiService {
       console.log('🔥 API: Request payload:', { question: message });
 
       const response = await api.post('/api/v1/chat', {
-        question: message
+        question: message,
+        file_id: 1  // Default to file_id 1 for SRS data
       });
 
       console.log('🔥 API: ConvBI response received:', response);
