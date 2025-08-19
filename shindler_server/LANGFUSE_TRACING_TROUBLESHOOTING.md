@@ -228,3 +228,4 @@ If the issue persists:
 5. **Test with a simple trace** first before complex workflows
 
 Remember: The chat functionality should work regardless of tracing status. Focus on getting traces working after confirming chat works.
+

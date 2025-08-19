@@ -4,27 +4,7 @@ load_dotenv()
 import os 
 
 
-# Import Langfuse with fallback for deployment environments
-try:
-    from langfuse import observe
-    try:
-        from langfuse.callback import CallbackHandler
-    except ImportError:
-        from langfuse.langchain import CallbackHandler
-    LANGFUSE_AVAILABLE = True
-    print("✅ Langfuse imported successfully for conversational BI")
-except ImportError:
-    print("❌ Langfuse not available - using fallback observability")
-    LANGFUSE_AVAILABLE = False
-    # Create fallback classes
-    class CallbackHandler:
-        def __init__(self):
-            pass
-    
-    def observe(func):
-        def wrapper(*args, **kwargs):
-            return func(*args, **kwargs)
-        return wrapper
+from langfuse.langchain import CallbackHandler
 
 from langgraph.graph import StateGraph,START,END 
 from langgraph.graph.message import add_messages
@@ -83,43 +63,9 @@ class TextToSQLWorkflow:
             api_key=os.environ["AZURE_OPENAI_API_KEY"]
         )
         
-        def create_langfuse_handler():
-            if not LANGFUSE_AVAILABLE:
-                return CallbackHandler()
-            public_key = os.getenv("LANGFUSE_PUBLIC_KEY")
-            secret_key = os.getenv("LANGFUSE_SECRET_KEY")
-            host = os.getenv("LANGFUSE_HOST", "https://cloud.langfuse.com")
-            try:
-                # Newer SDK (v3)
-                return CallbackHandler(public_key=public_key, secret_key=secret_key, host=host)
-            except TypeError:
-                # Older integration signature, fall back to no-arg
-                return CallbackHandler()
-
-        # Create individual handlers for each agent with proper Langfuse configuration
-        if LANGFUSE_AVAILABLE:
-            # Create handlers (no unsupported kwargs)
-            self.langfuse_handler = create_langfuse_handler()
-            self.root_handler = self.langfuse_handler
-            self.intent_handler = self.langfuse_handler
-            self.greeting_handler = self.langfuse_handler
-            self.table_id_handler = self.langfuse_handler
-            self.text_to_sql_handler = self.langfuse_handler
-            self.summarizer_handler = self.langfuse_handler
-            self.clarification_handler = self.langfuse_handler
-            self.visualization_handler = self.langfuse_handler
-            print("✅ Langfuse CallbackHandlers configured")
-        else:
-            # Fallback handlers
-            self.root_handler = CallbackHandler()
-            self.intent_handler = CallbackHandler()
-            self.greeting_handler = CallbackHandler()
-            self.table_id_handler = CallbackHandler()
-            self.text_to_sql_handler = CallbackHandler()
-            self.summarizer_handler = CallbackHandler()
-            self.clarification_handler = CallbackHandler()
-            self.visualization_handler = CallbackHandler()
-            print("⚠️  Using fallback CallbackHandlers (no Langfuse)")
+        # Simple CallbackHandler setup
+        self.callback_handler = CallbackHandler()
+        print("✅ CallbackHandler configured")
     
     
     def _serialize_state_for_json(self, state: WorkflowState) -> Dict[str, Any]:
@@ -142,28 +88,7 @@ class TextToSQLWorkflow:
                 serializable_state[key] = value
         return serializable_state
 
-    def _create_agent_trace(self, agent_name: str, state: WorkflowState):
-        """Create a custom trace for each agent"""
-        if LANGFUSE_AVAILABLE:
-            try:
-                import langfuse
-                langfuse_client = langfuse.Langfuse()
-                
-                trace = langfuse_client.trace(
-                    name=f"{agent_name}_agent",
-                    metadata={
-                        "agent": agent_name,
-                        "workflow": "text_to_sql_workflow",
-                        "question": state["question"][:100] if state.get("question") else "",
-                        "timestamp": datetime.now().isoformat()
-                    }
-                )
-                print(f"🔍 Created trace for {agent_name}_agent")
-                return trace
-            except Exception as e:
-                print(f"⚠️  Failed to create trace for {agent_name}: {e}")
-                return None
-        return None
+
 
     def _build_workflow(self)->StateGraph[WorkflowState]:
         graph_builder=StateGraph(WorkflowState)
@@ -201,21 +126,12 @@ class TextToSQLWorkflow:
 
         return graph_builder
 
-    @observe(name="intent_classification_agent")
     def _intent_classification_agent(self,state:WorkflowState)->WorkflowState:
         prompt=ChatPromptTemplate.from_messages(intent_prompt)
         prev_conv=state["history"][-6:] if state["history"] else []
         chain=prompt|self.llm
         
-        # Prepare config with conditional Langfuse metadata
-        config = {"callbacks": [self.intent_handler]}
-        if LANGFUSE_AVAILABLE:
-            config["metadata"] = {"langfuse_tags": ["intent_classification_agent", "text_to_sql_workflow"]}
-            config["tags"] = ["intent_classification_agent", "text_to_sql_workflow"]
-            config["run_name"] = "intent_classification_agent"
-            print("🔍 Intent agent: Langfuse tracing enabled")
-        else:
-            print("⚠️  Intent agent: Langfuse tracing disabled")
+        config = {"callbacks": [self.callback_handler],"metadata": {"langfuse_tags": ["intent_classification_agent", "text_to_sql_workflow"]}}
         
         result=chain.invoke({
             "question":state["question"],
@@ -235,14 +151,10 @@ class TextToSQLWorkflow:
 
         return state
     
-    @observe(name="greeting_agent")
     def _greeting_agent(self,state:WorkflowState)->WorkflowState:
         prompt=ChatPromptTemplate.from_messages(greeting_prompt)
         chain=prompt|self.llm 
-        # Prepare config with conditional Langfuse metadata
-        config = {"callbacks": [self.greeting_handler]}
-        if LANGFUSE_AVAILABLE:
-            config["metadata"] = {"langfuse_tags": ["greeting_agent", "text_to_sql_workflow"]}
+        config = {"callbacks": [self.callback_handler],"metadata": {"langfuse_tags": ["greeting_agent", "text_to_sql_workflow"]}}
         
         result=chain.invoke({
             "question":state["question"]
@@ -254,16 +166,11 @@ class TextToSQLWorkflow:
     
 
     
-    @observe(name="table_identification_agent")
     def _table_identification_agent(self,state:WorkflowState)->WorkflowState: 
         prompt=ChatPromptTemplate.from_messages(table_identification_prompt)
         prev_conv=state["history"][-6:] if state["history"] else []
         chain=prompt|self.llm 
-        # Prepare config with conditional Langfuse metadata
-        config = {"callbacks": [self.table_id_handler]}
-        if LANGFUSE_AVAILABLE:
-            config["metadata"] = {"langfuse_tags": ["table_identification_agent", "text_to_sql_workflow"]}
-            config["run_name"] = "table_identification_agent"
+        config = {"callbacks": [self.callback_handler],"metadata": {"langfuse_tags": ["table_identification_agent", "text_to_sql_workflow"]}}
         
         result=chain.invoke({
             "question":state["question"],
@@ -286,7 +193,6 @@ class TextToSQLWorkflow:
 
         return state
     
-    @observe(name="text_to_sql_agent")
     def _text_to_sql_agent(self,state:WorkflowState)->WorkflowState:
         prompt=ChatPromptTemplate.from_messages(text_to_sql_prompt)
 
@@ -295,11 +201,7 @@ class TextToSQLWorkflow:
         # print(prev_conv)
         # print("="*6)
         chain=prompt|self.llm
-        # Prepare config with conditional Langfuse metadata
-        config = {"callbacks": [self.text_to_sql_handler]}
-        if LANGFUSE_AVAILABLE:
-            config["metadata"] = {"langfuse_tags": ["text_to_sql_agent", "text_to_sql_workflow"]}
-            config["run_name"] = "text_to_sql_agent"
+        config = {"callbacks": [self.callback_handler],"metadata": {"langfuse_tags": ["text_to_sql_agent", "text_to_sql_workflow"]}}
         
         result=chain.invoke({
             "semantic_info":state["semantic_info"] ,
@@ -335,12 +237,12 @@ class TextToSQLWorkflow:
             for row in results:
                 row_dict = dict(zip(columns, row))
                 formatted_results.append(row_dict)
-            print(state["sql_query"])
+            # print(state["sql_query"])
             state["query_result"] = str(formatted_results)
             # Optimize state by storing only essential query info
             # state["history"] = [{"role":"system", "content":f"query_result_count: {len(results)}"}]
             state["needs_clarification"] = False
-            print(state["query_result"])
+            # print(state["query_result"])
             cursor.close()
             conn.close()
             
@@ -357,7 +259,6 @@ class TextToSQLWorkflow:
         except psycopg.Error as e:
             return None  
     
-    @observe(name="summarizer_agent")
     def _summarizer_agent(self, state: WorkflowState) -> WorkflowState:
 
         
@@ -365,11 +266,7 @@ class TextToSQLWorkflow:
         # Optimize history to reduce state size
         prez_conv = state["history"][-1:] if state["history"] else []
         chain = prompt | self.llm
-        # Prepare config with conditional Langfuse metadata
-        config = {"callbacks": [self.summarizer_handler]}
-        if LANGFUSE_AVAILABLE:
-            config["metadata"] = {"langfuse_tags": ["summarizer_agent", "text_to_sql_workflow"]}
-            config["run_name"] = "summarizer_agent"
+        config = {"callbacks": [self.callback_handler],"metadata": {"langfuse_tags": ["summarizer_agent", "text_to_sql_workflow"]}}
         
         result = chain.invoke({
             "question": state["question"],
@@ -386,18 +283,13 @@ class TextToSQLWorkflow:
 
         return state
 
-    @observe(name="clarification_agent")
     def _clarification_agent(self, state: WorkflowState) -> WorkflowState:
         prompt = ChatPromptTemplate.from_messages(clarification_prompt)
         prez_conv=state["history"]
         if len(state["history"])>2:
             prez_conv=state["history"][-2:]
         chain = prompt | self.llm
-        # Prepare config with conditional Langfuse metadata
-        config = {"callbacks": [self.clarification_handler]}
-        if LANGFUSE_AVAILABLE:
-            config["metadata"] = {"langfuse_tags": ["clarification_agent", "text_to_sql_workflow"]}
-            config["run_name"] = "clarification_agent"
+        config = {"callbacks": [self.callback_handler],"metadata": {"langfuse_tags": ["clarification_agent", "text_to_sql_workflow"]}}
         
         result = chain.invoke({
             "question": state["question"],
@@ -409,7 +301,6 @@ class TextToSQLWorkflow:
         
         return state
     
-    @observe(name="visualization_agent")
     def _visualization_agent(self, state: WorkflowState) -> WorkflowState:
         
         """
@@ -446,11 +337,7 @@ class TextToSQLWorkflow:
             # Optimize history to reduce state size
             prez_conv = state["history"][-1:] if state["history"] else []
 
-            # Prepare config with conditional Langfuse metadata
-            config = {"callbacks": [self.visualization_handler]}
-            if LANGFUSE_AVAILABLE:
-                config["metadata"] = {"langfuse_tags": ["visualization_agent", "text_to_sql_workflow"]}
-                config["run_name"] = "visualization_agent"
+            config = {"callbacks": [self.callback_handler],"metadata": {"langfuse_tags": ["visualization_agent", "text_to_sql_workflow"]}}
             
             result = chain.invoke({
                 "question": question,
@@ -494,10 +381,7 @@ class TextToSQLWorkflow:
             workflow=self._build_workflow()
             graph=workflow.compile(checkpointer=checkpointer)
 
-            config = {"configurable": {"thread_id": "201"}}
-            if LANGFUSE_AVAILABLE:
-                config["callbacks"] = [self.root_handler]
-                config["run_name"] = "text_to_sql_workflow"
+            config = {"configurable": {"thread_id": "201"}, "callbacks": [self.callback_handler]}
             result = graph.invoke(input_state, config=config)
             return result  # Return the result instead of None
         
@@ -526,10 +410,7 @@ class TextToSQLWorkflow:
             workflow = self._build_workflow()
             graph = workflow.compile(checkpointer=checkpointer)
 
-            config = {"configurable": {"thread_id": "8080"}}
-            if LANGFUSE_AVAILABLE:
-                config["callbacks"] = [self.root_handler]
-                config["run_name"] = "text_to_sql_workflow_stream"
+            config = {"configurable": {"thread_id": "8080"}, "callbacks": [self.callback_handler]}
             for chunk in graph.stream(
                 input=input_state,
                 config=config,

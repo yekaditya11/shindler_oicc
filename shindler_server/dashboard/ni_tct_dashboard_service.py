@@ -1127,7 +1127,7 @@ class NITCTDashboardService:
                         WHEN UPPER(TRIM(COALESCE({config['work_stopped_field']}, ''))) = 'YES' THEN
                             CASE
                                 WHEN work_stopped_hours IS NULL OR TRIM(CAST(work_stopped_hours AS TEXT)) = '' THEN 'No Work Stoppage'
-                                WHEN CAST(work_stopped_hours AS TEXT) ~ '^[0-9]+\.?[0-9]*$' THEN
+                                WHEN CAST(work_stopped_hours AS TEXT) ~ '^[0-9]+\\.?[0-9]*$' THEN
                                     CASE
                                         WHEN CAST(work_stopped_hours AS NUMERIC) <= 24 THEN 'One Day or Less'
                                         WHEN CAST(work_stopped_hours AS NUMERIC) > 24 THEN 'More than One Day'
